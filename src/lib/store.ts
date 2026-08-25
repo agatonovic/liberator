@@ -47,6 +47,7 @@ import {
   projectRowsOntoSchema,
   sameTemplateGrid,
   templateGrid,
+  tileClipboard,
 } from "./grid";
 import { createId } from "./ids";
 import { publicPath } from "./public-path";
@@ -177,7 +178,12 @@ type AppState = {
   setPreviewRow: (index: number) => void;
   setGridCell: (rowIndex: number, header: string, value: string) => void;
   setGridCells: (updates: { rowIndex: number; header: string; value: string }[]) => void;
-  pasteGrid: (rowIndex: number, colIndex: number, text: string) => { rows: number; cols: number };
+  pasteGrid: (
+    rowIndex: number,
+    colIndex: number,
+    text: string,
+    dest?: { rows: number; cols: number },
+  ) => { rows: number; cols: number };
   ensurePrintGrid: () => void;
   ensureGridRows: (minLength: number) => void;
   addGridRows: (count?: number) => void;
@@ -1578,7 +1584,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
   },
 
-  pasteGrid: (rowIndex, colIndex, text) => {
+  pasteGrid: (rowIndex, colIndex, text, dest) => {
     let applied = { rows: 0, cols: 0 };
     set((state) => {
       const headers = state.data.headers;
@@ -1589,6 +1595,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         matrix = matrix.slice(1);
       }
       if (!matrix.length) return state;
+      if (dest) matrix = tileClipboard(matrix, dest.rows, dest.cols);
       const rows = state.data.rows.map((row) => ({ ...row }));
       const need = rowIndex + matrix.length;
       while (rows.length < need) rows.push(Object.fromEntries(headers.map((header) => [header, ""])));
@@ -1616,13 +1623,15 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   ensurePrintGrid: () => {
-    const doc = get().current();
-    if (!doc) return;
+    const raw = get().current();
+    if (!raw) return;
+    const doc = repairTemplateDocument(raw);
     set((state) => {
+      const documents = doc === raw ? state.documents : state.documents.map((item) => (item.id === doc.id ? doc : item));
       const stored = sameTemplateGrid(doc, state.data) ? state.data : state.templateGrids[doc.id];
       const data = gridForTemplate(doc, stored);
-      if (data === state.data) return state;
-      const next = withGrid(state, data);
+      if (documents === state.documents && data === state.data) return state;
+      const next = { ...withGrid(state, data), documents };
       persist({ ...state, ...next });
       return next;
     });

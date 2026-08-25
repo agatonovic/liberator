@@ -548,8 +548,8 @@ export function PrintView() {
                 onDraftChange={setDraft}
                 onToggleRequired={(header) => setColumnRequired(header, !requiredHeaders.has(header))}
                 onEnsureRows={ensureGridRows}
-                onPasteMatrix={(row, col, text) => {
-                  const result = pasteGrid(row, col, text);
+                onPasteMatrix={(row, col, text, dest) => {
+                  const result = pasteGrid(row, col, text, dest);
                   if (result.rows) toast.success(`Pasted ${result.rows} × ${result.cols}`);
                 }}
               />

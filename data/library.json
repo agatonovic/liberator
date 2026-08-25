@@ -3462,6 +3462,8 @@
             "opacity": 1
           },
           "content": "98 559 366 80",
+          "binding": "ref1",
+          "transform": "part_number",
           "spans": [
             {
               "start": 0,
@@ -3487,7 +3489,7 @@
           ]
         }
       ],
-      "description": "Canopy A3 for positions with three part numbers.",
+      "description": "Canopy A3 for positions with one part number.",
       "dataColumns": [
         {
           "key": "position",
@@ -3497,61 +3499,19 @@
             "Position",
             "position"
           ],
-          "example": "WG1D.11.014",
+          "example": "WG1D.02.001",
           "required": true
         },
         {
           "key": "ref1",
           "label": "Part number 1",
           "headers": [
+            "PN",
+            "Produit",
+            "REFERENCE",
             "ref1"
           ],
-          "example": "9855936580",
-          "required": true
-        },
-        {
-          "key": "qty1",
-          "label": "Qty 1",
-          "headers": [
-            "qty1"
-          ],
-          "example": "3",
-          "required": true
-        },
-        {
-          "key": "ref2",
-          "label": "Part number 2",
-          "headers": [
-            "ref2"
-          ],
-          "example": "9855936180",
-          "required": true
-        },
-        {
-          "key": "qty2",
-          "label": "Qty 2",
-          "headers": [
-            "qty2"
-          ],
-          "example": "1",
-          "required": true
-        },
-        {
-          "key": "ref3",
-          "label": "Part number 3",
-          "headers": [
-            "ref3"
-          ],
-          "example": "9860692580",
-          "required": true
-        },
-        {
-          "key": "qty3",
-          "label": "Qty 3",
-          "headers": [
-            "qty3"
-          ],
-          "example": "1",
+          "example": "9845605680",
           "required": true
         },
         {
@@ -3562,7 +3522,7 @@
             "Map",
             "MAP"
           ],
-          "example": "WG1D.11.014%",
+          "example": "WG1D.02.001%",
           "required": false
         }
       ],
@@ -3769,6 +3729,8 @@
             "opacity": 1
           },
           "content": "98 559 366 80",
+          "binding": "ref1",
+          "transform": "part_number",
           "spans": [
             {
               "start": 0,
@@ -3815,7 +3777,7 @@
             "opacity": 1
           },
           "content": "x2",
-          "binding": "qty1",
+          "binding": "qty2",
           "spans": []
         },
         {
@@ -3840,6 +3802,8 @@
             "opacity": 1
           },
           "content": "98 559 366 80",
+          "binding": "ref2",
+          "transform": "part_number",
           "spans": [
             {
               "start": 0,
@@ -3865,7 +3829,7 @@
           ]
         }
       ],
-      "description": "Canopy A3 for positions with three part numbers.",
+      "description": "Canopy A3 for positions with two part numbers.",
       "dataColumns": [
         {
           "key": "position",
@@ -3875,25 +3839,28 @@
             "Position",
             "position"
           ],
-          "example": "WG1D.11.014",
+          "example": "WG1D.13.006",
           "required": true
         },
         {
           "key": "ref1",
           "label": "Part number 1",
           "headers": [
-            "ref1"
+            "ref1",
+            "PN",
+            "Produit"
           ],
-          "example": "9855936580",
+          "example": "9846755980",
           "required": true
         },
         {
           "key": "qty1",
           "label": "Qty 1",
           "headers": [
-            "qty1"
+            "qty1",
+            "QTY1"
           ],
-          "example": "3",
+          "example": "2",
           "required": true
         },
         {
@@ -3902,34 +3869,17 @@
           "headers": [
             "ref2"
           ],
-          "example": "9855936180",
+          "example": "7357993320",
           "required": true
         },
         {
           "key": "qty2",
           "label": "Qty 2",
           "headers": [
-            "qty2"
+            "qty2",
+            "QTY2"
           ],
-          "example": "1",
-          "required": true
-        },
-        {
-          "key": "ref3",
-          "label": "Part number 3",
-          "headers": [
-            "ref3"
-          ],
-          "example": "9860692580",
-          "required": true
-        },
-        {
-          "key": "qty3",
-          "label": "Qty 3",
-          "headers": [
-            "qty3"
-          ],
-          "example": "1",
+          "example": "3",
           "required": true
         },
         {
@@ -3940,7 +3890,7 @@
             "Map",
             "MAP"
           ],
-          "example": "WG1D.11.014%",
+          "example": "WG1D.13.006%",
           "required": false
         }
       ],
@@ -4706,15 +4656,6 @@
           "required": true
         },
         {
-          "key": "arrow_top",
-          "label": "Top arrow",
-          "headers": [
-            "arrow_top"
-          ],
-          "example": "UP",
-          "required": false
-        },
-        {
           "key": "barcode_top",
           "label": "Top barcode",
           "headers": [
@@ -4734,15 +4675,6 @@
           ],
           "example": "HB7B.001.001",
           "required": true
-        },
-        {
-          "key": "arrow_bot",
-          "label": "Bottom arrow",
-          "headers": [
-            "arrow_bot"
-          ],
-          "example": "DOWN",
-          "required": false
         },
         {
           "key": "barcode_bot",

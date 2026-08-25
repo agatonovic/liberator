@@ -846,8 +846,52 @@ function compareArrowColumns(a: DataColumn, b: DataColumn) {
   return rank(a) - rank(b) || a.key.localeCompare(b.key);
 }
 
+/** Designed GA dual arrows are UP over DOWN in the art — not Generate columns. */
+function isGaWarehouseDual(doc: LabelDocument) {
+  if (doc.catalogId === "ga_warehouse_a3_dual") return true;
+  const name = doc.name.trim();
+  return /^GA Warehouse Dual$/i.test(name) || /^GA warehouse A3 dual$/i.test(name);
+}
+
+function isFixedDualArrow(element: LabelElement) {
+  if (element.hidden) return false;
+  const key = element.binding?.trim() ?? "";
+  if (/^arrow_(top|bot)$/i.test(key)) return true;
+  return (
+    element.type === "arrow" ||
+    element.type === "doubleArrow" ||
+    element.transform === "arrow" ||
+    isSwappableArrowImage(element)
+  );
+}
+
+export function repairFixedGaDualArrows(doc: LabelDocument): LabelDocument {
+  if (!isGaWarehouseDual(doc)) return doc;
+  const columns = doc.dataColumns ?? [];
+  const dataColumns = columns.filter((column) => !isArrowDataColumn(column));
+  const columnsChanged = dataColumns.length !== columns.length;
+  let elementsChanged = false;
+  const elements = doc.elements.map((el) => {
+    if (!isFixedDualArrow(el)) return el;
+    if (!el.binding?.trim() && el.transform !== "arrow") return el;
+    elementsChanged = true;
+    return {
+      ...el,
+      binding: undefined,
+      transform: el.transform === "arrow" ? undefined : el.transform,
+    };
+  });
+  if (!columnsChanged && !elementsChanged) return doc;
+  return {
+    ...doc,
+    dataColumns: columnsChanged ? dataColumns : doc.dataColumns,
+    elements: elementsChanged ? elements : doc.elements,
+  };
+}
+
 /** Bind vector arrows to UP/DOWN columns and restore allowed values. */
 export function repairDirectionArrows(doc: LabelDocument): LabelDocument {
+  if (isGaWarehouseDual(doc)) return doc;
   const columns = [...(doc.dataColumns ?? [])];
   let columnsChanged = false;
   const dataColumns = columns.map((column) => {
@@ -883,31 +927,86 @@ export function repairDirectionArrows(doc: LabelDocument): LabelDocument {
   };
 }
 
+const HBC_LEVEL_KEYS = ["lvl5", "lvl4", "lvl3", "lvl2", "lvl1"] as const;
+
 /**
  * The designed FIXED GA label is one Open Sans field, not the catalog's four
- * part-number boxes. Bind it to `reference` and format `7357986330` as groups
+ * part-number boxes. Bind grouped part-number art to `reference` / `ref1`…
  * without bumping catalog revision (that would wipe the designed layout).
  */
+function isPartNumberColumn(column: DataColumn) {
+  const key = column.key.trim();
+  if (/^lvl[1-5]$/i.test(key)) return true;
+  if (/^(ref|pn)\d*$/i.test(key)) return true;
+  if (/^reference$/i.test(key)) return true;
+  const blob = [column.key, column.label, ...(column.headers ?? [])].join(" ").toLowerCase();
+  return /part number|broj crte|produit/.test(blob);
+}
+
+function partNumberColumnRank(column: DataColumn) {
+  if (/^reference$/i.test(column.key)) return 0;
+  const numbered = /^(?:ref|pn)(\d+)$/i.exec(column.key);
+  if (numbered) return Number(numbered[1]);
+  return 100;
+}
+
+function partNumberColumnKeys(doc: LabelDocument): string[] {
+  const columns = doc.dataColumns ?? [];
+  const keys: string[] = [];
+  const add = (key?: string) => {
+    const trimmed = key?.trim();
+    if (trimmed && !keys.includes(trimmed)) keys.push(trimmed);
+  };
+  for (const key of HBC_LEVEL_KEYS) add(findColumnByName(columns, key)?.key);
+  const ranked = columns
+    .filter((column) => isPartNumberColumn(column) && !HBC_LEVEL_KEYS.includes(column.key as (typeof HBC_LEVEL_KEYS)[number]))
+    .sort((a, b) => partNumberColumnRank(a) - partNumberColumnRank(b));
+  for (const column of ranked) add(column.key);
+  if (!keys.length && doc.catalogId?.startsWith("fixed_ga")) add("reference");
+  return keys;
+}
+
 export function repairPartNumberFields(doc: LabelDocument): LabelDocument {
-  const reference =
-    findColumnByName(doc.dataColumns ?? [], "reference") ??
-    findColumnByName(doc.dataColumns ?? [], "Part Number");
-  const referenceKey =
-    reference?.key ?? (doc.catalogId?.startsWith("fixed_ga") ? "reference" : undefined);
-  if (!referenceKey) return doc;
+  const pnKeys = partNumberColumnKeys(doc);
+  if (!pnKeys.length) return doc;
+  const boundKeys = new Set(
+    doc.elements
+      .map((el) => el.binding?.trim())
+      .filter((key): key is string => Boolean(key) && pnKeys.includes(key)),
+  );
+  const unusedKeys = pnKeys.filter((key) => !boundKeys.has(key));
+  const unbound = doc.elements
+    .filter(
+      (el) =>
+        el.type === "text" &&
+        !el.hidden &&
+        !el.binding?.trim() &&
+        looksLikeGroupedPartNumber(el.content ?? ""),
+    )
+    .slice()
+    .sort((a, b) => a.y - b.y || a.x - b.x);
+
+  const assign = new Map<string, string>();
+  for (let i = 0; i < Math.min(unbound.length, unusedKeys.length); i += 1) {
+    assign.set(unbound[i]!.id, unusedKeys[i]!);
+  }
+
   let changed = false;
   const elements = doc.elements.map((el) => {
+    const key = assign.get(el.id);
+    if (key) {
+      changed = true;
+      return { ...el, binding: key, transform: "part_number" as const };
+    }
     if (el.type !== "text" || el.hidden) return el;
     if (el.transform === "part" || el.partIndex != null) return el;
-    const grouped = looksLikeGroupedPartNumber(el.content ?? "");
-    const boundToReference = el.binding?.trim() === referenceKey;
-    if (!grouped && !boundToReference) return el;
-    if (boundToReference && el.transform === "part_number") return el;
-    if (!el.binding?.trim() && grouped) {
-      changed = true;
-      return { ...el, binding: referenceKey, transform: "part_number" as const };
-    }
-    if (boundToReference && grouped && el.transform !== "part_number") {
+    const bound = el.binding?.trim();
+    if (
+      bound &&
+      pnKeys.includes(bound) &&
+      looksLikeGroupedPartNumber(el.content ?? "") &&
+      el.transform !== "part_number"
+    ) {
       changed = true;
       return { ...el, transform: "part_number" as const };
     }
@@ -915,8 +1014,6 @@ export function repairPartNumberFields(doc: LabelDocument): LabelDocument {
   });
   return changed ? { ...doc, elements } : doc;
 }
-
-const HBC_LEVEL_KEYS = ["lvl5", "lvl4", "lvl3", "lvl2", "lvl1"] as const;
 
 /**
  * Designed HBC shelf labels keep one grouped drawing-number field per level
@@ -973,10 +1070,143 @@ export function repairHbcDrawingNumbers(doc: LabelDocument): LabelDocument {
   return changed ? { ...doc, elements } : doc;
 }
 
+function qtyColumnKeys(columns: DataColumn[]) {
+  return columns
+    .filter((column) => /^qty\d*$/i.test(column.key.trim()))
+    .sort((a, b) => {
+      const na = Number(/(\d+)$/.exec(a.key)?.[1] ?? 1);
+      const nb = Number(/(\d+)$/.exec(b.key)?.[1] ?? 1);
+      return na - nb;
+    })
+    .map((column) => column.key);
+}
+
+/** Designed Canopy qty boxes were all bound to qty1; split them top-to-bottom. */
+export function repairQtyFields(doc: LabelDocument): LabelDocument {
+  const qtyKeys = qtyColumnKeys(doc.dataColumns ?? []);
+  if (qtyKeys.length < 2) return doc;
+  const els = doc.elements
+    .filter((el) => el.type === "text" && !el.hidden && qtyKeys.includes(el.binding?.trim() ?? ""))
+    .slice()
+    .sort((a, b) => a.y - b.y || a.x - b.x);
+  if (els.length < 2) return doc;
+  const unique = new Set(els.map((el) => el.binding?.trim()));
+  if (unique.size === els.length) return doc;
+  let changed = false;
+  const elements = doc.elements.map((el) => {
+    const index = els.findIndex((item) => item.id === el.id);
+    if (index < 0 || index >= qtyKeys.length) return el;
+    const key = qtyKeys[index]!;
+    if (el.binding === key) return el;
+    changed = true;
+    return { ...el, binding: key };
+  });
+  return changed ? { ...doc, elements } : doc;
+}
+
+function col(
+  key: string,
+  label: string,
+  headers: string[],
+  example: string,
+  required = true,
+): DataColumn {
+  return { key, label, headers, example, required };
+}
+
+/** Designed 1 PN / 2 PN copies inherited the 3 PN Excel schema. */
+const CANOPY_NAME_SCHEMAS: Record<string, { description: string; columns: DataColumn[] }> = {
+  "Canopy A3 — 1 PN": {
+    description: "Canopy A3 for positions with one part number.",
+    columns: [
+      col("position", "Position", ["MAP SIMPLE", "Position", "position"], "WG1D.02.001"),
+      col("ref1", "Part number 1", ["PN", "Produit", "REFERENCE", "ref1"], "9845605680"),
+      col("barcode", "Barcode", ["BARCODE", "Map", "MAP"], "WG1D.02.001%", false),
+    ],
+  },
+  "Canopy A3 — 2 PN": {
+    description: "Canopy A3 for positions with two part numbers.",
+    columns: [
+      col("position", "Position", ["MAP SIMPLE", "Position", "position"], "WG1D.13.006"),
+      col("ref1", "Part number 1", ["ref1", "PN", "Produit"], "9846755980"),
+      col("qty1", "Qty 1", ["qty1", "QTY1"], "2"),
+      col("ref2", "Part number 2", ["ref2"], "7357993320"),
+      col("qty2", "Qty 2", ["qty2", "QTY2"], "3"),
+      col("barcode", "Barcode", ["BARCODE", "Map", "MAP"], "WG1D.13.006%", false),
+    ],
+  },
+  "Canopy A3 — 3 PN": {
+    description: "Canopy A3 for positions with three part numbers.",
+    columns: [
+      col("position", "Position", ["MAP SIMPLE", "Position", "position"], "WG1D.11.014"),
+      col("ref1", "Part number 1", ["ref1"], "9855936580"),
+      col("qty1", "Qty 1", ["qty1"], "3"),
+      col("ref2", "Part number 2", ["ref2"], "9855936180"),
+      col("qty2", "Qty 2", ["qty2"], "1"),
+      col("ref3", "Part number 3", ["ref3"], "9860692580"),
+      col("qty3", "Qty 3", ["qty3"], "1"),
+      col("barcode", "Barcode", ["BARCODE", "Map", "MAP"], "WG1D.11.014%", false),
+    ],
+  },
+};
+
+function canopySchemaName(name: string) {
+  return name.trim().replace(/\u2013/g, "\u2014");
+}
+
+function sameColumnKeys(a: DataColumn[] | undefined, b: DataColumn[]) {
+  return Boolean(a?.length === b.length && a?.every((column, index) => column.key === b[index]?.key));
+}
+
+/**
+ * Match Generate columns to the Canopy art (1 PN has no qty / extra refs).
+ * Do not set catalogId: the designed copies replaced deleted catalog seeds.
+ */
+export function repairCanopySchema(doc: LabelDocument): LabelDocument {
+  const spec = CANOPY_NAME_SCHEMAS[canopySchemaName(doc.name)];
+  if (!spec) return doc;
+  const sameCols = sameColumnKeys(doc.dataColumns, spec.columns);
+  const sameDesc = doc.description === spec.description;
+  if (sameCols && sameDesc) return doc;
+  return {
+    ...doc,
+    dataColumns: sameCols ? doc.dataColumns : spec.columns,
+    description: spec.description,
+  };
+}
+
+function isRefOrQtyKey(key: string) {
+  return /^(?:ref|pn|qty)\d*$/i.test(key.trim());
+}
+
+/** Drop leftover refN / qtyN columns that nothing on the label reads. */
+export function repairUnusedRefQtyColumns(doc: LabelDocument): LabelDocument {
+  const columns = doc.dataColumns ?? [];
+  if (!columns.some((column) => isRefOrQtyKey(column.key))) return doc;
+  const used = new Set<string>();
+  for (const el of doc.elements) {
+    const binding = el.binding?.trim();
+    const fallback = el.fallbackBinding?.trim();
+    if (binding) used.add(binding);
+    if (fallback) used.add(fallback);
+  }
+  const next = columns.filter((column) => !isRefOrQtyKey(column.key) || used.has(column.key));
+  if (next.length === columns.length || !next.length) return doc;
+  return { ...doc, dataColumns: next };
+}
+
 export function repairTemplateDocument(doc: LabelDocument): LabelDocument {
-  return repairCodeElements(
-    repairHbcDrawingNumbers(
-      repairPartNumberFields(repairGaAddressFields(bindFolderImages(repairDirectionArrows(doc)))),
+  return repairUnusedRefQtyColumns(
+    repairCodeElements(
+      repairQtyFields(
+        repairHbcDrawingNumbers(
+          repairPartNumberFields(
+            repairGaAddressFields(
+              bindFolderImages(repairFixedGaDualArrows(repairDirectionArrows(repairCanopySchema(doc)))),
+            ),
+          ),
+        ),
+      ),
     ),
   );
 }

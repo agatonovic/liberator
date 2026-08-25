@@ -1,14 +1,15 @@
 "use client";
 
+import { parseArrow } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { serializeTsv } from "@/lib/grid";
 import type { DataRow } from "@/lib/resolve";
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent } from "react";
 
 const HEADER_ROW = -1;
 
 type Sel = { r0: number; c0: number; r1: number; c1: number };
-type DragKind = "header" | "cells";
+type DragKind = "header" | "cells" | "row";
 
 function norm(sel: Sel): Sel {
   return {
@@ -22,6 +23,11 @@ function norm(sel: Sel): Sel {
 function inSel(sel: Sel, r: number, c: number) {
   const box = norm(sel);
   return r >= box.r0 && r <= box.r1 && c >= box.c0 && c <= box.c1;
+}
+
+function isRange(sel: Sel) {
+  const box = norm(sel);
+  return box.r0 !== box.r1 || box.c0 !== box.c1;
 }
 
 function colLetter(index: number) {
@@ -47,6 +53,52 @@ function upDownPair(options?: string[]) {
   const down = options.find((value) => value.toUpperCase() === "DOWN");
   if (!up || !down) return null;
   return { up, down };
+}
+
+function ArrowChoice({
+  value,
+  pair,
+  onPick,
+  onButtonMouseDown,
+}: {
+  value: string;
+  pair: { up: string; down: string };
+  onPick: (value: string) => void;
+  onButtonMouseDown?: (event: ReactMouseEvent) => void;
+}) {
+  const current = parseArrow(value);
+  return (
+    <div className="flex h-full items-center gap-0.5" onDoubleClick={(event) => event.stopPropagation()}>
+      {(
+        [
+          { label: "UP", value: pair.up, on: current === "UP" },
+          { label: "DOWN", value: pair.down, on: current === "DOWN" },
+        ] as const
+      ).map((option) => (
+        <button
+          key={option.label}
+          type="button"
+          tabIndex={-1}
+          className={cn(
+            "h-[18px] flex-1 rounded-sm px-1 text-[10px] font-semibold leading-none",
+            option.on ? "bg-[#1b4f9c] text-white" : "text-[#5f6368] hover:bg-[#e8f0fe]",
+          )}
+          onMouseDown={(event) => {
+            event.preventDefault();
+            onButtonMouseDown?.(event);
+          }}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (event.shiftKey) return;
+            onPick(option.value);
+          }}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 const ROW_PX = 24;
@@ -80,7 +132,12 @@ export function Spreadsheet({
   onActiveRow: (index: number) => void;
   onChangeCell: (rowIndex: number, header: string, value: string) => void;
   onChangeCells?: (updates: { rowIndex: number; header: string; value: string }[]) => void;
-  onPasteMatrix: (rowIndex: number, colIndex: number, text: string) => void;
+  onPasteMatrix: (
+    rowIndex: number,
+    colIndex: number,
+    text: string,
+    dest?: { rows: number; cols: number },
+  ) => void;
   onEnsureRows?: (minLength: number) => void;
   onToggleRequired?: (header: string) => void;
   onDraftChange?: (draft: { row: number; header: string; value: string } | null) => void;
@@ -92,6 +149,7 @@ export function Spreadsheet({
   const [editing, setEditing] = useState<{ r: number; c: number; value: string } | null>(null);
   const dragRef = useRef(false);
   const dragKindRef = useRef<DragKind | null>(null);
+  const movedRef = useRef(false);
   const active = useMemo(() => ({ r: sel.r0, c: sel.c0 }), [sel.r0, sel.c0]);
   const grow = onEnsureRows;
 
@@ -109,6 +167,9 @@ export function Spreadsheet({
     function endDrag() {
       dragRef.current = false;
       dragKindRef.current = null;
+      queueMicrotask(() => {
+        movedRef.current = false;
+      });
     }
     window.addEventListener("mouseup", endDrag);
     return () => window.removeEventListener("mouseup", endDrag);
@@ -179,6 +240,12 @@ export function Spreadsheet({
     clearDraft();
   }
 
+  function writeCells(updates: { rowIndex: number; header: string; value: string }[]) {
+    if (!updates.length) return;
+    if (onChangeCells) onChangeCells(updates);
+    else updates.forEach((update) => onChangeCell(update.rowIndex, update.header, update.value));
+  }
+
   function clearSelection() {
     const box = norm(sel);
     if (box.r0 < 0 && box.r1 < 0) return;
@@ -189,8 +256,33 @@ export function Spreadsheet({
         if (header) updates.push({ rowIndex: r, header, value: "" });
       }
     }
-    if (onChangeCells) onChangeCells(updates);
-    else updates.forEach((update) => onChangeCell(update.rowIndex, update.header, update.value));
+    writeCells(updates);
+  }
+
+  function writeArrowCells(direction: "UP" | "DOWN") {
+    const box = norm(sel);
+    const updates: { rowIndex: number; header: string; value: string }[] = [];
+    for (let r = Math.max(0, box.r0); r <= box.r1; r += 1) {
+      for (let c = box.c0; c <= box.c1; c += 1) {
+        const header = headers[c];
+        const pair = header ? upDownPair(columnOptions?.[header]) : null;
+        if (pair) updates.push({ rowIndex: r, header, value: direction === "UP" ? pair.up : pair.down });
+      }
+    }
+    writeCells(updates);
+  }
+
+  function pickArrow(r: number, c: number, header: string, pair: { up: string; down: string }, value: string) {
+    if (movedRef.current) return;
+    commitEdit();
+    const direction = parseArrow(value) === "UP" ? "UP" : "DOWN";
+    if (inSel(sel, r, c) && isRange(sel)) writeArrowCells(direction);
+    else {
+      setSel({ r0: r, c0: c, r1: r, c1: c });
+      onActiveRow(r);
+      onChangeCell(r, header, direction === "UP" ? pair.up : pair.down);
+    }
+    rootRef.current?.focus();
   }
 
   function selectedGrid() {
@@ -225,7 +317,7 @@ export function Spreadsheet({
     const header = headers[c];
     const pair = header ? upDownPair(columnOptions?.[header]) : null;
     if (!pair || (key !== "ArrowUp" && key !== "ArrowDown")) return false;
-    onChangeCell(r, header, key === "ArrowUp" ? pair.up : pair.down);
+    writeArrowCells(key === "ArrowUp" ? "UP" : "DOWN");
     return true;
   }
 
@@ -285,18 +377,34 @@ export function Spreadsheet({
     } else if (event.key === "ArrowRight" || event.key === "Tab") {
       event.preventDefault();
       move(0, event.key === "Tab" && event.shiftKey ? -1 : 1, event.key !== "Tab" && event.shiftKey);
-    } else if (event.key === "Enter") {
+    } else if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       if (active.r < 0) {
-        move(1, 0, false);
+        if (event.key === "Enter") move(1, 0, false);
         return;
       }
+      const header = headers[active.c];
+      const pair = header ? upDownPair(columnOptions?.[header]) : null;
+      if (pair) {
+        writeArrowCells(parseArrow(cellValue(active.r, active.c)) === "UP" ? "DOWN" : "UP");
+        return;
+      }
+      if (event.key === " ") return;
       setEditing({ r: active.r, c: active.c, value: cellValue(active.r, active.c) });
     } else if (event.key === "Delete" || event.key === "Backspace") {
       event.preventDefault();
       clearSelection();
     } else if (event.key.length === 1 && !cmd && !event.altKey) {
       if (active.r < 0) return;
+      const header = headers[active.c];
+      const pair = header ? upDownPair(columnOptions?.[header]) : null;
+      if (pair) {
+        event.preventDefault();
+        const key = event.key.toUpperCase();
+        if (key === "U") writeArrowCells("UP");
+        else if (key === "D") writeArrowCells("DOWN");
+        return;
+      }
       event.preventDefault();
       setEditing({ r: active.r, c: active.c, value: event.key });
       applyDraft(active.r, active.c, event.key);
@@ -335,7 +443,12 @@ export function Spreadsheet({
         event.preventDefault();
         event.stopPropagation();
         if (editing) return;
-        onPasteMatrix(norm(sel).r0, norm(sel).c0, text);
+        const box = norm(sel);
+        const r0 = Math.max(0, box.r0);
+        onPasteMatrix(r0, box.c0, text, {
+          rows: Math.max(1, box.r1 - r0 + 1),
+          cols: Math.max(1, box.c1 - box.c0 + 1),
+        });
       }}
       onCopy={(event) => {
         event.preventDefault();
@@ -438,17 +551,39 @@ export function Spreadsheet({
             {rows.map((row, r) => (
               <tr key={r} data-grid-row={r}>
                 <th
+                  title="Drag to select rows"
                   className={cn(
-                    "sticky left-0 z-10 h-6 w-10 border-r border-b border-[#d0d7de] bg-[#f8f9fa] text-center font-normal text-[#5f6368]",
+                    "sticky left-0 z-10 h-6 w-10 cursor-default border-r border-b border-[#d0d7de] bg-[#f8f9fa] text-center font-normal text-[#5f6368]",
                     r === activeRow && "bg-[#e6f4ea] font-semibold text-[#137333]",
+                    inSel(sel, r, 0) && sel.c0 === 0 && sel.c1 >= headers.length - 1 && "bg-[#e6f4ea]",
                   )}
+                  onMouseDown={(event) => {
+                    if (event.button !== 0) return;
+                    commitEdit();
+                    dragRef.current = true;
+                    dragKindRef.current = "row";
+                    movedRef.current = false;
+                    const lastC = Math.max(0, headers.length - 1);
+                    const next = event.shiftKey
+                      ? { r0: Math.max(0, sel.r0), c0: 0, r1: r, c1: lastC }
+                      : { r0: r, c0: 0, r1: r, c1: lastC };
+                    setSel(next);
+                    onActiveRow(r);
+                  }}
+                  onMouseEnter={() => {
+                    if (!dragRef.current || dragKindRef.current !== "row") return;
+                    movedRef.current = true;
+                    const lastC = Math.max(0, headers.length - 1);
+                    setSel((prev) => ({ ...prev, r1: r, c0: 0, c1: lastC }));
+                  }}
                 >
                   {r + 1}
                 </th>
                 {headers.map((header, c) => {
                   const selected = inSel(sel, r, c);
                   const isActive = active.r === r && active.c === c;
-                  const isEdit = editing?.r === r && editing?.c === c;
+                  const pair = upDownPair(columnOptions?.[header]);
+                  const isEdit = !pair && editing?.r === r && editing?.c === c;
                   const hasIssue = issueCells?.has(`${r}:${header}`);
                   return (
                     <td
@@ -456,6 +591,7 @@ export function Spreadsheet({
                       data-grid-cell={`${r}:${c}`}
                       className={cn(
                         "relative h-6 min-w-[132px] border-r border-b border-[#d0d7de] bg-white px-1.5 align-middle",
+                        pair && "px-1",
                         r === activeRow && !selected && "bg-[#f8fbf8]",
                         hasIssue && !selected && "bg-[#fef7e0]",
                         selected && !isActive && "bg-[#e2efda]",
@@ -468,6 +604,7 @@ export function Spreadsheet({
                         commitEdit();
                         dragRef.current = true;
                         dragKindRef.current = "cells";
+                        movedRef.current = false;
                         const next = event.shiftKey
                           ? { ...sel, r1: r, c1: c }
                           : { r0: r, c0: c, r1: r, c1: c };
@@ -476,12 +613,19 @@ export function Spreadsheet({
                       }}
                       onMouseEnter={() => {
                         if (!dragRef.current || dragKindRef.current !== "cells") return;
+                        movedRef.current = true;
                         setSel((prev) => ({ ...prev, r1: r, c1: c }));
                       }}
                       onMouseUp={() => {
                         dragRef.current = false;
                       }}
                       onDoubleClick={() => {
+                        if (pair) {
+                          const next = parseArrow(cellValue(r, c)) === "UP" ? "DOWN" : "UP";
+                          if (inSel(sel, r, c) && isRange(sel)) writeArrowCells(next);
+                          else onChangeCell(r, header, next === "UP" ? pair.up : pair.down);
+                          return;
+                        }
                         setEditing({ r, c, value: cellValue(r, c) });
                       }}
                     >
@@ -513,6 +657,19 @@ export function Spreadsheet({
                             }
                             event.stopPropagation();
                           }}
+                        />
+                      ) : pair ? (
+                        <ArrowChoice
+                          value={String(row[header] ?? "")}
+                          pair={pair}
+                          onButtonMouseDown={(event) => {
+                            if (event.shiftKey) return;
+                            if (inSel(sel, r, c) && isRange(sel)) {
+                              event.stopPropagation();
+                              movedRef.current = false;
+                            }
+                          }}
+                          onPick={(value) => pickArrow(r, c, header, pair, value)}
                         />
                       ) : (
                         <span className="block truncate">{row[header]}</span>

@@ -177,6 +177,22 @@ export function parseSpreadsheetPaste(text: string): string[][] {
   return parseDelimited(trimmed, ",");
 }
 
+/** Repeat a copied block to fill dest when dest size is an exact multiple of the source. */
+export function tileClipboard(source: string[][], destRows: number, destCols: number): string[][] {
+  const srcRows = source.length;
+  const srcCols = Math.max(0, ...source.map((row) => row.length));
+  if (!srcRows || !srcCols || destRows < 1 || destCols < 1) return source;
+  if (destRows % srcRows !== 0 || destCols % srcCols !== 0) return source;
+  const out: string[][] = [];
+  for (let r = 0; r < destRows; r += 1) {
+    const src = source[r % srcRows] ?? [];
+    const line: string[] = [];
+    for (let c = 0; c < destCols; c += 1) line.push(src[c % srcCols] ?? "");
+    out.push(line);
+  }
+  return out;
+}
+
 export function looksLikeHeaderRow(row: string[], headers: string[]) {
   if (!row.length || !headers.length) return false;
   const norm = (value: string) => value.trim().toLowerCase();

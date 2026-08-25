@@ -34,19 +34,15 @@ export function wrapPlainLines(
   return lines.length ? lines : [""];
 }
 
-function plainTextFits(
+function plainTextFitsWidth(
   text: string,
   boxW: number,
-  boxH: number,
   size: number,
   letterSpacing: number,
-  lineHeight: number,
   measure: (text: string, size: number) => number,
 ) {
-  if (size <= 0 || boxW <= 0 || boxH <= 0) return true;
-  const lines = wrapPlainLines(text, boxW, size, letterSpacing, measure);
-  if (lines.length * size * lineHeight > boxH) return false;
-  for (const line of lines) {
+  if (size <= 0 || boxW <= 0) return true;
+  for (const line of text.split("\n")) {
     if (spacedWidth(line, size, letterSpacing, measure) > boxW) return false;
   }
   return true;
@@ -66,19 +62,15 @@ export function isLongerThanDesigned(text: string, designed: string) {
 export function shouldShrinkPlainText(
   text: string,
   boxW: number,
-  boxH: number,
+  _boxH: number,
   fontSize: number,
   letterSpacing: number,
-  lineHeight: number,
+  _lineHeight: number,
   measure: (text: string, size: number) => number,
   designed = "",
 ) {
   if (!isLongerThanDesigned(text, designed)) return false;
-  if (plainTextFits(text, boxW, boxH, fontSize, letterSpacing, lineHeight, measure)) return false;
-  const lines = wrapPlainLines(text, boxW, fontSize, letterSpacing, measure);
-  if (lines.length > 1 && lines.length * fontSize * lineHeight > boxH) return true;
-  const longest = lines.reduce((max, line) => Math.max(max, compactLength(line)), 0);
-  return longest >= MIN_SHRINK_CHARS;
+  return !plainTextFitsWidth(text, boxW, fontSize, letterSpacing, measure);
 }
 
 export function fitPlainFontSize({
@@ -105,14 +97,13 @@ export function fitPlainFontSize({
   const max = Math.max(0, fontSize);
   const min = Math.min(max, Math.max(0.5, minFontSize));
   const innerW = Math.max(1, boxW - Math.max(2, boxW * 0.02));
-  const innerH = Math.max(1, boxH - 1);
   if (!text.trim() || max <= min) return max;
-  if (!shouldShrinkPlainText(text, innerW, innerH, max, letterSpacing, lineHeight, measure, designed)) return max;
+  if (!shouldShrinkPlainText(text, innerW, boxH, max, letterSpacing, lineHeight, measure, designed)) return max;
   let lo = min;
   let hi = max;
   for (let i = 0; i < FIT_PASSES; i += 1) {
     const mid = (lo + hi) / 2;
-    if (plainTextFits(text, innerW, innerH, mid, letterSpacing, lineHeight, measure)) lo = mid;
+    if (plainTextFitsWidth(text, innerW, mid, letterSpacing, measure)) lo = mid;
     else hi = mid;
   }
   return lo;

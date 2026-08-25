@@ -15,7 +15,7 @@ import { gaMagacinPrefixSpans, normalizeArrow } from "@/lib/format";
 import { useDesignedMedia } from "@/lib/resolve";
 import { isStrokeArrow, polygonPoints } from "@/lib/shapes";
 import { layoutRuns, runsFromContent, transferSpans } from "@/lib/text-color";
-import { fitPlainFontSize, wrapPlainLines } from "@/lib/text-fit";
+import { fitPlainFontSize } from "@/lib/text-fit";
 import { canvasFontFamily } from "@/lib/fonts";
 import { resolvePublicSrc } from "@/lib/public-path";
 import { mmToPx, pxToMm } from "@/lib/units";
@@ -166,10 +166,7 @@ function ColoredLabelText({
     });
   }, [display, element.content, fontFamily, fontSize, fontWeight, height, letterSpacing, lineHeight, mixed, width, zoom]);
 
-  const fittedText = useMemo(() => {
-    if (mixed || fittedSize >= fontSize - 0.05) return display;
-    return wrapPlainLines(display, width, fittedSize, letterSpacing, measure).join("\n");
-  }, [display, fittedSize, fontFamily, fontSize, fontWeight, letterSpacing, mixed, width]);
+  const fittedText = display;
 
   const placed = useMemo(() => {
     if (!mixed) return [];

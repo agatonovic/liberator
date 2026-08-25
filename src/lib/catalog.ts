@@ -696,9 +696,7 @@ function gaDual(): LabelDocument {
       }),
       imageBox(boxes.arrow, {
         origin,
-        binding: `arrow_${prefix}`,
         content: arrow,
-        transform: "arrow",
         imageDataUrl: `/templates/ga/arrows/${arrow}.png`,
       }),
       barcodeBox(boxes.barcode, {
@@ -744,10 +742,8 @@ function gaDual(): LabelDocument {
     "One dual sticker (409 × 134 mm): level 002 UP over 001 DOWN. Generate packs 2 per A3 landscape.",
     [
       col("address_top", "Top address", ["address_top", "Address Top", "TOP", "MAP TOP"], "RHB7B.001.002"),
-      col("arrow_top", "Top arrow", ["arrow_top"], "UP", false, { values: ["UP", "DOWN"] }),
       col("barcode_top", "Top barcode", ["barcode_top"], "RHB7B.001.002", false),
       col("address_bot", "Bottom address", ["address_bot", "Address Bot", "BOTTOM", "MAP BOT"], "HB7B.001.001"),
-      col("arrow_bot", "Bottom arrow", ["arrow_bot"], "DOWN", false, { values: ["UP", "DOWN"] }),
       col("barcode_bot", "Bottom barcode", ["barcode_bot"], "HB7B.001.001", false),
     ],
     { pageSize: "A3-landscape", columns: 1, rows: 2, gapMm: 0, marginMm: 2 },

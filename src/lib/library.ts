@@ -60,6 +60,27 @@ export function mergeIdLists(...lists: (string[] | undefined)[]): string[] {
   return [...new Set(lists.flatMap((list) => list ?? []))];
 }
 
+const PUBLISHED_LIBRARY_KEY = "labelator.published-library";
+
+export function publishedLibraryStamp(remote: {
+  documents?: { id: string; updatedAt?: string }[];
+  folders?: { id: string; name: string }[];
+  deletedFolderIds?: string[];
+} | null): string {
+  if (!remote?.documents?.length) return "";
+  const folders = (remote.folders ?? []).map((folder) => `${folder.id}:${folder.name}`).sort().join(",");
+  const docs = remote.documents.map((doc) => `${doc.id}:${doc.updatedAt ?? ""}`).sort().join(",");
+  const deleted = [...(remote.deletedFolderIds ?? [])].sort().join(",");
+  return `${folders}|${docs}|${deleted}`;
+}
+
+export function consumePublishedLibraryStamp(stamp: string): boolean {
+  if (!stamp || typeof window === "undefined") return false;
+  if (window.localStorage.getItem(PUBLISHED_LIBRARY_KEY) === stamp) return false;
+  window.localStorage.setItem(PUBLISHED_LIBRARY_KEY, stamp);
+  return true;
+}
+
 function preferCatalogCopy(a: LabelDocument, b: LabelDocument, defaultFolderIds: Set<string>): LabelDocument {
   const aCustom = Boolean(a.folderId && !defaultFolderIds.has(a.folderId));
   const bCustom = Boolean(b.folderId && !defaultFolderIds.has(b.folderId));

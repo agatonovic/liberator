@@ -15,4 +15,4 @@ Open [http://localhost:3000](http://localhost:3000). Data stays in the browser (
 
 ## GitHub Pages
 
-Pushes to `main` build a static export and deploy to GitHub Pages. The site is served under `/liberator`.
+Pushes to `main` build a static export and deploy to GitHub Pages. The site is served under `/liberator`. Templates, folders, and the data sheet come from `data/library.json` in the repo.

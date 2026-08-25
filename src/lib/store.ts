@@ -62,6 +62,8 @@ import {
   mergeDocuments,
   mergeFolders,
   mergeIdLists,
+  consumePublishedLibraryStamp,
+  publishedLibraryStamp,
   restoreOrphanedTemplates,
   seedTemplateLibrary,
   type TemplateFolder,
@@ -280,6 +282,36 @@ function fitGroupOnPage(
   }));
 }
 let persistTimer: ReturnType<typeof setTimeout> | null = null;
+
+type RemoteLibrary = {
+  documents?: LabelDocument[];
+  folders?: TemplateFolder[];
+  currentId?: string | null;
+  data?: PersistedData;
+  librarySeeded?: boolean;
+  deletedIds?: string[];
+  deletedCatalogIds?: string[];
+  deletedFolderIds?: string[];
+  savedColors?: string[];
+  activity?: ActivityEvent[];
+};
+
+async function fetchRemoteLibrary(): Promise<RemoteLibrary | null> {
+  const paths = process.env.NEXT_PUBLIC_BASE_PATH
+    ? ["/library.json", "/api/library"]
+    : ["/api/library", "/library.json"];
+  for (const path of paths) {
+    try {
+      const res = await fetch(publicPath(path));
+      if (!res.ok) continue;
+      const json = (await res.json()) as RemoteLibrary | null;
+      if (json && Array.isArray(json.documents) && Array.isArray(json.folders)) return json;
+    } catch {
+      /* try the next location */
+    }
+  }
+  return null;
+}
 
 function applyElementPatch(el: LabelElement, patch: Partial<LabelElement>): LabelElement {
   return constrainCodeElement({
@@ -508,8 +540,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
       return;
     }
-    const stored = await loadAllDocuments();
-    const meta = await loadMeta();
+    let stored = await loadAllDocuments();
+    let meta = await loadMeta();
     let remote: {
       documents?: LabelDocument[];
       folders?: TemplateFolder[];
@@ -521,12 +553,23 @@ export const useAppStore = create<AppState>((set, get) => ({
       deletedFolderIds?: string[];
       savedColors?: string[];
       activity?: ActivityEvent[];
-    } | null = null;
-    try {
-      const res = await fetch(publicPath("/api/library"));
-      if (res.ok) remote = await res.json();
-    } catch {
-      remote = null;
+    } | null = await fetchRemoteLibrary();
+    const takePublished =
+      Boolean(process.env.NEXT_PUBLIC_BASE_PATH) &&
+      consumePublishedLibraryStamp(publishedLibraryStamp(remote));
+    if (takePublished && remote) {
+      stored = [];
+      meta = {
+        currentId: remote.currentId ?? null,
+        data: remote.data ?? EMPTY_DATA,
+        folders: remote.folders,
+        librarySeeded: true,
+        deletedIds: remote.deletedIds,
+        deletedCatalogIds: remote.deletedCatalogIds,
+        deletedFolderIds: remote.deletedFolderIds,
+        savedColors: remote.savedColors,
+        activity: remote.activity,
+      };
     }
     let deletedIds = mergeIdLists(meta?.deletedIds, remote?.deletedIds);
     let deletedCatalogIds = mergeIdLists(meta?.deletedCatalogIds, remote?.deletedCatalogIds);

@@ -1,0 +1,5207 @@
+{
+  "documents": [
+    {
+      "version": 1,
+      "id": "ff9a7d76-b9a8-4b29-a861-612b6142c9a9",
+      "name": "FIXED GA A4",
+      "updatedAt": "2026-08-24T17:28:45.542Z",
+      "page": {
+        "widthMm": 254,
+        "heightMm": 68
+      },
+      "elements": [
+        {
+          "id": "7297664f-3556-4ffc-873e-7a8a2a412bba",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 254,
+          "height": 71.61,
+          "rotation": 0,
+          "style": {
+            "fill": "#ffffff",
+            "stroke": "transparent",
+            "strokeWidth": 0.42,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "237d3b5b-9f7b-448f-bbbd-a3838a11f875",
+          "type": "rect",
+          "x": -4.528396176558165e-13,
+          "y": -3.7599553100638635e-15,
+          "width": 254,
+          "height": 20.459999999999997,
+          "rotation": 0,
+          "style": {
+            "fill": "#305496",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1
+          },
+          "hidden": false
+        },
+        {
+          "id": "df7df19f-a297-448c-a108-2e6e2f3e2c42",
+          "type": "text",
+          "x": 5.979970503531921e-13,
+          "y": 2.1200000000000103,
+          "width": 253.99999999999886,
+          "height": 16.229999999999972,
+          "rotation": 0,
+          "style": {
+            "fill": "#ffffff",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 14.82,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "FIXED TEST",
+          "binding": "title",
+          "spans": [
+            {
+              "start": 0,
+              "end": 10,
+              "fontSizeMm": 14.8
+            }
+          ]
+        },
+        {
+          "id": "d07abf13-f845-4328-b658-d2450217201f",
+          "type": "image",
+          "x": 231.07,
+          "y": 4.94,
+          "width": 14.11,
+          "height": 11.29,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "opacity": 1
+          },
+          "content": "UP",
+          "binding": "arrow",
+          "imageDataUrl": "/templates/ga/arrows/UP-white.png",
+          "hidden": true
+        },
+        {
+          "id": "15f7de26-ba23-4089-ad5c-f9e9211fd8eb",
+          "type": "text",
+          "x": 5.29,
+          "y": 58.300000000000004,
+          "width": 243.42,
+          "height": 5.64,
+          "rotation": 0,
+          "style": {
+            "fill": "#595959",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element",
+            "fontSizeMm": 4.94,
+            "fontWeight": "normal",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "RHB1A.001.003",
+          "binding": "position"
+        },
+        {
+          "id": "1b155028-32ba-4e2b-a5b5-1a76eb39b118",
+          "type": "text",
+          "x": 0,
+          "y": 14.5,
+          "width": 254,
+          "height": 49.400000000000006,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 35.4,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "73 579 863 30",
+          "spans": [
+            {
+              "start": 7,
+              "end": 10,
+              "fill": "#E43434"
+            }
+          ],
+          "hidden": false
+        },
+        {
+          "id": "08703a12-c249-4755-9afc-e98f5fe1b0ce",
+          "type": "arrow",
+          "x": 236,
+          "y": 17,
+          "width": 13.852162227633098,
+          "height": 12.17311226064682,
+          "rotation": 270,
+          "style": {
+            "fill": "#FFFFFF",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "arrowKind": "line"
+          },
+          "binding": "arrow",
+          "transform": "arrow",
+          "content": "UP"
+        },
+        {
+          "id": "165a3a7c-cc48-4f21-a444-8204d45af439",
+          "type": "arrow",
+          "x": 7.6000000000000005,
+          "y": 17,
+          "width": 13.852162227633098,
+          "height": 12.17311226064682,
+          "rotation": -90,
+          "style": {
+            "fill": "#FFFFFF",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "arrowKind": "line"
+          },
+          "binding": "arrow",
+          "transform": "arrow",
+          "content": "UP"
+        }
+      ],
+      "catalogId": "fixed_ga_a4",
+      "catalogRevision": 3,
+      "description": "FIXED sticker (254 × 72 mm). Generate packs 2 per A4 landscape.",
+      "dataColumns": [
+        {
+          "key": "reference",
+          "label": "Part Number",
+          "headers": [
+            "reference",
+            "Part Number",
+            "PN",
+            "part_number"
+          ],
+          "example": "7357986330",
+          "required": true
+        },
+        {
+          "key": "position",
+          "label": "Assigned Location",
+          "headers": [
+            "position",
+            "Assigned Location",
+            "Location",
+            "MAP SIMPLE",
+            "address"
+          ],
+          "example": "RHB1A.001.003",
+          "required": true
+        },
+        {
+          "key": "title",
+          "label": "Header text",
+          "headers": [
+            "title",
+            "Title",
+            "HEADER",
+            "Header"
+          ],
+          "example": "FIXED",
+          "required": false
+        },
+        {
+          "key": "arrow",
+          "label": "Arrow",
+          "headers": [
+            "arrow",
+            "Arrow",
+            "ARROW"
+          ],
+          "example": "UP",
+          "required": false
+        }
+      ],
+      "sheet": {
+        "pageSize": "A4-landscape",
+        "columns": 1,
+        "rows": 2,
+        "gapMm": 0,
+        "marginMm": 4
+      },
+      "folderId": "655d6e1b-31bb-4d5e-ae3d-0ca99fbdead6",
+      "lastUsedAt": "2026-08-25T06:16:20.829Z",
+      "versions": [
+        {
+          "id": "b9459673-82f2-4143-bcef-b95ae6d86ee9",
+          "name": "",
+          "createdAt": "2026-08-24T17:28:39.324Z",
+          "snapshot": {
+            "page": {
+              "widthMm": 254,
+              "heightMm": 68
+            },
+            "sheet": {
+              "pageSize": "A4-landscape",
+              "columns": 1,
+              "rows": 2,
+              "gapMm": 0,
+              "marginMm": 4
+            },
+            "elements": [
+              {
+                "id": "7297664f-3556-4ffc-873e-7a8a2a412bba",
+                "type": "rect",
+                "x": 0,
+                "y": 0,
+                "width": 254,
+                "height": 71.61,
+                "rotation": 0,
+                "style": {
+                  "fill": "#ffffff",
+                  "stroke": "transparent",
+                  "strokeWidth": 0.42,
+                  "opacity": 1
+                }
+              },
+              {
+                "id": "237d3b5b-9f7b-448f-bbbd-a3838a11f875",
+                "type": "rect",
+                "x": -4.528396176558165e-13,
+                "y": -3.7599553100638635e-15,
+                "width": 254,
+                "height": 20.459999999999997,
+                "rotation": 0,
+                "style": {
+                  "fill": "#305496",
+                  "stroke": "transparent",
+                  "strokeWidth": 0,
+                  "opacity": 1
+                },
+                "hidden": false
+              },
+              {
+                "id": "df7df19f-a297-448c-a108-2e6e2f3e2c42",
+                "type": "text",
+                "x": 5.979970503531921e-13,
+                "y": 2.1200000000000103,
+                "width": 253.99999999999886,
+                "height": 16.229999999999972,
+                "rotation": 0,
+                "style": {
+                  "fill": "#ffffff",
+                  "stroke": "transparent",
+                  "strokeWidth": 0,
+                  "fontFamily": "Artifakt Element Black",
+                  "fontSizeMm": 14.82,
+                  "fontWeight": "bold",
+                  "align": "center",
+                  "verticalAlign": "middle",
+                  "letterSpacingMm": 0,
+                  "lineHeight": 1,
+                  "opacity": 1
+                },
+                "content": "FIXED",
+                "binding": "title"
+              },
+              {
+                "id": "d07abf13-f845-4328-b658-d2450217201f",
+                "type": "image",
+                "x": 231.07,
+                "y": 4.94,
+                "width": 14.11,
+                "height": 11.29,
+                "rotation": 0,
+                "style": {
+                  "fill": "#000000",
+                  "opacity": 1
+                },
+                "content": "UP",
+                "binding": "arrow",
+                "imageDataUrl": "/templates/ga/arrows/UP-white.png",
+                "hidden": true
+              },
+              {
+                "id": "15f7de26-ba23-4089-ad5c-f9e9211fd8eb",
+                "type": "text",
+                "x": 5.29,
+                "y": 58.300000000000004,
+                "width": 243.42,
+                "height": 5.64,
+                "rotation": 0,
+                "style": {
+                  "fill": "#595959",
+                  "stroke": "transparent",
+                  "strokeWidth": 0,
+                  "fontFamily": "Artifakt Element",
+                  "fontSizeMm": 4.94,
+                  "fontWeight": "normal",
+                  "align": "center",
+                  "verticalAlign": "middle",
+                  "letterSpacingMm": 0,
+                  "lineHeight": 1,
+                  "opacity": 1
+                },
+                "content": "RHB1A.001.003",
+                "binding": "position"
+              },
+              {
+                "id": "1b155028-32ba-4e2b-a5b5-1a76eb39b118",
+                "type": "text",
+                "x": 0,
+                "y": 14.5,
+                "width": 254,
+                "height": 49.400000000000006,
+                "rotation": 0,
+                "style": {
+                  "fill": "#000000",
+                  "stroke": "transparent",
+                  "strokeWidth": 0,
+                  "fontFamily": "Open Sans",
+                  "fontSizeMm": 35.4,
+                  "fontWeight": "bold",
+                  "align": "center",
+                  "verticalAlign": "middle",
+                  "letterSpacingMm": 0,
+                  "lineHeight": 1,
+                  "opacity": 1
+                },
+                "content": "73 579 863 30",
+                "spans": [
+                  {
+                    "start": 7,
+                    "end": 10,
+                    "fill": "#E43434"
+                  }
+                ],
+                "hidden": false
+              },
+              {
+                "id": "08703a12-c249-4755-9afc-e98f5fe1b0ce",
+                "type": "arrow",
+                "x": 236,
+                "y": 17,
+                "width": 13.852162227633098,
+                "height": 12.17311226064682,
+                "rotation": 270,
+                "style": {
+                  "fill": "#FFFFFF",
+                  "stroke": "transparent",
+                  "strokeWidth": 0,
+                  "opacity": 1,
+                  "arrowKind": "line"
+                },
+                "binding": "arrow",
+                "transform": "arrow",
+                "content": "UP"
+              },
+              {
+                "id": "165a3a7c-cc48-4f21-a444-8204d45af439",
+                "type": "arrow",
+                "x": 7.6000000000000005,
+                "y": 17,
+                "width": 13.852162227633098,
+                "height": 12.17311226064682,
+                "rotation": -90,
+                "style": {
+                  "fill": "#FFFFFF",
+                  "stroke": "transparent",
+                  "strokeWidth": 0,
+                  "opacity": 1,
+                  "arrowKind": "line"
+                },
+                "binding": "arrow",
+                "transform": "arrow",
+                "content": "UP"
+              }
+            ],
+            "dataColumns": [
+              {
+                "key": "reference",
+                "label": "Part Number",
+                "headers": [
+                  "reference",
+                  "Part Number",
+                  "PN",
+                  "part_number"
+                ],
+                "example": "7357986330",
+                "required": true
+              },
+              {
+                "key": "position",
+                "label": "Assigned Location",
+                "headers": [
+                  "position",
+                  "Assigned Location",
+                  "Location",
+                  "MAP SIMPLE",
+                  "address"
+                ],
+                "example": "RHB1A.001.003",
+                "required": true
+              },
+              {
+                "key": "title",
+                "label": "Header text",
+                "headers": [
+                  "title",
+                  "Title",
+                  "HEADER",
+                  "Header"
+                ],
+                "example": "FIXED",
+                "required": false
+              },
+              {
+                "key": "arrow",
+                "label": "Arrow",
+                "headers": [
+                  "arrow",
+                  "Arrow",
+                  "ARROW"
+                ],
+                "example": "UP",
+                "required": false
+              }
+            ],
+            "description": "FIXED sticker (254 × 72 mm). Generate packs 2 per A4 landscape."
+          }
+        },
+        {
+          "id": "8389790f-07c5-4c58-a240-efc92a8c2a12",
+          "name": "",
+          "createdAt": "2026-08-24T15:07:22.419Z",
+          "snapshot": {
+            "page": {
+              "widthMm": 254,
+              "heightMm": 68
+            },
+            "sheet": {
+              "pageSize": "A4-landscape",
+              "columns": 1,
+              "rows": 2,
+              "gapMm": 0,
+              "marginMm": 4
+            },
+            "elements": [
+              {
+                "id": "7297664f-3556-4ffc-873e-7a8a2a412bba",
+                "type": "rect",
+                "x": 0,
+                "y": 0,
+                "width": 254,
+                "height": 71.61,
+                "rotation": 0,
+                "style": {
+                  "fill": "#ffffff",
+                  "stroke": "transparent",
+                  "strokeWidth": 0.42,
+                  "opacity": 1
+                }
+              },
+              {
+                "id": "237d3b5b-9f7b-448f-bbbd-a3838a11f875",
+                "type": "rect",
+                "x": -4.528396176558165e-13,
+                "y": -3.7599553100638635e-15,
+                "width": 254,
+                "height": 20.459999999999997,
+                "rotation": 0,
+                "style": {
+                  "fill": "#305496",
+                  "stroke": "transparent",
+                  "strokeWidth": 0,
+                  "opacity": 1
+                },
+                "hidden": false
+              },
+              {
+                "id": "df7df19f-a297-448c-a108-2e6e2f3e2c42",
+                "type": "text",
+                "x": 5.979970503531921e-13,
+                "y": 2.1200000000000103,
+                "width": 253.99999999999886,
+                "height": 16.229999999999972,
+                "rotation": 0,
+                "style": {
+                  "fill": "#ffffff",
+                  "stroke": "transparent",
+                  "strokeWidth": 0,
+                  "fontFamily": "Artifakt Element Black",
+                  "fontSizeMm": 14.82,
+                  "fontWeight": "bold",
+                  "align": "center",
+                  "verticalAlign": "middle",
+                  "letterSpacingMm": 0,
+                  "lineHeight": 1,
+                  "opacity": 1
+                },
+                "content": "FIXED",
+                "binding": "title"
+              },
+              {
+                "id": "d07abf13-f845-4328-b658-d2450217201f",
+                "type": "image",
+                "x": 231.07,
+                "y": 4.94,
+                "width": 14.11,
+                "height": 11.29,
+                "rotation": 0,
+                "style": {
+                  "fill": "#000000",
+                  "opacity": 1
+                },
+                "content": "UP",
+                "binding": "arrow",
+                "imageDataUrl": "/templates/ga/arrows/UP-white.png",
+                "hidden": true
+              },
+              {
+                "id": "15f7de26-ba23-4089-ad5c-f9e9211fd8eb",
+                "type": "text",
+                "x": 5.29,
+                "y": 58.300000000000004,
+                "width": 243.42,
+                "height": 5.64,
+                "rotation": 0,
+                "style": {
+                  "fill": "#595959",
+                  "stroke": "transparent",
+                  "strokeWidth": 0,
+                  "fontFamily": "Artifakt Element",
+                  "fontSizeMm": 4.94,
+                  "fontWeight": "normal",
+                  "align": "center",
+                  "verticalAlign": "middle",
+                  "letterSpacingMm": 0,
+                  "lineHeight": 1,
+                  "opacity": 1
+                },
+                "content": "RHB1A.001.003",
+                "binding": "position"
+              },
+              {
+                "id": "1b155028-32ba-4e2b-a5b5-1a76eb39b118",
+                "type": "text",
+                "x": 0,
+                "y": 14.5,
+                "width": 254,
+                "height": 49.400000000000006,
+                "rotation": 0,
+                "style": {
+                  "fill": "#000000",
+                  "stroke": "transparent",
+                  "strokeWidth": 0,
+                  "fontFamily": "Open Sans",
+                  "fontSizeMm": 35.4,
+                  "fontWeight": "bold",
+                  "align": "center",
+                  "verticalAlign": "middle",
+                  "letterSpacingMm": 0,
+                  "lineHeight": 1,
+                  "opacity": 1
+                },
+                "content": "73 579 863 30",
+                "spans": [
+                  {
+                    "start": 7,
+                    "end": 10,
+                    "fill": "#E43434"
+                  }
+                ],
+                "hidden": false
+              },
+              {
+                "id": "08703a12-c249-4755-9afc-e98f5fe1b0ce",
+                "type": "arrow",
+                "x": 236,
+                "y": 17,
+                "width": 13.852162227633098,
+                "height": 12.17311226064682,
+                "rotation": 270,
+                "style": {
+                  "fill": "#FFFFFF",
+                  "stroke": "transparent",
+                  "strokeWidth": 0,
+                  "opacity": 1,
+                  "arrowKind": "line"
+                },
+                "binding": "arrow",
+                "transform": "arrow",
+                "content": "UP"
+              },
+              {
+                "id": "165a3a7c-cc48-4f21-a444-8204d45af439",
+                "type": "arrow",
+                "x": 7.6000000000000005,
+                "y": 17,
+                "width": 13.852162227633098,
+                "height": 12.17311226064682,
+                "rotation": -90,
+                "style": {
+                  "fill": "#FFFFFF",
+                  "stroke": "transparent",
+                  "strokeWidth": 0,
+                  "opacity": 1,
+                  "arrowKind": "line"
+                },
+                "binding": "arrow",
+                "transform": "arrow",
+                "content": "UP"
+              }
+            ],
+            "dataColumns": [
+              {
+                "key": "reference",
+                "label": "Part Number",
+                "headers": [
+                  "reference",
+                  "Part Number",
+                  "PN",
+                  "part_number"
+                ],
+                "example": "7357986330",
+                "required": true
+              },
+              {
+                "key": "position",
+                "label": "Assigned Location",
+                "headers": [
+                  "position",
+                  "Assigned Location",
+                  "Location",
+                  "MAP SIMPLE",
+                  "address"
+                ],
+                "example": "RHB1A.001.003",
+                "required": true
+              },
+              {
+                "key": "title",
+                "label": "Header text",
+                "headers": [
+                  "title",
+                  "Title",
+                  "HEADER",
+                  "Header"
+                ],
+                "example": "FIXED",
+                "required": false
+              },
+              {
+                "key": "arrow",
+                "label": "Arrow",
+                "headers": [
+                  "arrow",
+                  "Arrow",
+                  "ARROW"
+                ],
+                "example": "UP",
+                "required": false
+              }
+            ],
+            "description": "FIXED sticker (254 × 72 mm). Generate packs 2 per A4 landscape."
+          }
+        }
+      ],
+      "favorite": false
+    },
+    {
+      "version": 1,
+      "id": "0a9b4a95-985c-487d-a58e-057a5e45ba57",
+      "name": "GA Address",
+      "updatedAt": "2026-08-24T11:02:46.791Z",
+      "page": {
+        "widthMm": 408.98,
+        "heightMm": 80.72
+      },
+      "elements": [
+        {
+          "id": "240acf7b-a377-437f-9231-5b8a60a2bb85",
+          "type": "image",
+          "x": 0,
+          "y": 0,
+          "width": 408.98,
+          "height": 80.72,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "opacity": 1
+          },
+          "imageDataUrl": "/templates/ga/ga_warehouse.png",
+          "locked": false,
+          "hidden": true
+        },
+        {
+          "id": "68ecc003-4a01-4f77-b30d-f8c4f04ae5cd",
+          "type": "text",
+          "x": 0.0005405405401282476,
+          "y": 23.79999999999957,
+          "width": 130.5,
+          "height": 34.06000000000002,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 34.95,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "HB1",
+          "binding": "address",
+          "transform": "ga_magacin",
+          "spans": []
+        },
+        {
+          "id": "7b42f430-0dc0-4338-9bda-74d9ee0ff6f4",
+          "type": "text",
+          "x": 198.3,
+          "y": 26.74,
+          "width": 55.46,
+          "height": 25.82,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element",
+            "fontSizeMm": 23.75,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "011",
+          "binding": "address",
+          "transform": "ga_regal_number",
+          "spans": [
+            {
+              "start": 0,
+              "end": 3,
+              "fontSizeMm": 23.8
+            }
+          ],
+          "hidden": true
+        },
+        {
+          "id": "973845f6-6f4c-4c10-9b26-8b97a8c9e353",
+          "type": "text",
+          "x": 288.29,
+          "y": 26.74,
+          "width": 60.5,
+          "height": 25.82,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element",
+            "fontSizeMm": 23.75,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "001",
+          "binding": "address",
+          "transform": "ga_nivo",
+          "hidden": true
+        },
+        {
+          "id": "4f394013-ce7c-4b1d-ad7e-86eae6ed4c46",
+          "type": "barcode",
+          "x": 67.2,
+          "y": 57.86,
+          "width": 274.96,
+          "height": 21.87,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "barcodeSymbology": "code128",
+            "barcodeDisplayValue": false,
+            "opacity": 1
+          },
+          "content": "HB1A.011.001",
+          "binding": "barcode",
+          "fallbackBinding": "address"
+        },
+        {
+          "id": "cce9be8a-e3c7-4eea-882f-77b002814a61",
+          "type": "rect",
+          "x": -1,
+          "y": -1,
+          "width": 409.90000000000003,
+          "height": 24.700000000000003,
+          "rotation": 0,
+          "style": {
+            "fill": "#2F5495",
+            "stroke": "transparent",
+            "strokeWidth": 0.4,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "0415d95c-f1cd-4e71-b09f-9fa0d47d871c",
+          "type": "text",
+          "x": -0.4,
+          "y": 2,
+          "width": 130.5,
+          "height": 20.8,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element",
+            "fontSizeMm": 4,
+            "fontWeight": "normal",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "MAGACIN",
+          "spans": [
+            {
+              "start": 0,
+              "end": 7,
+              "fill": "#FFFFFF",
+              "fontSizeMm": 21.6
+            }
+          ]
+        },
+        {
+          "id": "0c99e4c5-ed52-4c7f-9373-5b95de52109e",
+          "type": "text",
+          "x": 130.08594594594572,
+          "y": 2,
+          "width": 145.79244649647444,
+          "height": 20.800000000000086,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element",
+            "fontSizeMm": 4,
+            "fontWeight": "normal",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "REGAL",
+          "spans": [
+            {
+              "start": 0,
+              "end": 5,
+              "fill": "#FFFFFF",
+              "fontSizeMm": 21.6
+            }
+          ]
+        },
+        {
+          "id": "bd11caf3-5062-475e-bb0d-0926908b6a2a",
+          "type": "text",
+          "x": 275.8783924424202,
+          "y": 2,
+          "width": 133.189459459459,
+          "height": 20.800000000000065,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element",
+            "fontSizeMm": 4,
+            "fontWeight": "normal",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "NIVO",
+          "spans": [
+            {
+              "start": 0,
+              "end": 4,
+              "fill": "#FFFFFF",
+              "fontSizeMm": 21.6
+            }
+          ]
+        },
+        {
+          "id": "8476b91e-268e-41ee-ba52-21c8c05b10f0",
+          "type": "line",
+          "x": 273.90000000000003,
+          "y": 0,
+          "width": 4,
+          "height": 23.8,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#ffffff",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "lineCap": "butt"
+          }
+        },
+        {
+          "id": "76ae118c-3181-4fd6-b5e0-d2661e3a41ba",
+          "type": "line",
+          "x": 128.6,
+          "y": 0,
+          "width": 4,
+          "height": 23.8,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#ffffff",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "lineCap": "butt"
+          }
+        },
+        {
+          "id": "b52e58cc-5e00-4892-994d-5abf0a3edc6e",
+          "type": "text",
+          "x": 130.09999999999985,
+          "y": 26.39236612466162,
+          "width": 45.68599184761867,
+          "height": 28.625461068883684,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 34.95,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "A",
+          "binding": "address",
+          "transform": "ga_regal_letter",
+          "spans": [
+            {
+              "start": 0,
+              "end": 1,
+              "fontSizeMm": 34.9
+            }
+          ]
+        },
+        {
+          "id": "3a8da68e-b73a-47ec-a65c-e3b7dc187a64",
+          "type": "text",
+          "x": 196.00000000000014,
+          "y": 25.99999999999988,
+          "width": 57.75999999999984,
+          "height": 28.62546106888367,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 34.95,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "011",
+          "binding": "address",
+          "transform": "ga_regal_number",
+          "spans": [
+            {
+              "start": 0,
+              "end": 3,
+              "fontSizeMm": 34.9
+            }
+          ]
+        },
+        {
+          "id": "f5f9b482-8de0-4209-ada7-057998106761",
+          "type": "text",
+          "x": 289,
+          "y": 26,
+          "width": 57.75999999999984,
+          "height": 28.62546106888367,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 34.95,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "001",
+          "binding": "address",
+          "transform": "ga_nivo",
+          "spans": [
+            {
+              "start": 0,
+              "end": 3,
+              "fontSizeMm": 34.9
+            }
+          ]
+        },
+        {
+          "id": "b4f1e589-f6a6-4513-ae27-fc9e1d47bc33",
+          "type": "arrow",
+          "x": 388.3,
+          "y": 28.1,
+          "width": 24.316094095974172,
+          "height": 23.537286811761195,
+          "rotation": 90,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "arrowKind": "line"
+          }
+        },
+        {
+          "id": "cedf9b20-b360-47b9-9b0c-e6a617ccd8e4",
+          "type": "line",
+          "x": 128.59999999999994,
+          "y": 23.867459343172335,
+          "width": 4,
+          "height": 31.150367850372962,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#000000",
+            "strokeWidth": 0.5,
+            "opacity": 1,
+            "lineCap": "butt"
+          }
+        },
+        {
+          "id": "c474c74f-2c9b-4282-a9d4-b0cc8f51483f",
+          "type": "line",
+          "x": 273.90000000000003,
+          "y": 23.700000000000003,
+          "width": 4,
+          "height": 31.150367850372962,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#000000",
+            "strokeWidth": 0.5,
+            "opacity": 1,
+            "lineCap": "butt"
+          }
+        },
+        {
+          "id": "1b28cfb2-76f9-42ea-bd70-78e3b55d5800",
+          "type": "line",
+          "x": 408.42231979679,
+          "y": 53.400000000000006,
+          "width": 4,
+          "height": 408.24268764716294,
+          "rotation": 90,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#000000",
+            "strokeWidth": 0.5,
+            "opacity": 1,
+            "lineCap": "butt"
+          }
+        }
+      ],
+      "catalogId": "ga_warehouse_a3",
+      "catalogRevision": 3,
+      "description": "One MAGACIN / REGAL / NIVO sticker (409 × 81 mm). Generate packs 3 per A3 landscape.",
+      "dataColumns": [
+        {
+          "key": "address",
+          "label": "Address",
+          "headers": [
+            "address",
+            "Address",
+            "MAP SIMPLE",
+            "POSITION"
+          ],
+          "example": "HB9A.011.001",
+          "required": true
+        },
+        {
+          "key": "arrow",
+          "label": "Arrow",
+          "headers": [
+            "arrow",
+            "Arrow",
+            "ARROW"
+          ],
+          "example": "DOWN",
+          "required": true
+        },
+        {
+          "key": "barcode",
+          "label": "Barcode",
+          "headers": [
+            "barcode",
+            "Barcode"
+          ],
+          "example": "HB9A.011.001",
+          "required": false
+        }
+      ],
+      "sheet": {
+        "pageSize": "A3-landscape",
+        "columns": 1,
+        "rows": 3,
+        "gapMm": 0,
+        "marginMm": 2
+      },
+      "folderId": "655d6e1b-31bb-4d5e-ae3d-0ca99fbdead6",
+      "lastUsedAt": "2026-08-24T15:19:24.023Z",
+      "lastGeneratedAt": "2026-08-24T11:02:51.368Z"
+    },
+    {
+      "version": 1,
+      "id": "ee4837ef-c0f7-4ac9-8612-a689518ad7b0",
+      "name": "Warehouse A3 Final ",
+      "updatedAt": "2026-08-22T12:21:44.817Z",
+      "page": {
+        "widthMm": 420,
+        "heightMm": 297
+      },
+      "elements": [
+        {
+          "id": "7fd823f1-4f41-4b9c-91d0-bf49fcebf6c7",
+          "type": "rect",
+          "x": 4.324278728152819,
+          "y": 4.3,
+          "width": 411.35144254369436,
+          "height": 207.64211319712837,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 2,
+            "opacity": 1,
+            "cornerRadiusMm": 0
+          }
+        },
+        {
+          "id": "a24318b8-cda9-4232-8efb-8ccf1c141423",
+          "type": "line",
+          "x": 34.5,
+          "y": -26,
+          "width": 40,
+          "height": 0.5,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#12263A",
+            "strokeWidth": 0.5,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "ff091287-a42b-427d-aaae-1380f414b864",
+          "type": "line",
+          "x": 26,
+          "y": -29.5,
+          "width": 40,
+          "height": 0.5,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#12263A",
+            "strokeWidth": 0.5,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "b5d3cdc3-139e-467f-8af9-e6fe5bcb6c5d",
+          "type": "line",
+          "x": 4.6000000000000005,
+          "y": 74.60000000000001,
+          "width": 410.87928351545975,
+          "height": 4,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 2,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "4bfb13ab-9464-44b1-a613-bd486e6dff46",
+          "type": "image",
+          "x": 298.80000000000024,
+          "y": 128.35555515374728,
+          "width": 111.70031926103383,
+          "height": 77.97938369619168,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "opacity": 1
+          },
+          "assetFolderId": "asset-folder-packaging",
+          "binding": "packaging"
+        },
+        {
+          "id": "cda8b4de-2cd2-4a24-8ee2-c54a5561b531",
+          "type": "barcode",
+          "x": 3.7999999999973433,
+          "y": 215.19894603525347,
+          "width": 414.3155331137425,
+          "height": 78.56039829321469,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "barcodeSymbology": "code39",
+            "barcodeDisplayValue": false,
+            "opacity": 1
+          },
+          "content": "WG1D.10.011",
+          "binding": "BARCODE"
+        },
+        {
+          "id": "3cc6764a-2e6f-4c11-89bd-1f0a73c613cf",
+          "type": "line",
+          "x": 4.262873445175046,
+          "y": 142.5,
+          "width": 288.1329634425508,
+          "height": 4,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 2,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "177c4fc6-31cf-4aec-8141-ad5f4eaeeef8",
+          "type": "line",
+          "x": 291.40000000000003,
+          "y": 76.50929169230712,
+          "width": 4,
+          "height": 134.43765341530386,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 2,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "b78a3399-ee4f-4a2e-926b-dfb834954b7e",
+          "type": "line",
+          "x": 199.39999999999992,
+          "y": 76.67490003319669,
+          "width": 4,
+          "height": 66.2713191273871,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 2,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "6a3c8b2f-842a-4724-85e3-fa4f7f4f77fd",
+          "type": "line",
+          "x": 107.39999999999992,
+          "y": 76.53039826146735,
+          "width": 4,
+          "height": 67.33654845518741,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 2,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "abf83ad8-5af3-44cc-b704-420faafd7fd3",
+          "type": "text",
+          "x": 9,
+          "y": 6,
+          "width": 51.65883390666473,
+          "height": 13.813514770727924,
+          "rotation": 0,
+          "style": {
+            "fill": "#929292",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 8,
+            "fontWeight": "bold",
+            "align": "left",
+            "verticalAlign": "middle",
+            "opacity": 1,
+            "fontFamily": "Artifakt Element Black"
+          },
+          "content": "REFERENCA"
+        },
+        {
+          "id": "4923f5a6-117f-4d2f-81de-6d8022c71c87",
+          "type": "text",
+          "x": 8.9,
+          "y": 129,
+          "width": 51.65883390666473,
+          "height": 13.813514770727924,
+          "rotation": 0,
+          "style": {
+            "fill": "#929292",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 8,
+            "fontWeight": "bold",
+            "align": "left",
+            "verticalAlign": "middle",
+            "opacity": 1,
+            "fontFamily": "Artifakt Element Black"
+          },
+          "content": "REF4"
+        },
+        {
+          "id": "d4399eb2-e697-45ba-9a0f-a4bd6d79301c",
+          "type": "text",
+          "x": 115,
+          "y": 128,
+          "width": 51.65883390666473,
+          "height": 13.813514770727924,
+          "rotation": 0,
+          "style": {
+            "fill": "#929292",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 8,
+            "fontWeight": "bold",
+            "align": "left",
+            "verticalAlign": "middle",
+            "opacity": 1,
+            "fontFamily": "Artifakt Element Black"
+          },
+          "content": "DUBINA"
+        },
+        {
+          "id": "e7052216-407c-4a75-bb89-b1ca99b9bd7f",
+          "type": "text",
+          "x": 208,
+          "y": 128,
+          "width": 51.65883390666473,
+          "height": 13.813514770727924,
+          "rotation": 0,
+          "style": {
+            "fill": "#929292",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 8,
+            "fontWeight": "bold",
+            "align": "left",
+            "verticalAlign": "middle",
+            "opacity": 1,
+            "fontFamily": "Artifakt Element Black"
+          },
+          "content": "SLOŽIVOST"
+        },
+        {
+          "id": "4853006e-02b8-420f-b199-748bbad70231",
+          "type": "text",
+          "x": 298.8,
+          "y": 79.10000000000001,
+          "width": 111.70031926103512,
+          "height": 13.81351477072786,
+          "rotation": 0,
+          "style": {
+            "fill": "#929292",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 8,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "opacity": 1,
+            "fontFamily": "Artifakt Element Black"
+          },
+          "content": "PAKOVANJE (MDR)"
+        },
+        {
+          "id": "67ab7451-af3d-48c3-bf9a-48f4927d3552",
+          "type": "text",
+          "x": 9,
+          "y": 195,
+          "width": 51.65883390666473,
+          "height": 13.813514770727924,
+          "rotation": 0,
+          "style": {
+            "fill": "#929292",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 8,
+            "fontWeight": "bold",
+            "align": "left",
+            "verticalAlign": "middle",
+            "opacity": 1,
+            "fontFamily": "Artifakt Element Black"
+          },
+          "content": "MAGACIN"
+        },
+        {
+          "id": "9a663fe8-0551-46ac-9ea0-16e94152b8a8",
+          "type": "text",
+          "x": 3.799999999999998,
+          "y": 98.99999999999993,
+          "width": 105.68302699261541,
+          "height": 17.853581820681327,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 31,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "opacity": 1,
+            "fontFamily": "Open Sans"
+          },
+          "content": "REVI",
+          "binding": "REF4"
+        },
+        {
+          "id": "aced3986-0fb4-4f29-8c47-210eaae8f79e",
+          "type": "text",
+          "x": 116.99999999999989,
+          "y": 98,
+          "width": 31.329355166450615,
+          "height": 17.853581820681526,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 31,
+            "fontWeight": "bold",
+            "align": "left",
+            "verticalAlign": "middle",
+            "opacity": 1,
+            "fontFamily": "Open Sans"
+          },
+          "content": "6",
+          "binding": "DUBINA"
+        },
+        {
+          "id": "3d93e2c0-3301-4d3b-8ed3-48d3a59f51f7",
+          "type": "text",
+          "x": 210,
+          "y": 98,
+          "width": 31.329355166450615,
+          "height": 17.853581820681526,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 31,
+            "fontWeight": "bold",
+            "align": "left",
+            "verticalAlign": "middle",
+            "opacity": 1,
+            "fontFamily": "Open Sans"
+          },
+          "content": "6",
+          "binding": "SLOZIVOST"
+        },
+        {
+          "id": "0cf208d4-715e-429c-a445-620442770578",
+          "type": "doubleArrow",
+          "x": 185.15037517454033,
+          "y": 88.99999999999959,
+          "width": 42.66641857354094,
+          "height": 30.83873632269739,
+          "rotation": 90,
+          "style": {
+            "fill": "#ffffff",
+            "stroke": "#12263A",
+            "strokeWidth": 1.45,
+            "opacity": 1,
+            "arrowKind": "triangle"
+          }
+        },
+        {
+          "id": "8ac2057b-fb4f-4820-b11d-8db579dda870",
+          "type": "doubleArrow",
+          "x": 282.7999999999998,
+          "y": 88.69999999999972,
+          "width": 42.66641857354085,
+          "height": 25.365423074067902,
+          "rotation": 90,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "arrowKind": "line"
+          }
+        },
+        {
+          "id": "65d73b3c-693c-45dd-88b6-21c0738e53a1",
+          "type": "text",
+          "x": 295.4000000000001,
+          "y": 98,
+          "width": 119.1497630392691,
+          "height": 17.853581820681423,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 31,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "opacity": 1,
+            "fontFamily": "Open Sans"
+          },
+          "content": "X4202",
+          "binding": "PAKOVANJE (MDR)"
+        },
+        {
+          "id": "41adf25d-d7fc-44b4-a6d3-f1a0d8c97b83",
+          "type": "text",
+          "x": 3.7,
+          "y": 35,
+          "width": 411.54976303927,
+          "height": 13.813514770727915,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 59.7,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "opacity": 1,
+            "fontFamily": "Open Sans",
+            "letterSpacingMm": -0.9
+          },
+          "content": "98 456 445 94",
+          "spans": [
+            {
+              "start": 0,
+              "end": 2,
+              "fontSizeMm": 45
+            },
+            {
+              "start": 3,
+              "end": 7,
+              "fontSizeMm": 66
+            },
+            {
+              "start": 7,
+              "end": 10,
+              "fill": "#FF2600",
+              "fontSizeMm": 66
+            },
+            {
+              "start": 11,
+              "end": 13,
+              "fontSizeMm": 45
+            }
+          ],
+          "binding": "REFERENCA"
+        },
+        {
+          "id": "e1fd123a-1455-4a53-95bc-1e73250ac304",
+          "type": "text",
+          "x": 3.6999999999999846,
+          "y": 167,
+          "width": 289.63472841961874,
+          "height": 17.853581820681296,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 41.5,
+            "fontWeight": "normal",
+            "align": "center",
+            "verticalAlign": "middle",
+            "opacity": 1,
+            "fontFamily": "Open Sans"
+          },
+          "content": "WG1D.01.001",
+          "binding": "MAGACIN",
+          "spans": []
+        }
+      ],
+      "catalogId": "warehouse_a3",
+      "description": "A3 warehouse sticker. One row per label.",
+      "dataColumns": [
+        {
+          "key": "reference",
+          "label": "Reference",
+          "headers": [
+            "REFERENCA",
+            "REFERENCE",
+            "Produit",
+            "PRODUCT"
+          ],
+          "example": "73 580 423 50",
+          "required": true
+        },
+        {
+          "key": "warehouse_code",
+          "label": "Magacin",
+          "headers": [
+            "MAGACIN",
+            "WAREHOUSE_CODE"
+          ],
+          "example": "WG6.99.123",
+          "required": true
+        },
+        {
+          "key": "ref4",
+          "label": "REF4",
+          "headers": [
+            "REF4"
+          ],
+          "example": "QULY",
+          "required": true
+        },
+        {
+          "key": "depth",
+          "label": "Dubina",
+          "headers": [
+            "DUBINA"
+          ],
+          "example": "1",
+          "required": true
+        },
+        {
+          "key": "stackability",
+          "label": "Složivost",
+          "headers": [
+            "SLOŽIVOST",
+            "SLOZIVOST"
+          ],
+          "example": "4",
+          "required": true
+        },
+        {
+          "key": "packaging",
+          "label": "Pakovanje",
+          "headers": [
+            "PAKOVANJE",
+            "PAKOVANJE (MDR)"
+          ],
+          "example": "X4202",
+          "required": true
+        },
+        {
+          "key": "barcode",
+          "label": "Barcode",
+          "headers": [
+            "BARCODE",
+            "BARCODE: ADRESA SKLADIŠTA"
+          ],
+          "example": "WG6.99.123%",
+          "required": false
+        }
+      ],
+      "sheet": {
+        "pageSize": "A3-landscape",
+        "columns": 1,
+        "rows": 1,
+        "gapMm": 4,
+        "marginMm": 8
+      },
+      "folderId": "655d6e1b-31bb-4d5e-ae3d-0ca99fbdead6"
+    },
+    {
+      "version": 1,
+      "id": "3085002f-b6ce-4feb-bfb5-62f111cd9645",
+      "name": "CDC A3",
+      "updatedAt": "2026-08-21T10:43:02.287Z",
+      "page": {
+        "widthMm": 420,
+        "heightMm": 297
+      },
+      "elements": [
+        {
+          "id": "6ec128a1-1aa8-4ba6-9697-d115e44118f7",
+          "type": "rect",
+          "x": 1.2408646528866606e-14,
+          "y": -3.227379600967373e-14,
+          "width": 419.9999999999993,
+          "height": 95.56768375406214,
+          "rotation": 0,
+          "style": {
+            "fill": "#1F295C",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1
+          },
+          "hidden": false
+        },
+        {
+          "id": "79b4bd4f-11c8-4010-89a1-b557adb85db7",
+          "type": "rect",
+          "x": 1.2408646528866606e-14,
+          "y": -3.227379600967373e-14,
+          "width": 419.9999999999993,
+          "height": 95.56768375406214,
+          "rotation": 0,
+          "style": {
+            "fill": "#1F295C",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1
+          },
+          "hidden": false
+        },
+        {
+          "id": "d2d967c6-bd22-4d6c-81e6-cca77a2219e0",
+          "type": "text",
+          "x": 6,
+          "y": 7.2,
+          "width": 408.52,
+          "height": 81.14,
+          "rotation": 0,
+          "style": {
+            "fill": "#FFFFFF",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 70,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1,
+            "fontFamily": "Artifakt Element Black"
+          },
+          "content": "CDC",
+          "binding": "building_name",
+          "spans": []
+        },
+        {
+          "id": "ef9dc16f-550e-4480-8ebd-ee405efc09bd",
+          "type": "text",
+          "x": 8.1,
+          "y": 98.2,
+          "width": 404.28,
+          "height": 85.37,
+          "rotation": 0,
+          "style": {
+            "fill": "#221F1F",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 50.4,
+            "fontWeight": "normal",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1,
+            "fontFamily": "Artifakt Element Black"
+          },
+          "content": "Czerwona rurka",
+          "binding": "warehouse_code",
+          "spans": [],
+          "hidden": true
+        },
+        {
+          "id": "9916fbd0-40bf-4daa-8041-9c0a57a69567",
+          "type": "barcode",
+          "x": 6.000000000003748,
+          "y": 186.10000000000002,
+          "width": 407.99999999999244,
+          "height": 104.93536750812537,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "barcodeSymbology": "code128",
+            "barcodeDisplayValue": false,
+            "opacity": 1
+          },
+          "content": "CDCNN.01.003",
+          "binding": "barcode",
+          "fallbackBinding": "warehouse_code",
+          "transform": "barcode_pct"
+        },
+        {
+          "id": "7413bca9-517a-487e-8d83-c491b5932f79",
+          "type": "rect",
+          "x": 2.8434267593323996,
+          "y": 3.000000246582709,
+          "width": 414.7279488892949,
+          "height": 288.89855811666644,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#FFFFFF",
+            "strokeWidth": 6,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "f6a1757d-088b-4ba5-9ce8-b2cd4ad595fa",
+          "type": "text",
+          "x": 8.1,
+          "y": 99,
+          "width": 404.28,
+          "height": 85.37,
+          "rotation": 0,
+          "style": {
+            "fill": "#221F1F",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontSizeMm": 50,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1,
+            "fontFamily": "Open Sans"
+          },
+          "content": "CDCNN.01.003",
+          "binding": "warehouse_code",
+          "spans": [],
+          "hidden": false
+        }
+      ],
+      "catalogId": "cdc_a3",
+      "description": "CDC A3 warehouse sticker.",
+      "dataColumns": [
+        {
+          "key": "building_name",
+          "label": "Naziv zgrade",
+          "headers": [
+            "Naziv zgrade",
+            "NAZIV ZGRADE",
+            "BUILDING",
+            "CDC"
+          ],
+          "example": "CDC",
+          "required": true
+        },
+        {
+          "key": "warehouse_code",
+          "label": "Adresa skladista",
+          "headers": [
+            "Adresa skladista",
+            "ADRESA SKLADISTA",
+            "MAGACIN",
+            "WAREHOUSE_CODE"
+          ],
+          "example": "CDCNN.10.001",
+          "required": true
+        },
+        {
+          "key": "barcode",
+          "label": "Barcode",
+          "headers": [
+            "BARCODE",
+            "BARCODE: ADRESA SKLADISTA"
+          ],
+          "example": "CDCNN.10.001%",
+          "required": false
+        }
+      ],
+      "folderId": "655d6e1b-31bb-4d5e-ae3d-0ca99fbdead6",
+      "lastUsedAt": "2026-08-24T15:19:49.824Z"
+    },
+    {
+      "version": 1,
+      "id": "0bc3bdcb-e913-4015-bb02-d95a0d17c39e",
+      "name": "HBC A4 Shelf",
+      "updatedAt": "2026-08-21T10:25:43.705Z",
+      "page": {
+        "widthMm": 210,
+        "heightMm": 188
+      },
+      "elements": [
+        {
+          "id": "30bb685d-6be7-405c-a8d2-c375e8ebc887",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 210.01,
+          "height": 31.04,
+          "rotation": 0,
+          "style": {
+            "fill": "#1F295C",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "44e36ede-56d7-40a9-a8db-a6526c2a4cea",
+          "type": "text",
+          "x": 0,
+          "y": 13.4,
+          "width": 210.01,
+          "height": 17.64,
+          "rotation": 0,
+          "style": {
+            "fill": "#ffffff",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 9.88,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "Ime Regala",
+          "spans": [
+            {
+              "start": 0,
+              "end": 10,
+              "fontSizeMm": 9.9
+            }
+          ]
+        },
+        {
+          "id": "63ccd3ff-7dd1-4f34-ae8d-19caf7791f8f",
+          "type": "text",
+          "x": 0,
+          "y": 31.19,
+          "width": 210.01,
+          "height": 22.82,
+          "rotation": 0,
+          "style": {
+            "fill": "#221F1F",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 18,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "HBC.05.001",
+          "binding": "shelf_name",
+          "spans": []
+        },
+        {
+          "id": "97d00243-91a3-48d4-a56c-8ca8b23488da",
+          "type": "rect",
+          "x": 0,
+          "y": 54.01,
+          "width": 210.01,
+          "height": 18.31,
+          "rotation": 0,
+          "style": {
+            "fill": "#1F295C",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "7af3ee14-d3cc-4329-9da8-9a4e8986eb6b",
+          "type": "line",
+          "x": 0,
+          "y": 93.5,
+          "width": 210.10000000000002,
+          "height": 4,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#12263A",
+            "strokeWidth": 0.6,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "caac4f83-6ee3-41eb-8083-5679831c33b9",
+          "type": "line",
+          "x": 0,
+          "y": 116.5,
+          "width": 210.10000000000002,
+          "height": 4,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#12263A",
+            "strokeWidth": 0.6,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "87a7cb26-f388-4f09-a14c-6cb32d00f9bb",
+          "type": "line",
+          "x": 0,
+          "y": 139.5,
+          "width": 210.10000000000002,
+          "height": 4,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#12263A",
+            "strokeWidth": 0.6,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "77f8ce10-838d-4e5b-8d8f-466a49f5a951",
+          "type": "line",
+          "x": 0,
+          "y": 162.5,
+          "width": 210.10000000000002,
+          "height": 4,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#12263A",
+            "strokeWidth": 0.6,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "2a6a1b89-e895-4dc6-bf38-7c1482c6c0dd",
+          "type": "line",
+          "x": 0,
+          "y": 185.5,
+          "width": 210.10000000000002,
+          "height": 4,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#12263A",
+            "strokeWidth": 0.6,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "4fb11742-e90e-4988-8860-3a57b5eb221f",
+          "type": "line",
+          "x": 160,
+          "y": 54.20841642924994,
+          "width": 4,
+          "height": 133.1331671415003,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#12263A",
+            "strokeWidth": 0.6,
+            "opacity": 1,
+            "lineCap": "butt"
+          }
+        },
+        {
+          "id": "b6af3f60-5a6a-4c48-b04d-796dc0806057",
+          "type": "line",
+          "x": 160,
+          "y": 54.2,
+          "width": 4,
+          "height": 18.066656319012576,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#ffffff",
+            "strokeWidth": 0.6,
+            "opacity": 1,
+            "lineCap": "butt"
+          }
+        },
+        {
+          "id": "664aba5b-4f11-4903-bf0c-dfed159e2a3a",
+          "type": "text",
+          "x": 3.0000000000000004,
+          "y": 55.999999999999396,
+          "width": 13472.353288629502,
+          "height": 16.100000000000016,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 9,
+            "fontWeight": "bold",
+            "align": "left",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "Broj Crteža",
+          "spans": [
+            {
+              "start": 0,
+              "end": 11,
+              "fill": "#FFFFFF"
+            }
+          ],
+          "hidden": true
+        },
+        {
+          "id": "de7c724d-7254-42d5-9d28-fabc7bf08a77",
+          "type": "text",
+          "x": 173,
+          "y": 56,
+          "width": 12507.356556845389,
+          "height": 16.099999999999977,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Inter",
+            "fontSizeMm": 9,
+            "fontWeight": "bold",
+            "align": "left",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "Nivo",
+          "spans": [
+            {
+              "start": 0,
+              "end": 4,
+              "fill": "#FFFFFF"
+            }
+          ],
+          "hidden": true
+        },
+        {
+          "id": "34db6fe4-1e56-4981-9908-cc105d4722a8",
+          "type": "text",
+          "x": 2,
+          "y": 54.000000000000014,
+          "width": 158.00000000000054,
+          "height": 17.639999999999986,
+          "rotation": 0,
+          "style": {
+            "fill": "#ffffff",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 9.88,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "Broj Crteža",
+          "spans": [
+            {
+              "start": 0,
+              "end": 11,
+              "fontSizeMm": 9.9
+            }
+          ]
+        },
+        {
+          "id": "431d4a85-8007-4e77-9e43-c30716d37c0a",
+          "type": "text",
+          "x": 160,
+          "y": 54.00000000000008,
+          "width": 52.10000000000048,
+          "height": 17.639999999999972,
+          "rotation": 0,
+          "style": {
+            "fill": "#ffffff",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 9.88,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "Nivo",
+          "spans": [
+            {
+              "start": 0,
+              "end": 4,
+              "fontSizeMm": 9.9
+            }
+          ]
+        },
+        {
+          "id": "d899646f-38b1-4d44-a7c1-cb1faf408fe0",
+          "type": "text",
+          "x": 2,
+          "y": 103.10000000000001,
+          "width": 158.0000000000005,
+          "height": 7.9999999999999405,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 19,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0.5,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "98 456 969 80",
+          "spans": [
+            {
+              "start": 0,
+              "end": 2,
+              "fontSizeMm": 15
+            },
+            {
+              "start": 3,
+              "end": 7,
+              "fontSizeMm": 22
+            },
+            {
+              "start": 7,
+              "end": 10,
+              "fill": "#FF2600",
+              "fontSizeMm": 22
+            },
+            {
+              "start": 11,
+              "end": 13,
+              "fontSizeMm": 15
+            }
+          ]
+        },
+        {
+          "id": "1f9f8854-38a2-4646-b28c-b264bdbe66f5",
+          "type": "text",
+          "x": 160,
+          "y": 103.10000000000001,
+          "width": 51.99999999999966,
+          "height": 7.999999999999932,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 16,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 1.5,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "4",
+          "spans": []
+        },
+        {
+          "id": "1a6b1219-5ea4-4bfe-a4dc-49cd6938b8ea",
+          "type": "text",
+          "x": 2,
+          "y": 125.9,
+          "width": 158.0000000000005,
+          "height": 7.9999999999999405,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 19,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0.5,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "98 456 969 80",
+          "spans": [
+            {
+              "start": 0,
+              "end": 2,
+              "fontSizeMm": 15
+            },
+            {
+              "start": 3,
+              "end": 7,
+              "fontSizeMm": 22
+            },
+            {
+              "start": 7,
+              "end": 10,
+              "fill": "#FF2600",
+              "fontSizeMm": 22
+            },
+            {
+              "start": 11,
+              "end": 13,
+              "fontSizeMm": 15
+            }
+          ]
+        },
+        {
+          "id": "1f541a09-9116-40f7-b38f-c2794d0b1073",
+          "type": "text",
+          "x": 160,
+          "y": 125.9,
+          "width": 51.99999999999966,
+          "height": 7.999999999999932,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 16,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 1.5,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "3",
+          "spans": [],
+          "hidden": false
+        },
+        {
+          "id": "1bce83b0-2996-495b-87a7-cf4b323cb0fb",
+          "type": "text",
+          "x": 2,
+          "y": 149.1,
+          "width": 158.0000000000005,
+          "height": 7.9999999999999405,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 19,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0.5,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "98 456 969 80",
+          "spans": [
+            {
+              "start": 0,
+              "end": 2,
+              "fontSizeMm": 15
+            },
+            {
+              "start": 3,
+              "end": 7,
+              "fontSizeMm": 22
+            },
+            {
+              "start": 7,
+              "end": 10,
+              "fill": "#FF2600",
+              "fontSizeMm": 22
+            },
+            {
+              "start": 11,
+              "end": 13,
+              "fontSizeMm": 15
+            }
+          ]
+        },
+        {
+          "id": "79c95df6-6810-43b9-a9b1-ee6bf1253a1e",
+          "type": "text",
+          "x": 160,
+          "y": 149.1,
+          "width": 51.99999999999966,
+          "height": 7.999999999999932,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 16,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 1.5,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "2",
+          "spans": []
+        },
+        {
+          "id": "3b991bf9-d234-42ef-9489-349bd68c4c68",
+          "type": "text",
+          "x": 2,
+          "y": 172.10000000000002,
+          "width": 158.0000000000005,
+          "height": 7.9999999999999405,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 19,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0.5,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "98 456 969 80",
+          "spans": [
+            {
+              "start": 0,
+              "end": 2,
+              "fontSizeMm": 15
+            },
+            {
+              "start": 3,
+              "end": 7,
+              "fontSizeMm": 22
+            },
+            {
+              "start": 7,
+              "end": 10,
+              "fill": "#FF2600",
+              "fontSizeMm": 22
+            },
+            {
+              "start": 11,
+              "end": 13,
+              "fontSizeMm": 15
+            }
+          ]
+        },
+        {
+          "id": "6393070e-ee3a-4287-a2e0-06ecf4e1269b",
+          "type": "text",
+          "x": 160,
+          "y": 172.10000000000002,
+          "width": 51.99999999999966,
+          "height": 7.999999999999932,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 16,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 1.5,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "1",
+          "spans": []
+        },
+        {
+          "id": "4d1d92c8-d994-4da7-9fd9-83592d57d1a7",
+          "type": "text",
+          "x": 160,
+          "y": 80,
+          "width": 51.99999999999966,
+          "height": 7.999999999999932,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 16,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 1.5,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "5",
+          "spans": []
+        },
+        {
+          "id": "dc8bc12a-4f3e-4ec4-af7d-4b15d07ab95d",
+          "type": "text",
+          "x": 2,
+          "y": 80,
+          "width": 158.0000000000005,
+          "height": 7.9999999999999405,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 19,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0.5,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "98 456 969 80",
+          "spans": [
+            {
+              "start": 0,
+              "end": 2,
+              "fontSizeMm": 15
+            },
+            {
+              "start": 3,
+              "end": 7,
+              "fontSizeMm": 22
+            },
+            {
+              "start": 7,
+              "end": 10,
+              "fill": "#FF2600",
+              "fontSizeMm": 22
+            },
+            {
+              "start": 11,
+              "end": 13,
+              "fontSizeMm": 15
+            }
+          ]
+        }
+      ],
+      "catalogId": "hbc_a4",
+      "description": "A4 shelf label. One Excel row per shelf (levels 5→1 as columns).",
+      "dataColumns": [
+        {
+          "key": "shelf_name",
+          "label": "Ime Regala",
+          "headers": [
+            "Ime Regala",
+            "SHELF"
+          ],
+          "example": "HBC.05.001",
+          "required": true
+        },
+        {
+          "key": "lvl5",
+          "label": "Nivo 5",
+          "headers": [
+            "Nivo 5",
+            "lvl5"
+          ],
+          "example": "9845796980",
+          "required": true
+        },
+        {
+          "key": "lvl4",
+          "label": "Nivo 4",
+          "headers": [
+            "Nivo 4",
+            "lvl4"
+          ],
+          "example": "9845796880",
+          "required": false
+        },
+        {
+          "key": "lvl3",
+          "label": "Nivo 3",
+          "headers": [
+            "Nivo 3",
+            "lvl3"
+          ],
+          "example": "9845796780",
+          "required": false
+        },
+        {
+          "key": "lvl2",
+          "label": "Nivo 2",
+          "headers": [
+            "Nivo 2",
+            "lvl2"
+          ],
+          "example": "9845796680",
+          "required": false
+        },
+        {
+          "key": "lvl1",
+          "label": "Nivo 1",
+          "headers": [
+            "Nivo 1",
+            "lvl1"
+          ],
+          "example": "9845796580",
+          "required": false
+        }
+      ],
+      "folderId": "655d6e1b-31bb-4d5e-ae3d-0ca99fbdead6"
+    },
+    {
+      "version": 1,
+      "id": "d74d79b4-d004-47d5-b9f2-373d06a3abcc",
+      "name": "Složivost A4",
+      "updatedAt": "2026-08-21T10:24:27.334Z",
+      "page": {
+        "widthMm": 210,
+        "heightMm": 148.5
+      },
+      "elements": [
+        {
+          "id": "aff6b341-6cbd-4329-9742-b54626f02e46",
+          "type": "text",
+          "x": 17,
+          "y": 99,
+          "width": 84.67,
+          "height": 11.29,
+          "rotation": 0,
+          "style": {
+            "fill": "#737373",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 14,
+            "fontWeight": "bold",
+            "align": "left",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "SLOŽIVOST",
+          "spans": []
+        },
+        {
+          "id": "ac0c90fc-df18-4f82-923e-9b46e7033ad3",
+          "type": "text",
+          "x": 103.60000000000001,
+          "y": 5.5,
+          "width": 94.9,
+          "height": 137.58,
+          "rotation": 0,
+          "style": {
+            "fill": "#221F1F",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 140,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "4",
+          "binding": "stackability",
+          "spans": []
+        },
+        {
+          "id": "2653f09b-1f8c-47c0-8581-aab5d2d2dfe2",
+          "type": "text",
+          "x": 17,
+          "y": 116.30000000000001,
+          "width": 81.49,
+          "height": 6,
+          "rotation": 0,
+          "style": {
+            "fill": "#737373",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 3.88,
+            "fontWeight": "normal",
+            "align": "left",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "WG1D.02.001",
+          "binding": "address"
+        },
+        {
+          "id": "70a3123c-9293-44f2-ae6d-8bcc50c89a97",
+          "type": "doubleArrow",
+          "x": 69.5,
+          "y": 26.700000000000003,
+          "width": 61.79999999999969,
+          "height": 50.441648995226856,
+          "rotation": 90,
+          "style": {
+            "fill": "#737373",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "arrowKind": "line"
+          }
+        }
+      ],
+      "catalogId": "slozivost_a4",
+      "description": "Two stackability labels per A4 page.",
+      "dataColumns": [
+        {
+          "key": "address",
+          "label": "Address",
+          "headers": [
+            "MAP SIMPLE",
+            "Map Simple",
+            "POSITION",
+            "address"
+          ],
+          "example": "WG1D.02.001",
+          "required": true
+        },
+        {
+          "key": "stackability",
+          "label": "Složivost",
+          "headers": [
+            "Stackability",
+            "SLOŽIVOST",
+            "SLOZIVOST"
+          ],
+          "example": "4",
+          "required": true
+        }
+      ],
+      "sheet": {
+        "pageSize": "A4",
+        "columns": 1,
+        "rows": 2,
+        "gapMm": 0,
+        "marginMm": 0
+      },
+      "folderId": "655d6e1b-31bb-4d5e-ae3d-0ca99fbdead6"
+    },
+    {
+      "version": 1,
+      "id": "6060f5ce-7572-44a4-b085-9845557f62df",
+      "name": "Canopy A3 — 3 PN",
+      "updatedAt": "2026-08-21T10:13:29.640Z",
+      "page": {
+        "widthMm": 420,
+        "heightMm": 297
+      },
+      "elements": [
+        {
+          "id": "e6df037f-5216-4099-89f2-4a5761ba8043",
+          "type": "text",
+          "x": 2.999999999997799,
+          "y": 144.09807234953317,
+          "width": 413.9912574463333,
+          "height": 61.39192765046591,
+          "rotation": 0,
+          "style": {
+            "fill": "#221F1F",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 50,
+            "fontWeight": "normal",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 1.2,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "WG1D.11.014",
+          "binding": "position",
+          "spans": []
+        },
+        {
+          "id": "f23c3182-5d62-4c2e-bbfd-362383ffbe8c",
+          "type": "text",
+          "x": 7.300000000000001,
+          "y": 194.20000000000002,
+          "width": 32.81,
+          "height": 11.29,
+          "rotation": 0,
+          "style": {
+            "fill": "#929292",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Inter",
+            "fontSizeMm": 5.48,
+            "fontWeight": "bold",
+            "align": "left",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "MAGACIN",
+          "spans": []
+        },
+        {
+          "id": "6cd9eef1-185f-490b-9cf3-217a3862927d",
+          "type": "barcode",
+          "x": 3.5587110847113914,
+          "y": 208.40000000000043,
+          "width": 412.83512146089237,
+          "height": 85.64192958046354,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "barcodeSymbology": "code128",
+            "barcodeDisplayValue": false,
+            "opacity": 1
+          },
+          "content": "WG1D.11.014%",
+          "binding": "barcode",
+          "fallbackBinding": "position",
+          "transform": "barcode_pct"
+        },
+        {
+          "id": "726c846a-544f-4ce1-ae72-054c98f24be5",
+          "type": "rect",
+          "x": 4.297643277117015,
+          "y": 3.9511120583162653,
+          "width": 411.2864270691328,
+          "height": 46.85245474140415,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 1.5,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "30941b40-230e-4121-b4c5-4847a0cd9431",
+          "type": "rect",
+          "x": 4.297643277117015,
+          "y": 50.803566799720436,
+          "width": 411.2864270691328,
+          "height": 46.85245474140415,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 1.5,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "8cd14574-73ff-4aac-be8a-8c133f92143e",
+          "type": "rect",
+          "x": 4.297643277117015,
+          "y": 97.65602154112467,
+          "width": 411.2864270691328,
+          "height": 46.85245474140415,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 1.5,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "4a62dd26-79ff-495f-897b-0070708b19eb",
+          "type": "rect",
+          "x": 4.29781516107035,
+          "y": 144.5034475155112,
+          "width": 411.39601738453337,
+          "height": 60.94209668871914,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 1.5,
+            "opacity": 1,
+            "cornerRadiusMm": 0
+          }
+        },
+        {
+          "id": "b240239d-b6b9-4cc9-90d9-742ea2f0a94f",
+          "type": "rect",
+          "x": 340.3000000000002,
+          "y": 3.2000000000000126,
+          "width": 76.09383254560362,
+          "height": 46.82157073180953,
+          "rotation": 0,
+          "style": {
+            "fill": "#1F295C",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "990e9cc3-4a90-4553-9057-bd6b055984ea",
+          "type": "rect",
+          "x": 340.3000000000001,
+          "y": 51.54287055162836,
+          "width": 76.0938325456038,
+          "height": 45.37384723758838,
+          "rotation": 0,
+          "style": {
+            "fill": "#1F295C",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "d48acd02-cc98-4a35-9bdd-43078ff53c11",
+          "type": "rect",
+          "x": 340.3000000000001,
+          "y": 98.39524703441889,
+          "width": 76.09383254560372,
+          "height": 45.33749741453516,
+          "rotation": 0,
+          "style": {
+            "fill": "#1F295C",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "6f1d2868-c1d8-4cb1-abf7-3be57b9aced8",
+          "type": "text",
+          "x": 347,
+          "y": 2.999999999999824,
+          "width": 65.33972730017895,
+          "height": 45.86000000000004,
+          "rotation": 0,
+          "style": {
+            "fill": "#ffffff",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 35,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "x1",
+          "binding": "qty1",
+          "spans": []
+        },
+        {
+          "id": "79144a9b-19ce-4b2d-98ec-7cfd9ed201e9",
+          "type": "text",
+          "x": 3.531744789318125,
+          "y": 4.499999999999669,
+          "width": 337.37733075263066,
+          "height": 45.58144574591697,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 43,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0.4,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "98 559 366 80",
+          "spans": [
+            {
+              "start": 0,
+              "end": 2,
+              "fontSizeMm": 40
+            },
+            {
+              "start": 3,
+              "end": 7,
+              "fontSizeMm": 52
+            },
+            {
+              "start": 7,
+              "end": 10,
+              "fill": "#FF2600",
+              "fontSizeMm": 52
+            },
+            {
+              "start": 11,
+              "end": 13,
+              "fontSizeMm": 40
+            }
+          ]
+        },
+        {
+          "id": "1c84c33b-6ac4-4ee4-875e-3b47cee378e2",
+          "type": "text",
+          "x": 347,
+          "y": 50.1,
+          "width": 65.33972730017895,
+          "height": 45.86000000000004,
+          "rotation": 0,
+          "style": {
+            "fill": "#ffffff",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 35,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "x2",
+          "binding": "qty1",
+          "spans": []
+        },
+        {
+          "id": "f01775b2-1324-4dc7-9b4e-1abd08d6a6f5",
+          "type": "text",
+          "x": 347,
+          "y": 96.4,
+          "width": 65.33972730017895,
+          "height": 45.86000000000004,
+          "rotation": 0,
+          "style": {
+            "fill": "#ffffff",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 35,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "x3",
+          "binding": "qty1",
+          "spans": []
+        },
+        {
+          "id": "3d98b03d-746e-46ba-bcd6-d367216456ca",
+          "type": "text",
+          "x": 2.9000000000000004,
+          "y": 51.7,
+          "width": 337.37733075263066,
+          "height": 45.58144574591697,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 43,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0.4,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "98 559 366 80",
+          "spans": [
+            {
+              "start": 0,
+              "end": 2,
+              "fontSizeMm": 40
+            },
+            {
+              "start": 3,
+              "end": 7,
+              "fontSizeMm": 52
+            },
+            {
+              "start": 7,
+              "end": 10,
+              "fill": "#FF2600",
+              "fontSizeMm": 52
+            },
+            {
+              "start": 11,
+              "end": 13,
+              "fontSizeMm": 40
+            }
+          ]
+        },
+        {
+          "id": "6086a9a6-ec55-42c2-b19c-3adc38ed2b19",
+          "type": "text",
+          "x": 3,
+          "y": 98,
+          "width": 337.37733075263066,
+          "height": 45.58144574591697,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 43,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0.4,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "98 559 366 80",
+          "spans": [
+            {
+              "start": 0,
+              "end": 2,
+              "fontSizeMm": 40
+            },
+            {
+              "start": 3,
+              "end": 7,
+              "fontSizeMm": 52
+            },
+            {
+              "start": 7,
+              "end": 10,
+              "fill": "#FF2600",
+              "fontSizeMm": 52
+            },
+            {
+              "start": 11,
+              "end": 13,
+              "fontSizeMm": 40
+            }
+          ]
+        }
+      ],
+      "catalogId": "canopy_a3_3pn",
+      "description": "Canopy A3 for positions with three part numbers.",
+      "dataColumns": [
+        {
+          "key": "position",
+          "label": "Position",
+          "headers": [
+            "MAP SIMPLE",
+            "Position",
+            "position"
+          ],
+          "example": "WG1D.11.014",
+          "required": true
+        },
+        {
+          "key": "ref1",
+          "label": "Part number 1",
+          "headers": [
+            "ref1"
+          ],
+          "example": "9855936580",
+          "required": true
+        },
+        {
+          "key": "qty1",
+          "label": "Qty 1",
+          "headers": [
+            "qty1"
+          ],
+          "example": "3",
+          "required": true
+        },
+        {
+          "key": "ref2",
+          "label": "Part number 2",
+          "headers": [
+            "ref2"
+          ],
+          "example": "9855936180",
+          "required": true
+        },
+        {
+          "key": "qty2",
+          "label": "Qty 2",
+          "headers": [
+            "qty2"
+          ],
+          "example": "1",
+          "required": true
+        },
+        {
+          "key": "ref3",
+          "label": "Part number 3",
+          "headers": [
+            "ref3"
+          ],
+          "example": "9860692580",
+          "required": true
+        },
+        {
+          "key": "qty3",
+          "label": "Qty 3",
+          "headers": [
+            "qty3"
+          ],
+          "example": "1",
+          "required": true
+        },
+        {
+          "key": "barcode",
+          "label": "Barcode",
+          "headers": [
+            "BARCODE",
+            "Map",
+            "MAP"
+          ],
+          "example": "WG1D.11.014%",
+          "required": false
+        }
+      ],
+      "folderId": "655d6e1b-31bb-4d5e-ae3d-0ca99fbdead6"
+    },
+    {
+      "version": 1,
+      "id": "14057388-ae40-4251-a03d-d9cb77a5d0e4",
+      "name": "Canopy A3 — 1 PN",
+      "updatedAt": "2026-08-21T10:12:01.330Z",
+      "page": {
+        "widthMm": 420,
+        "heightMm": 297
+      },
+      "elements": [
+        {
+          "id": "e6df037f-5216-4099-89f2-4a5761ba8043",
+          "type": "text",
+          "x": 3,
+          "y": 128.3,
+          "width": 413.9912574463333,
+          "height": 61.39192765046591,
+          "rotation": 0,
+          "style": {
+            "fill": "#221F1F",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 50,
+            "fontWeight": "normal",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 1,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "WG1D.11.014",
+          "binding": "position",
+          "spans": []
+        },
+        {
+          "id": "f23c3182-5d62-4c2e-bbfd-362383ffbe8c",
+          "type": "text",
+          "x": 7.300000000000001,
+          "y": 194.20000000000002,
+          "width": 32.81,
+          "height": 11.29,
+          "rotation": 0,
+          "style": {
+            "fill": "#929292",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Inter",
+            "fontSizeMm": 5.48,
+            "fontWeight": "bold",
+            "align": "left",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "MAGACIN",
+          "spans": []
+        },
+        {
+          "id": "6cd9eef1-185f-490b-9cf3-217a3862927d",
+          "type": "barcode",
+          "x": 3.7,
+          "y": 208.5,
+          "width": 412.0253592615328,
+          "height": 85.64192958046343,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "barcodeSymbology": "code128",
+            "barcodeDisplayValue": false,
+            "opacity": 1
+          },
+          "content": "WG1D.11.014%",
+          "binding": "barcode",
+          "fallbackBinding": "position",
+          "transform": "barcode_pct"
+        },
+        {
+          "id": "726c846a-544f-4ce1-ae72-054c98f24be5",
+          "type": "rect",
+          "x": 4.297643277116902,
+          "y": 4.698676302212994,
+          "width": 411.2864270691272,
+          "height": 105.71295471543367,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 1.5,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "4a62dd26-79ff-495f-897b-0070708b19eb",
+          "type": "rect",
+          "x": 4.297719513031272,
+          "y": 110.3084977941427,
+          "width": 411.2863508332118,
+          "height": 94.710564302512,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 1.5,
+            "opacity": 1,
+            "cornerRadiusMm": 0
+          }
+        },
+        {
+          "id": "79144a9b-19ce-4b2d-98ec-7cfd9ed201e9",
+          "type": "text",
+          "x": 4,
+          "y": 37,
+          "width": 411.2864270691285,
+          "height": 45.581445745916525,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 55.1,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": -1.4,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "98 559 366 80",
+          "spans": [
+            {
+              "start": 0,
+              "end": 2,
+              "fontSizeMm": 44
+            },
+            {
+              "start": 3,
+              "end": 7,
+              "fontSizeMm": 73
+            },
+            {
+              "start": 7,
+              "end": 10,
+              "fill": "#FF2600",
+              "fontSizeMm": 73
+            },
+            {
+              "start": 11,
+              "end": 13,
+              "fontSizeMm": 44
+            }
+          ]
+        }
+      ],
+      "description": "Canopy A3 for positions with three part numbers.",
+      "dataColumns": [
+        {
+          "key": "position",
+          "label": "Position",
+          "headers": [
+            "MAP SIMPLE",
+            "Position",
+            "position"
+          ],
+          "example": "WG1D.11.014",
+          "required": true
+        },
+        {
+          "key": "ref1",
+          "label": "Part number 1",
+          "headers": [
+            "ref1"
+          ],
+          "example": "9855936580",
+          "required": true
+        },
+        {
+          "key": "qty1",
+          "label": "Qty 1",
+          "headers": [
+            "qty1"
+          ],
+          "example": "3",
+          "required": true
+        },
+        {
+          "key": "ref2",
+          "label": "Part number 2",
+          "headers": [
+            "ref2"
+          ],
+          "example": "9855936180",
+          "required": true
+        },
+        {
+          "key": "qty2",
+          "label": "Qty 2",
+          "headers": [
+            "qty2"
+          ],
+          "example": "1",
+          "required": true
+        },
+        {
+          "key": "ref3",
+          "label": "Part number 3",
+          "headers": [
+            "ref3"
+          ],
+          "example": "9860692580",
+          "required": true
+        },
+        {
+          "key": "qty3",
+          "label": "Qty 3",
+          "headers": [
+            "qty3"
+          ],
+          "example": "1",
+          "required": true
+        },
+        {
+          "key": "barcode",
+          "label": "Barcode",
+          "headers": [
+            "BARCODE",
+            "Map",
+            "MAP"
+          ],
+          "example": "WG1D.11.014%",
+          "required": false
+        }
+      ],
+      "folderId": "655d6e1b-31bb-4d5e-ae3d-0ca99fbdead6"
+    },
+    {
+      "version": 1,
+      "id": "374ebcd7-87ef-4c98-b006-3cb9d38d659b",
+      "name": "Canopy A3 — 2 PN",
+      "updatedAt": "2026-08-21T10:11:18.478Z",
+      "page": {
+        "widthMm": 420,
+        "heightMm": 297
+      },
+      "elements": [
+        {
+          "id": "e6df037f-5216-4099-89f2-4a5761ba8043",
+          "type": "text",
+          "x": 2.999999999997799,
+          "y": 144.09807234953317,
+          "width": 413.9912574463333,
+          "height": 61.39192765046591,
+          "rotation": 0,
+          "style": {
+            "fill": "#221F1F",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 52,
+            "fontWeight": "normal",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "WG1D.11.014",
+          "binding": "position",
+          "spans": []
+        },
+        {
+          "id": "f23c3182-5d62-4c2e-bbfd-362383ffbe8c",
+          "type": "text",
+          "x": 7.300000000000001,
+          "y": 194.20000000000002,
+          "width": 32.81,
+          "height": 11.29,
+          "rotation": 0,
+          "style": {
+            "fill": "#929292",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 5.48,
+            "fontWeight": "bold",
+            "align": "left",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "MAGACIN",
+          "spans": []
+        },
+        {
+          "id": "6cd9eef1-185f-490b-9cf3-217a3862927d",
+          "type": "barcode",
+          "x": 3.5587110847113914,
+          "y": 208.40000000000043,
+          "width": 412.83512146089237,
+          "height": 85.64192958046354,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "barcodeSymbology": "code128",
+            "barcodeDisplayValue": false,
+            "opacity": 1
+          },
+          "content": "WG1D.11.014%",
+          "binding": "barcode",
+          "fallbackBinding": "position",
+          "transform": "barcode_pct"
+        },
+        {
+          "id": "726c846a-544f-4ce1-ae72-054c98f24be5",
+          "type": "rect",
+          "x": 4.29764327711702,
+          "y": 4.323108076060943,
+          "width": 411.2864270691319,
+          "height": 70.05661767873619,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 1.5,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "30941b40-230e-4121-b4c5-4847a0cd9431",
+          "type": "rect",
+          "x": 4.29764327711702,
+          "y": 74.37972575479712,
+          "width": 411.2864270691319,
+          "height": 70.05661767873619,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 1.5,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "4a62dd26-79ff-495f-897b-0070708b19eb",
+          "type": "rect",
+          "x": 4.29781516107035,
+          "y": 144.5034475155112,
+          "width": 411.39601738453337,
+          "height": 60.94209668871914,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#929292",
+            "strokeWidth": 1.5,
+            "opacity": 1,
+            "cornerRadiusMm": 0
+          }
+        },
+        {
+          "id": "b240239d-b6b9-4cc9-90d9-742ea2f0a94f",
+          "type": "rect",
+          "x": 340.29999999999916,
+          "y": 3.2000000000000215,
+          "width": 76.09383254560343,
+          "height": 70.0104380438697,
+          "rotation": 0,
+          "style": {
+            "fill": "#1F295C",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "990e9cc3-4a90-4553-9057-bd6b055984ea",
+          "type": "rect",
+          "x": 340.2999999999991,
+          "y": 75.48517733853447,
+          "width": 76.09383254560363,
+          "height": 67.84571451126155,
+          "rotation": 0,
+          "style": {
+            "fill": "#1F295C",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "6f1d2868-c1d8-4cb1-abf7-3be57b9aced8",
+          "type": "text",
+          "x": 340.72155541396813,
+          "y": 14.899999999999984,
+          "width": 75.68069485364357,
+          "height": 45.85999999999996,
+          "rotation": 0,
+          "style": {
+            "fill": "#ffffff",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 35,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "x1",
+          "binding": "qty1",
+          "spans": []
+        },
+        {
+          "id": "79144a9b-19ce-4b2d-98ec-7cfd9ed201e9",
+          "type": "text",
+          "x": 3.531744789318135,
+          "y": 17.900000000000002,
+          "width": 337.1898106246501,
+          "height": 45.58144574591704,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 44,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "98 559 366 80",
+          "spans": [
+            {
+              "start": 0,
+              "end": 2,
+              "fontSizeMm": 38
+            },
+            {
+              "start": 3,
+              "end": 7,
+              "fontSizeMm": 55
+            },
+            {
+              "start": 7,
+              "end": 10,
+              "fill": "#FF2600",
+              "fontSizeMm": 55
+            },
+            {
+              "start": 11,
+              "end": 13,
+              "fontSizeMm": 38
+            }
+          ]
+        },
+        {
+          "id": "1c84c33b-6ac4-4ee4-875e-3b47cee378e2",
+          "type": "text",
+          "x": 340.72155541396813,
+          "y": 86.09999999999984,
+          "width": 75.68069485364357,
+          "height": 45.85999999999996,
+          "rotation": 0,
+          "style": {
+            "fill": "#ffffff",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 35,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "x2",
+          "binding": "qty1",
+          "spans": []
+        },
+        {
+          "id": "0f831072-4759-4b51-b1c0-bc29a4f386d8",
+          "type": "text",
+          "x": 3.5,
+          "y": 87.80000000000001,
+          "width": 337.1898106246501,
+          "height": 45.58144574591704,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 44,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "98 559 366 80",
+          "spans": [
+            {
+              "start": 0,
+              "end": 2,
+              "fontSizeMm": 38
+            },
+            {
+              "start": 3,
+              "end": 7,
+              "fontSizeMm": 55
+            },
+            {
+              "start": 7,
+              "end": 10,
+              "fill": "#FF2600",
+              "fontSizeMm": 55
+            },
+            {
+              "start": 11,
+              "end": 13,
+              "fontSizeMm": 38
+            }
+          ]
+        }
+      ],
+      "description": "Canopy A3 for positions with three part numbers.",
+      "dataColumns": [
+        {
+          "key": "position",
+          "label": "Position",
+          "headers": [
+            "MAP SIMPLE",
+            "Position",
+            "position"
+          ],
+          "example": "WG1D.11.014",
+          "required": true
+        },
+        {
+          "key": "ref1",
+          "label": "Part number 1",
+          "headers": [
+            "ref1"
+          ],
+          "example": "9855936580",
+          "required": true
+        },
+        {
+          "key": "qty1",
+          "label": "Qty 1",
+          "headers": [
+            "qty1"
+          ],
+          "example": "3",
+          "required": true
+        },
+        {
+          "key": "ref2",
+          "label": "Part number 2",
+          "headers": [
+            "ref2"
+          ],
+          "example": "9855936180",
+          "required": true
+        },
+        {
+          "key": "qty2",
+          "label": "Qty 2",
+          "headers": [
+            "qty2"
+          ],
+          "example": "1",
+          "required": true
+        },
+        {
+          "key": "ref3",
+          "label": "Part number 3",
+          "headers": [
+            "ref3"
+          ],
+          "example": "9860692580",
+          "required": true
+        },
+        {
+          "key": "qty3",
+          "label": "Qty 3",
+          "headers": [
+            "qty3"
+          ],
+          "example": "1",
+          "required": true
+        },
+        {
+          "key": "barcode",
+          "label": "Barcode",
+          "headers": [
+            "BARCODE",
+            "Map",
+            "MAP"
+          ],
+          "example": "WG1D.11.014%",
+          "required": false
+        }
+      ],
+      "folderId": "655d6e1b-31bb-4d5e-ae3d-0ca99fbdead6"
+    },
+    {
+      "version": 1,
+      "id": "ac4c76e0-42b0-4233-94d9-946516d43d80",
+      "name": "OVS A3 dual",
+      "updatedAt": "2026-08-21T09:41:43.993Z",
+      "page": {
+        "widthMm": 380,
+        "heightMm": 100
+      },
+      "elements": [
+        {
+          "id": "f26451d0-282a-4950-961b-9cbb2361f0a8",
+          "type": "rect",
+          "x": 7.960918069390736e-14,
+          "y": 1.2597122822428791e-14,
+          "width": 379.99999999999966,
+          "height": 47.29963592874802,
+          "rotation": 0,
+          "style": {
+            "fill": "#1F295C",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1
+          }
+        },
+        {
+          "id": "b844eb1d-ad0d-4b61-b4da-17ee54b2244d",
+          "type": "text",
+          "x": -6.908662656482464e-15,
+          "y": 6.000000000000006,
+          "width": 380.00000000000034,
+          "height": 38.449999999999946,
+          "rotation": 0,
+          "style": {
+            "fill": "#ffffff",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 28.63,
+            "fontWeight": "normal",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 1.4,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "OVS FIKSNE POZICIJE",
+          "binding": "title",
+          "spans": []
+        },
+        {
+          "id": "1d477871-e6f7-4fc2-be4b-125ae4f54edf",
+          "type": "text",
+          "x": 155.605,
+          "y": 5.1000000000000005,
+          "width": 68.79,
+          "height": 7.06,
+          "rotation": 0,
+          "style": {
+            "fill": "#0061ff",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 4.28,
+            "fontWeight": "normal",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "HB2K.001.001",
+          "binding": "mapping_address",
+          "spans": []
+        },
+        {
+          "id": "b7154d4b-41ad-4a0e-aa43-37be04085556",
+          "type": "text",
+          "x": -5.117964787707968e-15,
+          "y": 33,
+          "width": 379.9999999999998,
+          "height": 78.99999999999996,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Open Sans",
+            "fontSizeMm": 48,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "73 581 423 80",
+          "spans": [
+            {
+              "start": 7,
+              "end": 10,
+              "fill": "#FF2600"
+            }
+          ]
+        }
+      ],
+      "catalogId": "simple_ovs_a3_dual",
+      "description": "Two OVS labels per A3 page.",
+      "dataColumns": [
+        {
+          "key": "reference",
+          "label": "Product code",
+          "headers": [
+            "Produit",
+            "REFERENCA",
+            "REFERENCE",
+            "PRODUCT"
+          ],
+          "example": "9847404480",
+          "required": true
+        },
+        {
+          "key": "title",
+          "label": "Header text",
+          "headers": [
+            "Title",
+            "HEADER",
+            "NASLOV"
+          ],
+          "example": "OVS FIKSNE POZICIJE",
+          "required": false
+        },
+        {
+          "key": "mapping_address",
+          "label": "Mapping address",
+          "headers": [
+            "New mapping",
+            "Mapping",
+            "MAPPING",
+            "Adresa",
+            "Location",
+            "POSITION"
+          ],
+          "example": "HB2K.001.001",
+          "required": false
+        }
+      ],
+      "sheet": {
+        "pageSize": "A3",
+        "columns": 1,
+        "rows": 2,
+        "gapMm": 0,
+        "marginMm": 0
+      },
+      "folderId": "655d6e1b-31bb-4d5e-ae3d-0ca99fbdead6"
+    },
+    {
+      "version": 1,
+      "id": "5289784a-bd04-47ed-99da-e936c3618691",
+      "name": "GA Warehouse Dual",
+      "updatedAt": "2026-08-21T07:17:03.927Z",
+      "page": {
+        "widthMm": 408.98,
+        "heightMm": 133.63
+      },
+      "elements": [
+        {
+          "id": "ab5f9180-38d3-416c-94c4-9e72c5576468",
+          "type": "image",
+          "x": 0,
+          "y": 0,
+          "width": 408.98,
+          "height": 133.63,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "opacity": 1
+          },
+          "imageDataUrl": "/templates/ga/ga_warehouse_dual.png",
+          "locked": true,
+          "hidden": true
+        },
+        {
+          "id": "5720299a-f8db-48b9-ab3a-fc6e743df9f2",
+          "type": "barcode",
+          "x": 67.2,
+          "y": 0.6,
+          "width": 274.96,
+          "height": 21.87,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "barcodeSymbology": "code128",
+            "barcodeDisplayValue": false,
+            "opacity": 1
+          },
+          "content": "RHB7B.001.002",
+          "binding": "barcode_top",
+          "fallbackBinding": "address_top"
+        },
+        {
+          "id": "6cd5ee11-32dd-4364-898b-48b1fd4643a0",
+          "type": "barcode",
+          "x": 67.2,
+          "y": 110.77,
+          "width": 274.96,
+          "height": 21.87,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "barcodeSymbology": "code128",
+            "barcodeDisplayValue": false,
+            "opacity": 1
+          },
+          "content": "HB7B.001.001",
+          "binding": "barcode_bot",
+          "fallbackBinding": "address_bot"
+        },
+        {
+          "id": "0090e800-5b14-43bb-9d9b-452fcddc5f02",
+          "type": "rect",
+          "x": -0.9,
+          "y": 53.900000000000006,
+          "width": 409.90000000000003,
+          "height": 24.700000000000003,
+          "rotation": 0,
+          "style": {
+            "fill": "#2F5495",
+            "stroke": "transparent",
+            "strokeWidth": 0.4,
+            "opacity": 1
+          },
+          "hidden": false
+        },
+        {
+          "id": "57105f91-ef69-40ed-b57f-44eae9bd5a40",
+          "type": "text",
+          "x": -0.9,
+          "y": 56.1,
+          "width": 130.5,
+          "height": 20.8,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element",
+            "fontSizeMm": 4,
+            "fontWeight": "normal",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "MAGACIN",
+          "spans": [
+            {
+              "start": 0,
+              "end": 7,
+              "fill": "#FFFFFF",
+              "fontSizeMm": 21.6
+            }
+          ]
+        },
+        {
+          "id": "0e1634f7-4ff8-4a8f-a3da-800ca2666bc2",
+          "type": "text",
+          "x": 130.1,
+          "y": 56.1,
+          "width": 145.79244649647444,
+          "height": 20.800000000000086,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element",
+            "fontSizeMm": 4,
+            "fontWeight": "normal",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "REGAL",
+          "spans": [
+            {
+              "start": 0,
+              "end": 5,
+              "fill": "#FFFFFF",
+              "fontSizeMm": 21.6
+            }
+          ]
+        },
+        {
+          "id": "f4b7af25-262a-4b45-a3dc-0921c46da47e",
+          "type": "text",
+          "x": 276.1,
+          "y": 56.1,
+          "width": 133.189459459459,
+          "height": 20.800000000000065,
+          "rotation": 0,
+          "style": {
+            "fill": "#12263A",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element",
+            "fontSizeMm": 4,
+            "fontWeight": "normal",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "NIVO",
+          "spans": [
+            {
+              "start": 0,
+              "end": 4,
+              "fill": "#FFFFFF",
+              "fontSizeMm": 21.6
+            }
+          ]
+        },
+        {
+          "id": "f3d1f900-9b44-4863-8df2-a8d5ac9c2f56",
+          "type": "line",
+          "x": 274.0999999999999,
+          "y": 53.85613383655031,
+          "width": 4,
+          "height": 24.75944908227948,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#ffffff",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "lineCap": "butt"
+          }
+        },
+        {
+          "id": "ee71ba8c-9e2f-47e8-8666-3c1605b914dd",
+          "type": "line",
+          "x": 128.09999999999997,
+          "y": 53.85613383655031,
+          "width": 4,
+          "height": 24.75944908227948,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#ffffff",
+            "strokeWidth": 1,
+            "opacity": 1,
+            "lineCap": "butt"
+          }
+        },
+        {
+          "id": "f8e61d64-b1f6-4dad-9943-19285372cdc6",
+          "type": "text",
+          "x": 0,
+          "y": 23,
+          "width": 130.5,
+          "height": 34.06000000000002,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 34.95,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "HB1",
+          "binding": "address_top",
+          "transform": "ga_magacin",
+          "spans": []
+        },
+        {
+          "id": "b381e70f-f921-48bc-acc1-622de6476d78",
+          "type": "text",
+          "x": 130.1,
+          "y": 25,
+          "width": 45.68599184761867,
+          "height": 28.625461068883684,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 34.95,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "A",
+          "binding": "address_top",
+          "transform": "ga_regal_letter",
+          "spans": [
+            {
+              "start": 0,
+              "end": 1,
+              "fontSizeMm": 34.9
+            }
+          ]
+        },
+        {
+          "id": "46a680d5-0886-4025-ad55-18503980956e",
+          "type": "text",
+          "x": 196,
+          "y": 25,
+          "width": 57.75999999999984,
+          "height": 28.62546106888367,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 34.95,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "011",
+          "binding": "address_top",
+          "transform": "ga_regal_number",
+          "spans": [
+            {
+              "start": 0,
+              "end": 3,
+              "fontSizeMm": 34.9
+            }
+          ]
+        },
+        {
+          "id": "613b9a26-28ae-49ce-8cb6-5f7fab110d3e",
+          "type": "text",
+          "x": 287.2790509574329,
+          "y": 25.00000000000015,
+          "width": 70.52010808655132,
+          "height": 28.625461068883705,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 34.95,
+            "fontWeight": "bold",
+            "align": "left",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "002",
+          "binding": "address_top",
+          "transform": "ga_nivo",
+          "spans": [
+            {
+              "start": 0,
+              "end": 3,
+              "fontSizeMm": 34.9
+            }
+          ]
+        },
+        {
+          "id": "3592fa77-b2c4-4646-9b8d-9ee38c8d44a9",
+          "type": "arrow",
+          "x": 365.70000000000005,
+          "y": 50,
+          "width": 24.316094095974172,
+          "height": 23.537286811761195,
+          "rotation": 270,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "arrowKind": "line"
+          }
+        },
+        {
+          "id": "08d90fdd-e02d-4db9-bc9f-0f0f3005d692",
+          "type": "line",
+          "x": 409.0459192397793,
+          "y": 22.000000000000025,
+          "width": 4,
+          "height": 409.2529032184891,
+          "rotation": 90,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#000000",
+            "strokeWidth": 0.5,
+            "opacity": 1,
+            "lineCap": "butt"
+          },
+          "hidden": false
+        },
+        {
+          "id": "b892b795-e6f8-45e6-ae53-1799b82f5136",
+          "type": "line",
+          "x": 274.10000000000014,
+          "y": 23.791332601180805,
+          "width": 4,
+          "height": 30.070397204276663,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#000000",
+            "strokeWidth": 0.5,
+            "opacity": 1,
+            "lineCap": "butt"
+          }
+        },
+        {
+          "id": "46d9ea88-0c69-4bb5-b53f-89ea523276b2",
+          "type": "line",
+          "x": 128.1000000000002,
+          "y": 23.98439868212542,
+          "width": 4,
+          "height": 30.070397204276663,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#000000",
+            "strokeWidth": 0.5,
+            "opacity": 1,
+            "lineCap": "butt"
+          },
+          "hidden": false
+        },
+        {
+          "id": "4c84754e-4947-484c-880c-89f7062f9de0",
+          "type": "line",
+          "x": 274.10000000000014,
+          "y": 78.7,
+          "width": 4,
+          "height": 30.070397204276663,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#000000",
+            "strokeWidth": 0.5,
+            "opacity": 1,
+            "lineCap": "butt"
+          },
+          "hidden": false
+        },
+        {
+          "id": "996d7df5-d685-436e-a18a-eb11533a522f",
+          "type": "line",
+          "x": 128.1000000000002,
+          "y": 78.7,
+          "width": 4,
+          "height": 30.070397204276663,
+          "rotation": 0,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#000000",
+            "strokeWidth": 0.5,
+            "opacity": 1,
+            "lineCap": "butt"
+          },
+          "hidden": false
+        },
+        {
+          "id": "7fb6b6ec-d783-4c40-b15c-8dc3dc59a5ae",
+          "type": "line",
+          "x": 409.0459192397793,
+          "y": 107.10000000000001,
+          "width": 4,
+          "height": 409.2529032184891,
+          "rotation": 90,
+          "style": {
+            "fill": "transparent",
+            "stroke": "#000000",
+            "strokeWidth": 0.5,
+            "opacity": 1,
+            "lineCap": "butt"
+          },
+          "hidden": false
+        },
+        {
+          "id": "cc99d081-0d38-40df-86bf-b6f6f06f3b71",
+          "type": "text",
+          "x": 0,
+          "y": 77.10000000000001,
+          "width": 130.5,
+          "height": 34.06000000000002,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 34.95,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "RHB1",
+          "binding": "address_bot",
+          "transform": "ga_magacin",
+          "spans": [
+            {
+              "start": 0,
+              "end": 4,
+              "fontSizeMm": 35
+            }
+          ]
+        },
+        {
+          "id": "5f0251b7-f851-4b1e-9b35-4c68bf316d63",
+          "type": "text",
+          "x": 130,
+          "y": 79,
+          "width": 45.68599184761867,
+          "height": 28.625461068883684,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 34.95,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "A",
+          "binding": "address_bot",
+          "transform": "ga_regal_letter",
+          "spans": [
+            {
+              "start": 0,
+              "end": 1,
+              "fontSizeMm": 34.9
+            }
+          ]
+        },
+        {
+          "id": "879b43ae-b564-4b4e-9742-54cf6d397486",
+          "type": "text",
+          "x": 197,
+          "y": 79.30000000000001,
+          "width": 57.75999999999984,
+          "height": 28.62546106888367,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 34.95,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "011",
+          "binding": "address_bot",
+          "transform": "ga_regal_number",
+          "spans": [
+            {
+              "start": 0,
+              "end": 3,
+              "fontSizeMm": 34.9
+            }
+          ]
+        },
+        {
+          "id": "5ac34d0c-e338-416f-8d8d-6bc622424f73",
+          "type": "text",
+          "x": 289,
+          "y": 79.10000000000001,
+          "width": 57.75999999999984,
+          "height": 28.62546106888367,
+          "rotation": 0,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "fontFamily": "Artifakt Element Black",
+            "fontSizeMm": 34.95,
+            "fontWeight": "bold",
+            "align": "center",
+            "verticalAlign": "middle",
+            "letterSpacingMm": 0,
+            "lineHeight": 1,
+            "opacity": 1
+          },
+          "content": "001",
+          "binding": "address_bot",
+          "transform": "ga_nivo",
+          "spans": [
+            {
+              "start": 0,
+              "end": 3,
+              "fontSizeMm": 34.9
+            }
+          ]
+        },
+        {
+          "id": "84142850-0388-480b-a60a-2eff974b746f",
+          "type": "arrow",
+          "x": 389.3,
+          "y": 82.2,
+          "width": 24.316094095974172,
+          "height": 23.537286811761195,
+          "rotation": 90,
+          "style": {
+            "fill": "#000000",
+            "stroke": "transparent",
+            "strokeWidth": 0,
+            "opacity": 1,
+            "arrowKind": "line"
+          }
+        }
+      ],
+      "catalogId": "ga_warehouse_a3_dual",
+      "catalogRevision": 3,
+      "description": "One dual sticker (409 × 134 mm): level 002 UP over 001 DOWN. Generate packs 2 per A3 landscape.",
+      "dataColumns": [
+        {
+          "key": "address_top",
+          "label": "Top address",
+          "headers": [
+            "address_top",
+            "Address Top",
+            "TOP",
+            "MAP TOP"
+          ],
+          "example": "RHB7B.001.002",
+          "required": true
+        },
+        {
+          "key": "arrow_top",
+          "label": "Top arrow",
+          "headers": [
+            "arrow_top"
+          ],
+          "example": "UP",
+          "required": false
+        },
+        {
+          "key": "barcode_top",
+          "label": "Top barcode",
+          "headers": [
+            "barcode_top"
+          ],
+          "example": "RHB7B.001.002",
+          "required": false
+        },
+        {
+          "key": "address_bot",
+          "label": "Bottom address",
+          "headers": [
+            "address_bot",
+            "Address Bot",
+            "BOTTOM",
+            "MAP BOT"
+          ],
+          "example": "HB7B.001.001",
+          "required": true
+        },
+        {
+          "key": "arrow_bot",
+          "label": "Bottom arrow",
+          "headers": [
+            "arrow_bot"
+          ],
+          "example": "DOWN",
+          "required": false
+        },
+        {
+          "key": "barcode_bot",
+          "label": "Bottom barcode",
+          "headers": [
+            "barcode_bot"
+          ],
+          "example": "HB7B.001.001",
+          "required": false
+        }
+      ],
+      "sheet": {
+        "pageSize": "A3-landscape",
+        "columns": 1,
+        "rows": 2,
+        "gapMm": 0,
+        "marginMm": 2
+      },
+      "folderId": "655d6e1b-31bb-4d5e-ae3d-0ca99fbdead6"
+    }
+  ],
+  "folders": [
+    {
+      "id": "655d6e1b-31bb-4d5e-ae3d-0ca99fbdead6",
+      "name": "Stellantis Kragujevac"
+    }
+  ],
+  "currentId": "ff9a7d76-b9a8-4b29-a861-612b6142c9a9",
+  "data": {
+    "fileName": "GA Address",
+    "headers": [
+      "reference",
+      "position",
+      "title",
+      "arrow"
+    ],
+    "rows": [
+      {
+        "reference": "",
+        "position": "HB9A.011.001",
+        "title": "",
+        "arrow": "DOWN"
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      },
+      {
+        "reference": "",
+        "position": "",
+        "title": "",
+        "arrow": ""
+      }
+    ],
+    "mapping": {
+      "reference": "reference",
+      "Part Number": "reference",
+      "PN": "reference",
+      "part_number": "reference",
+      "position": "position",
+      "Assigned Location": "position",
+      "Location": "position",
+      "MAP SIMPLE": "position",
+      "address": "position",
+      "title": "title",
+      "Header text": "title",
+      "Title": "title",
+      "HEADER": "title",
+      "Header": "title",
+      "arrow": "arrow",
+      "Arrow": "arrow",
+      "ARROW": "arrow"
+    },
+    "previewRowIndex": 0
+  },
+  "librarySeeded": true,
+  "deletedIds": [
+    "2b2581b4-0b36-4ae0-9989-9b217d2a939b",
+    "58b22684-795f-4f68-a21a-4b0d6dfb7813",
+    "45eae67e-c612-47e7-ad68-22f9fcd1b8c5",
+    "fac55540-c7e5-4b54-a8d8-3a646854199a",
+    "cd241e8b-9df7-4a47-839f-120223ce0e4e",
+    "97ff9c04-9a9a-47bc-b4ea-345cc1740c79",
+    "33792bca-7905-4567-af1c-a830324f0689",
+    "d8469688-49bd-4465-a07d-282995fcfa9a",
+    "1c2bc8c0-64d1-449b-8cbc-323f64374ffe",
+    "5e15f1f7-542c-49db-aa10-cdf6c2ae392a",
+    "c1762bf4-16fd-48a9-8bbc-2bb835a9e5a2",
+    "3a9d77bb-cb95-48ee-8763-a0965537ed97",
+    "acab8291-b548-42d5-9117-a4a352de46e6",
+    "2da1fe8d-93ec-4bc1-8ae8-b605b20b5452",
+    "754d8c52-621a-44eb-a946-b568756a43fc",
+    "32ed3622-f0fa-4ed9-9167-57d7fefa84c0",
+    "886d87b2-428f-40eb-9526-45fdcf783098",
+    "95e1f090-e3d3-43f1-9b53-10b17c481185",
+    "ece6c6c9-3320-435f-8ac6-9355f22ceaa7",
+    "e32d8420-ae0e-499d-898f-469febef144f",
+    "c228a17e-14c2-46fc-8f7a-2b9fe8d1640a",
+    "cafb19d2-6e88-4e03-a984-eee51eaa198e",
+    "a077d024-9074-42d8-9b40-c3fdf9e5945b",
+    "075f44a9-2c05-469a-8305-49f1b7261db8",
+    "e902b4d0-56b9-4a7f-9a7f-5a5f1f21f4a2",
+    "5a157bfc-16ff-4528-9bab-df0a9af7f95f",
+    "e213087f-059b-48e7-b5df-d9f0e8859664",
+    "4bd45e6a-5138-4bff-981f-932f64f01ec8",
+    "b4c530c2-17a8-436d-82e5-7bac31d96333",
+    "6d0b2a74-48fb-4ce4-a1da-beb5cd78ecd2",
+    "0276696e-80dd-49c7-b697-5a12ca915b39",
+    "6a704dd0-bff7-402a-808f-ed88180382c8",
+    "0bc0130d-5732-40a7-ad73-42c2396d12ff",
+    "ede37710-1d6f-41e7-8adb-d41967b0469b",
+    "da01bc63-f568-4614-9e3e-d625fe83e3cc",
+    "9259947f-13a6-4c17-9be0-191f350af366"
+  ],
+  "deletedCatalogIds": [
+    "sample_shipping",
+    "canopy_a3_2pn",
+    "canopy_a3_1pn",
+    "simple_ovs_a3",
+    "fixed_ga_a3"
+  ],
+  "deletedFolderIds": [
+    "folder_warehouse",
+    "folder_ovs",
+    "folder_hbc",
+    "folder_canopy",
+    "folder_ga",
+    "folder_starter",
+    "folder_my_templates"
+  ],
+  "savedColors": [],
+  "activity": [
+    {
+      "type": "generate",
+      "templateId": "0a9b4a95-985c-487d-a58e-057a5e45ba57",
+      "templateName": "GA Address",
+      "labelCount": 1,
+      "fileName": "ga-address.pdf",
+      "pageSize": "A3-landscape",
+      "columns": 1,
+      "rows": 3,
+      "id": "7bec7a28-eaa1-4afa-9f79-191dac0ba675",
+      "timestamp": "2026-08-24T11:02:51.368Z"
+    },
+    {
+      "type": "generate",
+      "templateId": "0a9b4a95-985c-487d-a58e-057a5e45ba57",
+      "templateName": "GA Address",
+      "labelCount": 1,
+      "fileName": "ga-address.pdf",
+      "pageSize": "A3-landscape",
+      "columns": 1,
+      "rows": 3,
+      "id": "13cf843d-21bd-4460-8edf-e37718c74363",
+      "timestamp": "2026-08-24T11:02:19.593Z"
+    }
+  ]
+}

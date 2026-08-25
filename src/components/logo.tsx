@@ -4,7 +4,7 @@ export function Logo({ compact = false, wordmarkOnly = false }: { compact?: bool
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 100 100"
-        className="size-8"
+        className="size-6"
         aria-label="Labelator"
       >
         <rect width="100" height="100" rx="6" fill="#202124" />

@@ -42,7 +42,3 @@ next-env.d.ts
 
 # copied into public/ during the GitHub Pages build
 /public/library.json
-
-# seeded packaging photos (copied from Seagull; keep manifest)
-/public/assets/packaging/*
-!/public/assets/packaging/manifest.json

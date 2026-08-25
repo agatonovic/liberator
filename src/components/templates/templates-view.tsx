@@ -55,6 +55,7 @@ const TemplateThumbnail = dynamic(
 
 const DRAG_TYPE = "application/x-labelator-template";
 const SORT_KEY = "labelator.templateSort";
+const RECENT_COLLAPSED_KEY = "labelator.recentCollapsed";
 
 function readSort(): TemplateSort {
   if (typeof window === "undefined") return "used";
@@ -199,7 +200,7 @@ export function TemplatesView() {
   const toggleFavorite = useAppStore((s) => s.toggleFavorite);
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("Untitled label");
+  const [name, setName] = useState("Untitled template");
   const [presetId, setPresetId] = useState("100x50");
   const [blankFolderId, setBlankFolderId] = useState<string>("");
   const [newFolderOpen, setNewFolderOpen] = useState(false);
@@ -214,9 +215,11 @@ export function TemplatesView() {
   const [query, setQuery] = useState("");
   const [folderFilter, setFolderFilter] = useState<string>("all");
   const [sort, setSort] = useState<TemplateSort>("used");
+  const [recentCollapsed, setRecentCollapsed] = useState(false);
 
   useEffect(() => {
     setSort(readSort());
+    setRecentCollapsed(window.localStorage.getItem(RECENT_COLLAPSED_KEY) === "1");
   }, []);
 
   const searching = Boolean(query.trim());
@@ -332,7 +335,7 @@ export function TemplatesView() {
             }}
           >
             <Plus className="size-4" />
-            Blank label
+            New blank template
           </Button>
         </div>
       </div>
@@ -401,12 +404,28 @@ export function TemplatesView() {
         <>
           {recent.length ? (
             <section className="mb-8">
-              <h2 className="mb-3 text-sm font-medium tracking-wide text-muted-foreground uppercase">Recent</h2>
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                {recent.map((doc) => (
-                  <TemplateCard key={doc.id} doc={doc} folderId={doc.folderId} compact {...cardProps} />
-                ))}
-              </div>
+              <button
+                type="button"
+                className="mb-3 flex w-full min-w-0 items-center gap-2 rounded-md px-1 py-1 text-left hover:bg-muted"
+                onClick={() => {
+                  const next = !recentCollapsed;
+                  setRecentCollapsed(next);
+                  window.localStorage.setItem(RECENT_COLLAPSED_KEY, next ? "1" : "0");
+                }}
+              >
+                <ChevronDown
+                  className={cn("size-4 shrink-0 text-muted-foreground transition-transform", recentCollapsed && "-rotate-90")}
+                />
+                <h2 className="text-sm font-medium tracking-wide text-muted-foreground uppercase">Recent</h2>
+                <span className="text-[11px] text-muted-foreground">{recent.length}</span>
+              </button>
+              {recentCollapsed ? null : (
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                  {recent.map((doc) => (
+                    <TemplateCard key={doc.id} doc={doc} folderId={doc.folderId} compact {...cardProps} />
+                  ))}
+                </div>
+              )}
             </section>
           ) : null}
 
@@ -512,7 +531,7 @@ export function TemplatesView() {
                   </div>
                 ) : (
                   <p className="rounded-lg border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
-                    Empty folder. Drag a template here, or create a blank label.
+                    Empty folder. Drag a template here, or create a blank template.
                   </p>
                 )}
               </section>
@@ -524,7 +543,7 @@ export function TemplatesView() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Blank label</DialogTitle>
+            <DialogTitle>New blank template</DialogTitle>
             <DialogDescription>Starts empty in the folder you choose.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-3">
@@ -570,7 +589,7 @@ export function TemplatesView() {
                 const preset = PAGE_PRESETS.find((item) => item.id === presetId) ?? PAGE_PRESETS[1];
                 const id = createBlank(
                   { widthMm: preset.widthMm, heightMm: preset.heightMm },
-                  name.trim() || "Untitled label",
+                  name.trim() || "Untitled template",
                   blankFolderId || undefined,
                 );
                 setOpen(false);

@@ -1,4 +1,4 @@
-import { parseArrow } from "./format";
+import { looksLikeGroupedPartNumber, parseArrow } from "./format";
 import { createId } from "./ids";
 import { roundMm } from "./units";
 
@@ -126,6 +126,7 @@ export type ElementStyle = {
 
 export type ElementTransform =
   | "part"
+  | "part_number"
   | "ga_magacin"
   | "ga_regal_letter"
   | "ga_regal_number"
@@ -882,8 +883,43 @@ export function repairDirectionArrows(doc: LabelDocument): LabelDocument {
   };
 }
 
+/**
+ * The designed FIXED GA label is one Open Sans field, not the catalog's four
+ * part-number boxes. Bind it to `reference` and format `7357986330` as groups
+ * without bumping catalog revision (that would wipe the designed layout).
+ */
+export function repairPartNumberFields(doc: LabelDocument): LabelDocument {
+  const reference =
+    findColumnByName(doc.dataColumns ?? [], "reference") ??
+    findColumnByName(doc.dataColumns ?? [], "Part Number");
+  const referenceKey =
+    reference?.key ?? (doc.catalogId?.startsWith("fixed_ga") ? "reference" : undefined);
+  if (!referenceKey) return doc;
+  let changed = false;
+  const elements = doc.elements.map((el) => {
+    if (el.type !== "text" || el.hidden) return el;
+    if (el.transform === "part" || el.partIndex != null) return el;
+    const grouped = looksLikeGroupedPartNumber(el.content ?? "");
+    const boundToReference = el.binding?.trim() === referenceKey;
+    if (!grouped && !boundToReference) return el;
+    if (boundToReference && el.transform === "part_number") return el;
+    if (!el.binding?.trim() && grouped) {
+      changed = true;
+      return { ...el, binding: referenceKey, transform: "part_number" as const };
+    }
+    if (boundToReference && grouped && el.transform !== "part_number") {
+      changed = true;
+      return { ...el, transform: "part_number" as const };
+    }
+    return el;
+  });
+  return changed ? { ...doc, elements } : doc;
+}
+
 export function repairTemplateDocument(doc: LabelDocument): LabelDocument {
-  return repairCodeElements(repairGaAddressFields(bindFolderImages(repairDirectionArrows(doc))));
+  return repairCodeElements(
+    repairPartNumberFields(repairGaAddressFields(bindFolderImages(repairDirectionArrows(doc)))),
+  );
 }
 
 /** If a photo has a lookup folder but no column, reuse the packaging binding already on the template. */

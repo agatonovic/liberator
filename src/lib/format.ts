@@ -1,3 +1,8 @@
+/** Designed FIXED-GA style: `73 579 863 30` (10) or `73 579 863 301` (11). */
+export function looksLikeGroupedPartNumber(content: string) {
+  return /^\d{2}\s+\d{3}\s+\d{3}\s+\d{2,3}$/.test(content.trim());
+}
+
 export function formatPartNumber(value: string): string {
   const text = value.trim();
   if (!text) return "";

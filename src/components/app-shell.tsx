@@ -4,6 +4,7 @@ import { Hint } from "@/components/hint";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { navPath } from "@/lib/public-path";
 import { FileOutput, Images, LayoutTemplate, PanelLeftClose, PanelLeftOpen, PenTool } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -38,6 +39,7 @@ export function useNavSidebar() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const current = navPath(pathname);
   const [open, setOpenState] = useState(true);
 
   useEffect(() => {
@@ -107,12 +109,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <nav className={cn("flex flex-1 flex-col gap-0.5 pt-2", open ? "px-2" : "items-center px-1")}>
             {NAV.map((item) => {
-              const active = pathname === item.href || (item.href === "/generate" && pathname === "/print");
+              const active = current === item.href || (item.href === "/generate" && current === "/print");
               const Icon = item.icon;
               const link = (
                 <Link
                   href={item.href}
                   aria-label={item.label}
+                  aria-current={active ? "page" : undefined}
                   className={cn(
                     "flex items-center rounded-lg text-sm font-medium transition-colors",
                     open ? "gap-2.5 px-3 py-2" : "size-9 justify-center",

@@ -94,7 +94,7 @@ async function seedPackaging(existing: AssetRecord[], folders: AssetFolder[]) {
     const nextFolders = folders.some((folder) => folder.id === PACKAGING_FOLDER_ID)
       ? folders
       : [...folders, { id: PACKAGING_FOLDER_ID, name: "packaging", createdAt: now }];
-    const have = new Set(existing.filter((asset) => asset.folderId === PACKAGING_FOLDER_ID).map((asset) => asset.id));
+    const have = new Map(existing.map((asset) => [asset.id, asset]));
     const seeded = files.map((name) => {
       const stem = assetLookupKey(name);
       return {
@@ -109,8 +109,20 @@ async function seedPackaging(existing: AssetRecord[], folders: AssetFolder[]) {
         createdAt: now,
       };
     });
+    const byId = new Map(seeded.map((asset) => [asset.id, asset]));
+    let changed = nextFolders !== folders;
+    const merged = existing.map((asset) => {
+      const fresh = byId.get(asset.id);
+      if (!fresh || asset.kind !== "static" || asset.url === fresh.url) return asset;
+      changed = true;
+      return { ...asset, url: fresh.url };
+    });
     const extras = seeded.filter((asset) => !have.has(asset.id));
-    return { folders: nextFolders, assets: extras.length ? [...existing, ...extras] : existing };
+    if (extras.length) changed = true;
+    return {
+      folders: nextFolders,
+      assets: changed ? [...merged, ...extras] : existing,
+    };
   } catch {
     return { folders, assets: existing };
   }
@@ -128,13 +140,13 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
     const thumbs: Record<string, string> = {};
     for (const item of stored.thumbs) thumbs[item.id] = rememberObjectUrl(`thumb:${item.id}`, item.blob);
     for (const item of stored.blobs) rememberObjectUrl(item.id, item.blob);
-    const seeded = stored.packagingSeeded
-      ? { folders: stored.folders, assets: stored.assets }
-      : await seedPackaging(stored.assets, stored.folders);
+    const seeded = await seedPackaging(stored.assets, stored.folders);
     const seededPackaging = seeded.folders.some((folder) => folder.id === PACKAGING_FOLDER_ID);
-    if (!stored.packagingSeeded && seededPackaging) {
+    if (seededPackaging) {
       await markPackagingSeeded();
-      await Promise.all([saveAssetFolders(seeded.folders), saveAssetRecords(seeded.assets)]);
+      if (seeded.assets !== stored.assets || seeded.folders !== stored.folders) {
+        await Promise.all([saveAssetFolders(seeded.folders), saveAssetRecords(seeded.assets)]);
+      }
     }
     set({
       hydrated: true,

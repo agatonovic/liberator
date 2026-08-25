@@ -14,6 +14,7 @@ import {
   type AssetFolder,
   type AssetRecord,
 } from "@/lib/assets";
+import { isStaticHost } from "@/lib/public-path";
 import { useAssetStore } from "@/lib/asset-store";
 import { cn } from "@/lib/utils";
 import { ChevronRight, Folder, FolderPlus, Images, Pencil, Trash2, Upload } from "lucide-react";
@@ -74,6 +75,7 @@ export function AssetsView() {
   }, [assets, resolvedFolder, query]);
 
   const selected = assets.find((asset) => asset.id === selectedId) ?? null;
+  const canUpload = !isStaticHost;
   const deleteFolderTarget = folders.find((folder) => folder.id === deleteFolderId) ?? null;
   const deleteFolderAssetCount = deleteFolderId ? (counts.get(deleteFolderId) ?? 0) : 0;
   const deleteFolderChildCount = deleteFolderId
@@ -164,7 +166,9 @@ export function AssetsView() {
             <p className="mt-1 max-w-xl text-sm text-muted-foreground">
               {activeFolder
                 ? `Images in ${folderPath(folders, activeFolder.id)}. Bind a label photo to this folder or a parent — Print also looks in subfolders.`
-                : "Upload once, reuse on every template. Bind a photo to a data column and a folder to swap images per row."}
+                : canUpload
+                  ? "Upload once, reuse on every template. Bind a photo to a data column and a folder to swap images per row."
+                  : "Packaging photos ship with this site. Bind a photo to a data column and a folder to swap images per row."}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -181,13 +185,16 @@ export function AssetsView() {
               <FolderPlus className="size-4" />
               {activeFolder ? "Subfolder" : "Folder"}
             </Button>
-            <Button variant="outline" onClick={() => fileRef.current?.click()}>
-              <Upload className="size-4" />
-              Upload
-            </Button>
+            {canUpload ? (
+              <Button variant="outline" onClick={() => fileRef.current?.click()}>
+                <Upload className="size-4" />
+                Upload
+              </Button>
+            ) : null}
           </div>
         </header>
 
+        {canUpload ? (
         <input
           ref={fileRef}
           type="file"
@@ -199,19 +206,28 @@ export function AssetsView() {
             event.target.value = "";
           }}
         />
+        ) : null}
 
         <div
-          className={cn("min-h-0 flex-1 overflow-y-auto p-6", dragging && "bg-primary/5")}
-          onDragOver={(event) => {
-            event.preventDefault();
-            setDragging(true);
-          }}
-          onDragLeave={() => setDragging(false)}
-          onDrop={(event) => {
-            event.preventDefault();
-            setDragging(false);
-            void addFiles(event.dataTransfer.files);
-          }}
+          className={cn("min-h-0 flex-1 overflow-y-auto p-6", canUpload && dragging && "bg-primary/5")}
+          onDragOver={
+            canUpload
+              ? (event) => {
+                  event.preventDefault();
+                  setDragging(true);
+                }
+              : undefined
+          }
+          onDragLeave={canUpload ? () => setDragging(false) : undefined}
+          onDrop={
+            canUpload
+              ? (event) => {
+                  event.preventDefault();
+                  setDragging(false);
+                  void addFiles(event.dataTransfer.files);
+                }
+              : undefined
+          }
         >
           {nested.length || visible.length ? (
             <ul className="grid grid-cols-[repeat(auto-fill,minmax(148px,1fr))] gap-3">
@@ -259,13 +275,15 @@ export function AssetsView() {
           ) : (
             <button
               type="button"
-              onClick={() => fileRef.current?.click()}
+              onClick={canUpload ? () => fileRef.current?.click() : undefined}
               className="flex h-full min-h-[280px] w-full flex-col items-center justify-center rounded-xl border border-dashed border-border text-center"
             >
               <Images className="size-8 text-muted-foreground" />
-              <p className="mt-3 text-sm font-medium">Drop images here</p>
+              <p className="mt-3 text-sm font-medium">{canUpload ? "Drop images here" : "No images in this folder"}</p>
               <p className="mt-1 max-w-sm text-xs text-muted-foreground">
-                Or create a subfolder. Name files after the data value, e.g. X4202.jpg.
+                {canUpload
+                  ? "Or create a subfolder. Name files after the data value, e.g. X4202.jpg."
+                  : "Packaging photos are included with this site. Uploading is only available in the local app."}
               </p>
             </button>
           )}

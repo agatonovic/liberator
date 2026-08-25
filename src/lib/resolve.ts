@@ -1,6 +1,6 @@
 import type { DataColumn, LabelDocument, LabelElement } from "./document";
 import { columnAliases, findColumnByName } from "./document";
-import { arrowSymbol, normalizeArrow, parseGaAddress, partNumberGroups } from "./format";
+import { arrowSymbol, formatPartNumber, normalizeArrow, parseGaAddress, partNumberGroups } from "./format";
 
 export type DataRow = Record<string, string>;
 export type ColumnMapping = Record<string, string>;
@@ -27,6 +27,9 @@ export function lookupRowValue(row: DataRow, key: string, mapping: ColumnMapping
 function applyTransform(element: LabelElement, raw: string): string {
   if (element.partIndex != null || element.transform === "part") {
     return partNumberGroups(raw)[element.partIndex ?? 0] ?? "";
+  }
+  if (element.transform === "part_number") {
+    return formatPartNumber(raw);
   }
   if (element.transform === "arrow") {
     if (element.type === "text") return arrowSymbol(raw);

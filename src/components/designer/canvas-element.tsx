@@ -16,6 +16,7 @@ import { isStrokeArrow, polygonPoints } from "@/lib/shapes";
 import { layoutRuns, runsFromContent, transferSpans } from "@/lib/text-color";
 import { fitPlainFontSize, wrapPlainLines } from "@/lib/text-fit";
 import { canvasFontFamily } from "@/lib/fonts";
+import { resolvePublicSrc } from "@/lib/public-path";
 import { mmToPx, pxToMm } from "@/lib/units";
 import Konva from "konva";
 import { useEffect, useMemo, useState } from "react";
@@ -276,13 +277,13 @@ function imageSource(
   const src = element.imageDataUrl;
   if (src) {
     if (/\/arrows\/(?:UP|DOWN)/.test(src) && value.trim()) {
-      return src.replace(/UP|DOWN/, normalizeArrow(value));
+      return resolvePublicSrc(src.replace(/UP|DOWN/, normalizeArrow(value)));
     }
-    return src;
+    return resolvePublicSrc(src);
   }
   const trimmed = value.trim();
   if (trimmed.startsWith("data:image") || /^https?:\/\//i.test(trimmed) || trimmed.startsWith("/")) {
-    return trimmed;
+    return resolvePublicSrc(trimmed);
   }
   return undefined;
 }

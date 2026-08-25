@@ -4,7 +4,7 @@
       "version": 1,
       "id": "ff9a7d76-b9a8-4b29-a861-612b6142c9a9",
       "name": "FIXED GA A4",
-      "updatedAt": "2026-08-24T17:28:45.542Z",
+      "updatedAt": "2026-08-25T08:47:00.000Z",
       "page": {
         "widthMm": 254,
         "heightMm": 68
@@ -135,6 +135,8 @@
             "opacity": 1
           },
           "content": "73 579 863 30",
+          "binding": "reference",
+          "transform": "part_number",
           "spans": [
             {
               "start": 7,
@@ -381,6 +383,8 @@
                   "opacity": 1
                 },
                 "content": "73 579 863 30",
+                "binding": "reference",
+                "transform": "part_number",
                 "spans": [
                   {
                     "start": 7,
@@ -617,6 +621,8 @@
                   "opacity": 1
                 },
                 "content": "73 579 863 30",
+                "binding": "reference",
+                "transform": "part_number",
                 "spans": [
                   {
                     "start": 7,

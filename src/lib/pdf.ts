@@ -35,6 +35,7 @@ import { fitPlainFontSize, wrapPlainLines } from "./text-fit";
 import { resolveBoundImageSrc } from "./assets";
 import { useAssetStore } from "./asset-store";
 import { gaMagacinPrefixSpans, normalizeArrow } from "./format";
+import { resolvePublicSrc } from "./public-path";
 import { mmToPt } from "./units";
 
 const SHEET_MM: Record<SheetPageSize, { widthMm: number; heightMm: number }> = {
@@ -595,7 +596,7 @@ async function drawElement(
   if (element.type === "image") {
     let src =
       resolveBoundImageSrc(element, value, useAssetStore.getState().assets, useAssetStore.getState().folders) ??
-      element.imageDataUrl;
+      resolvePublicSrc(element.imageDataUrl);
     if (src && /\/arrows\/(?:UP|DOWN)/.test(src) && value.trim()) {
       src = src.replace(/UP|DOWN/, normalizeArrow(value));
     }

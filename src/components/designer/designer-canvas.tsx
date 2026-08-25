@@ -871,8 +871,9 @@ export function DesignerCanvas({
             height={paper.height}
             fill="rgba(255,255,255,0.001)"
           />
-          {doc.elements.filter((element) => !element.hidden).map((element) => (
-            <CanvasElement
+          {fontTick > 0 &&
+            doc.elements.filter((element) => !element.hidden).map((element) => (
+              <CanvasElement
               key={`${element.id}-${fontTick}`}
               element={element}
               zoom={zoom}

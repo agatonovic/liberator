@@ -1,3 +1,5 @@
+const WORDMARK_WIDTH = 85;
+
 export function Logo({ compact = false, wordmarkOnly = false }: { compact?: boolean; wordmarkOnly?: boolean }) {
   if (compact) {
     return (
@@ -16,9 +18,10 @@ export function Logo({ compact = false, wordmarkOnly = false }: { compact?: bool
   const wordmark = (
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 85 10"
+        viewBox={`0 0 ${WORDMARK_WIDTH} 10`}
         className="block aspect-[85/10] h-auto w-full"
-        aria-label="Labelator"
+        aria-hidden={wordmarkOnly ? undefined : true}
+        aria-label={wordmarkOnly ? "Labelator" : undefined}
       >
         <rect x="0" y="0" width="2.05" height="10" fill="#202124" />
         <rect x="0" y="8.746" width="5.4" height="1.254" fill="#202124" />
@@ -57,11 +60,26 @@ export function Logo({ compact = false, wordmarkOnly = false }: { compact?: bool
   );
   if (wordmarkOnly) return wordmark;
   return (
-    <div className="flex w-min min-w-0 flex-col gap-1">
+    <div className="flex w-[8.55rem] max-w-full flex-col" aria-hidden>
       {wordmark}
-      <div className="w-max whitespace-nowrap text-[8.5px] leading-none font-medium tracking-[0.07em] text-muted-foreground uppercase">
-        Label design & automation
-      </div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox={`0 0 ${WORDMARK_WIDTH} 7`}
+        className="mt-[6px] block h-auto w-full text-muted-foreground"
+      >
+        <text
+          x="0"
+          y="5.65"
+          fill="currentColor"
+          fontFamily="var(--font-sans), Helvetica, sans-serif"
+          fontSize="5.85"
+          fontWeight="500"
+          textLength={WORDMARK_WIDTH}
+          lengthAdjust="spacingAndGlyphs"
+        >
+          LABEL DESIGN & AUTOMATION
+        </text>
+      </svg>
     </div>
   );
 }

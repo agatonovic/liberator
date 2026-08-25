@@ -72,13 +72,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         >
           <div
             className={cn(
-              "flex shrink-0 border-b border-sidebar-border",
-              open ? "items-center justify-between gap-2 px-5 py-3.5" : "justify-center px-1 py-3",
+              "flex h-14 shrink-0 items-center border-b border-sidebar-border",
+              open ? "justify-between gap-2 px-5" : "justify-center px-1",
             )}
           >
             {open ? (
               <>
-                <Logo />
+                <Link
+                  href="/templates"
+                  aria-label="Labelator, go to Templates"
+                  className="block min-w-0 cursor-pointer rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+                >
+                  <Logo />
+                </Link>
                 <Hint label="Close sidebar">
                   <Button
                     variant="ghost"

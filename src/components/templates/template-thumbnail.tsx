@@ -63,17 +63,20 @@ export function TemplateThumbnail({
           />
         </Layer>
         <Layer x={x} y={y} listening={false} clipX={0} clipY={0} clipWidth={paperW} clipHeight={paperH}>
-          {doc.elements.filter((element) => !element.hidden).map((element) => (
-            <CanvasElement
-              key={`${element.id}-${fontTick}`}
-              element={element}
-              zoom={zoom}
-              value={resolveValue(element, null, {})}
-              interactive={false}
-              onSelect={() => {}}
-              onDragEnd={() => {}}
-            />
-          ))}
+          {fontTick > 0 &&
+            doc.elements
+              .filter((element) => !element.hidden)
+              .map((element) => (
+                <CanvasElement
+                  key={`${element.id}-${fontTick}`}
+                  element={element}
+                  zoom={zoom}
+                  value={resolveValue(element, null, {})}
+                  interactive={false}
+                  onSelect={() => {}}
+                  onDragEnd={() => {}}
+                />
+              ))}
         </Layer>
       </Stage>
     </div>

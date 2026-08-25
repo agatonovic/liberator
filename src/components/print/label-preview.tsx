@@ -64,7 +64,8 @@ export function LabelPreview({
           />
         </Layer>
         <Layer x={x} y={y} listening={false} clipX={0} clipY={0} clipWidth={paperW} clipHeight={paperH}>
-          {doc.elements
+          {fontTick > 0 &&
+            doc.elements
             .filter((element) => !element.hidden)
             .map((element) => (
               <CanvasElement

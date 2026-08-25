@@ -1001,11 +1001,13 @@ export function repairPartNumberFields(doc: LabelDocument): LabelDocument {
     if (el.type !== "text" || el.hidden) return el;
     if (el.transform === "part" || el.partIndex != null) return el;
     const bound = el.binding?.trim();
+    const grouped = looksLikeGroupedPartNumber(el.content ?? "");
+    const column = bound ? findColumnByName(doc.dataColumns ?? [], bound) : undefined;
     if (
       bound &&
-      pnKeys.includes(bound) &&
-      looksLikeGroupedPartNumber(el.content ?? "") &&
-      el.transform !== "part_number"
+      grouped &&
+      el.transform !== "part_number" &&
+      (pnKeys.includes(bound) || (column != null && pnKeys.includes(column.key)))
     ) {
       changed = true;
       return { ...el, transform: "part_number" as const };

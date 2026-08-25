@@ -1210,7 +1210,7 @@
       "version": 1,
       "id": "ee4837ef-c0f7-4ac9-8612-a689518ad7b0",
       "name": "Warehouse A3 Final ",
-      "updatedAt": "2026-08-22T12:21:44.817Z",
+      "updatedAt": "2026-08-25T18:46:00.000Z",
       "page": {
         "widthMm": 420,
         "heightMm": 297
@@ -1659,7 +1659,8 @@
               "fontSizeMm": 45
             }
           ],
-          "binding": "REFERENCA"
+          "binding": "REFERENCA",
+          "transform": "part_number"
         },
         {
           "id": "e1fd123a-1455-4a53-95bc-1e73250ac304",

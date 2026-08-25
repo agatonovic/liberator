@@ -285,15 +285,27 @@ export function layoutRuns(
   }
   while (lines.length > 1 && lines[lines.length - 1].length === 0) lines.pop();
 
-  const lineHeights = lines.map((line) => {
+  const scaled = lines.map((line) => {
+    const width = line.reduce((sum, token) => sum + token.width, 0);
+    if (width <= boxW || boxW <= 0 || width <= 0) return line;
+    const scale = boxW / width;
+    return line.map((token) => ({
+      ...token,
+      fontSize: token.fontSize * scale,
+      inkH: token.inkH * scale,
+      width: token.width * scale,
+    }));
+  });
+
+  const lineHeights = scaled.map((line) => {
     const maxInk = line.reduce((max, token) => Math.max(max, token.inkH), 0);
     return Math.max(maxInk, 1) * lineHeight;
   });
 
   const placed: PlacedRun[] = [];
   let lineY = 0;
-  for (let i = 0; i < lines.length; i += 1) {
-    const line = lines[i];
+  for (let i = 0; i < scaled.length; i += 1) {
+    const line = scaled[i] ?? [];
     const maxSize = line.reduce((max, token) => Math.max(max, token.fontSize), 0);
     const width = line.reduce((sum, token) => sum + token.width, 0);
     let x = 0;

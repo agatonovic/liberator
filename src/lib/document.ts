@@ -972,7 +972,7 @@ export function repairPartNumberFields(doc: LabelDocument): LabelDocument {
   const boundKeys = new Set(
     doc.elements
       .map((el) => el.binding?.trim())
-      .filter((key): key is string => Boolean(key) && pnKeys.includes(key)),
+      .filter((key): key is string => typeof key === "string" && pnKeys.includes(key)),
   );
   const unusedKeys = pnKeys.filter((key) => !boundKeys.has(key));
   const unbound = doc.elements
@@ -1028,7 +1028,7 @@ export function repairHbcDrawingNumbers(doc: LabelDocument): LabelDocument {
   const boundKeys = new Set(
     doc.elements
       .map((el) => el.binding?.trim())
-      .filter((key): key is string => Boolean(key) && levelKeys.includes(key as (typeof HBC_LEVEL_KEYS)[number])),
+      .filter((key): key is string => typeof key === "string" && levelKeys.includes(key as (typeof HBC_LEVEL_KEYS)[number])),
   );
   const unusedKeys = levelKeys.filter((key) => !boundKeys.has(key));
   const unbound = doc.elements

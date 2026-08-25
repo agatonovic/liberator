@@ -1,4 +1,3 @@
-const FIT_PASSES = 14;
 const MIN_SHRINK_CHARS = 8;
 
 function spacedWidth(text: string, size: number, letterSpacing: number, measure: (text: string, size: number) => number) {
@@ -73,6 +72,19 @@ export function shouldShrinkPlainText(
   return !plainTextFitsWidth(text, boxW, fontSize, letterSpacing, measure);
 }
 
+function longestLineWidth(
+  text: string,
+  size: number,
+  letterSpacing: number,
+  measure: (text: string, size: number) => number,
+) {
+  let widest = 0;
+  for (const line of text.split("\n")) {
+    widest = Math.max(widest, spacedWidth(line, size, letterSpacing, measure));
+  }
+  return widest;
+}
+
 export function fitPlainFontSize({
   text,
   designed = "",
@@ -96,15 +108,10 @@ export function fitPlainFontSize({
 }) {
   const max = Math.max(0, fontSize);
   const min = Math.min(max, Math.max(0.5, minFontSize));
-  const innerW = Math.max(1, boxW - Math.max(2, boxW * 0.02));
+  const innerW = Math.max(1, boxW);
   if (!text.trim() || max <= min) return max;
   if (!shouldShrinkPlainText(text, innerW, boxH, max, letterSpacing, lineHeight, measure, designed)) return max;
-  let lo = min;
-  let hi = max;
-  for (let i = 0; i < FIT_PASSES; i += 1) {
-    const mid = (lo + hi) / 2;
-    if (plainTextFitsWidth(text, innerW, mid, letterSpacing, measure)) lo = mid;
-    else hi = mid;
-  }
-  return lo;
+  const widthAtMax = longestLineWidth(text, max, letterSpacing, measure);
+  if (widthAtMax <= 0) return max;
+  return Math.max(min, Math.min(max, max * (innerW / widthAtMax)));
 }

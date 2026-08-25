@@ -10,6 +10,7 @@ export type LibrarySnapshot = {
   folders: TemplateFolder[];
   currentId: string | null;
   data?: PersistedData;
+  templateGrids?: Record<string, PersistedData>;
   librarySeeded?: boolean;
   deletedIds?: string[];
   deletedCatalogIds?: string[];

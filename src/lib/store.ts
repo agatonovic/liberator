@@ -8,11 +8,9 @@ import {
   createElement,
   documentBindings,
   expandGroupSelection,
-  bindFolderImages,
   isPaintColor,
   normalizeImportedDocument,
-  repairCodeElements,
-  repairGaAddressFields,
+  repairTemplateDocument,
   packGroupedElements,
   remapPastedGroups,
   selectionGroupFlags,
@@ -42,9 +40,9 @@ import { elementAabb } from "./guides";
 import { parseWorkbook, schemaColumns } from "./excel";
 import {
   filledRowIndexes,
+  gridForTemplate,
   headerForColumn,
   looksLikeHeaderRow,
-  padRows,
   parseSpreadsheetPaste,
   projectRowsOntoSchema,
   sameTemplateGrid,
@@ -102,6 +100,7 @@ type AppState = {
   dataPast: PersistedData[];
   dataFuture: PersistedData[];
   data: PersistedData;
+  templateGrids: Record<string, PersistedData>;
   savedColors: string[];
   activity: ActivityEvent[];
   hydrate: () => Promise<void>;
@@ -288,6 +287,7 @@ type RemoteLibrary = {
   folders?: TemplateFolder[];
   currentId?: string | null;
   data?: PersistedData;
+  templateGrids?: Record<string, PersistedData>;
   librarySeeded?: boolean;
   deletedIds?: string[];
   deletedCatalogIds?: string[];
@@ -325,6 +325,7 @@ function persistMeta(state: AppState) {
   return {
     currentId: state.currentId,
     data: state.data,
+    templateGrids: state.templateGrids,
     folders: state.folders,
     librarySeeded: true,
     deletedIds: state.deletedIds,
@@ -348,6 +349,7 @@ async function writeLibraryBackup() {
         folders: latest.folders,
         currentId: latest.currentId,
         data: latest.data,
+        templateGrids: latest.templateGrids,
         librarySeeded: true,
         deletedIds: latest.deletedIds,
         deletedCatalogIds: latest.deletedCatalogIds,
@@ -471,11 +473,20 @@ function cloneData(data: PersistedData): PersistedData {
   };
 }
 
+function withGrid(state: AppState, data: PersistedData): Pick<AppState, "data" | "templateGrids"> {
+  return {
+    data,
+    templateGrids: state.currentId
+      ? { ...state.templateGrids, [state.currentId]: data }
+      : state.templateGrids,
+  };
+}
+
 function withDataHistory(state: AppState, data: PersistedData): Partial<AppState> {
   return {
     dataPast: [...(state.dataPast ?? []), cloneData(state.data)].slice(-HISTORY_LIMIT),
     dataFuture: [],
-    data,
+    ...withGrid(state, data),
   };
 }
 
@@ -520,6 +531,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   textSelectionFontSizeMm: null,
   textStyleRequest: null,
   data: EMPTY_DATA,
+  templateGrids: {},
   savedColors: [],
   activity: [],
   saveState: "saved",
@@ -532,7 +544,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   hydrate: async () => {
     if (get().hydrated) {
       const documents = get().documents.map((doc) =>
-        repairCodeElements(repairGaAddressFields(bindFolderImages(doc))),
+        repairTemplateDocument(doc),
       );
       if (documents.some((doc, i) => doc !== get().documents[i])) {
         set({ documents });
@@ -542,18 +554,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
     let stored = await loadAllDocuments();
     let meta = await loadMeta();
-    let remote: {
-      documents?: LabelDocument[];
-      folders?: TemplateFolder[];
-      currentId?: string | null;
-      data?: PersistedData;
-      librarySeeded?: boolean;
-      deletedIds?: string[];
-      deletedCatalogIds?: string[];
-      deletedFolderIds?: string[];
-      savedColors?: string[];
-      activity?: ActivityEvent[];
-    } | null = await fetchRemoteLibrary();
+    let remote: RemoteLibrary | null = await fetchRemoteLibrary();
     const takePublished =
       Boolean(process.env.NEXT_PUBLIC_BASE_PATH) &&
       consumePublishedLibraryStamp(publishedLibraryStamp(remote));
@@ -562,6 +563,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       meta = {
         currentId: remote.currentId ?? null,
         data: remote.data ?? EMPTY_DATA,
+        templateGrids: remote.templateGrids,
         folders: remote.folders,
         librarySeeded: true,
         deletedIds: remote.deletedIds,
@@ -598,16 +600,25 @@ export const useAppStore = create<AppState>((set, get) => ({
       window.localStorage.setItem(restoreKey, "1");
     }
     const collapsed = collapseCatalogDuplicates(documents);
-    documents = collapsed.documents.map((doc) =>
-      repairCodeElements(repairGaAddressFields(bindFolderImages(doc))),
-    );
+    documents = collapsed.documents.map((doc) => repairTemplateDocument(doc));
     if (collapsed.droppedIds.length) deletedIds = mergeIdLists(deletedIds, collapsed.droppedIds);
     const currentId =
       (meta?.currentId && documents.some((d) => d.id === meta.currentId) && meta.currentId) ||
       (remote?.currentId && documents.some((d) => d.id === remote.currentId) && remote.currentId) ||
       documents[0]?.id ||
       null;
-    const data = meta?.data ?? remote?.data ?? EMPTY_DATA;
+    const templateGrids: Record<string, PersistedData> = {
+      ...(remote?.templateGrids ?? {}),
+      ...(meta?.templateGrids ?? {}),
+    };
+    let data = meta?.data ?? remote?.data ?? EMPTY_DATA;
+    const currentDoc = documents.find((doc) => doc.id === currentId);
+    if (currentDoc) {
+      const storedGrid = templateGrids[currentDoc.id];
+      const source = storedGrid ?? (data.headers.length ? data : null);
+      data = gridForTemplate(currentDoc, source);
+      templateGrids[currentDoc.id] = data;
+    }
     const clipped = readStoredClipboard();
     set({
       hydrated: true,
@@ -618,6 +629,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       deletedFolderIds,
       currentId,
       data,
+      templateGrids,
       clipboard: clipped?.elements ?? [],
       clipboardSourceId: clipped?.sourceId ?? null,
       savedColors: mergeSavedColors(meta?.savedColors, remote?.savedColors),
@@ -662,7 +674,23 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   openDocument: (id) => {
     set((state) => {
-      const next = { currentId: id, selectedIds: [], past: [], future: [], dataPast: [], dataFuture: [], pasteCount: 1 };
+      if (id === state.currentId) return state;
+      const templateGrids = { ...state.templateGrids };
+      if (state.currentId && state.data.headers.length) templateGrids[state.currentId] = state.data;
+      const doc = state.documents.find((item) => item.id === id);
+      const data = doc ? gridForTemplate(doc, templateGrids[id]) : EMPTY_DATA;
+      if (doc) templateGrids[id] = data;
+      const next = {
+        currentId: id,
+        data,
+        templateGrids,
+        selectedIds: [],
+        past: [],
+        future: [],
+        dataPast: [],
+        dataFuture: [],
+        pasteCount: 1,
+      };
       persist({ ...state, ...next });
       return next;
     });
@@ -831,7 +859,15 @@ export const useAppStore = create<AppState>((set, get) => ({
       const deletedCatalogIds = lastOfCatalog
         ? mergeIdLists(state.deletedCatalogIds, [removed!.catalogId!])
         : state.deletedCatalogIds;
-      const next = { documents, currentId, selectedIds: [], past: [], future: [], deletedIds, deletedCatalogIds };
+      const templateGrids = { ...state.templateGrids };
+      delete templateGrids[id];
+      let data = state.data;
+      if (state.currentId === id) {
+        const nextDoc = documents.find((item) => item.id === currentId) ?? null;
+        data = nextDoc ? gridForTemplate(nextDoc, templateGrids[nextDoc.id]) : EMPTY_DATA;
+        if (nextDoc) templateGrids[nextDoc.id] = data;
+      }
+      const next = { documents, currentId, data, templateGrids, selectedIds: [], past: [], future: [], deletedIds, deletedCatalogIds };
       persist({ ...state, ...next });
       return next;
     });
@@ -1436,7 +1472,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       const next = {
         dataPast: past.slice(0, -1),
         dataFuture: [...(state.dataFuture ?? []), cloneData(state.data)],
-        data: previous,
+        ...withGrid(state, previous),
       };
       persist({ ...state, ...next });
       return next;
@@ -1454,7 +1490,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       const next = {
         dataFuture: future.slice(0, -1),
         dataPast: [...(state.dataPast ?? []), cloneData(state.data)],
-        data: nextData,
+        ...withGrid(state, nextData),
       };
       persist({ ...state, ...next });
       return next;
@@ -1488,8 +1524,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     set((state) => {
       const mapping: ColumnMapping = { ...state.data.mapping, [binding]: header };
       const data = { ...state.data, mapping };
-      persist({ ...state, data });
-      return { data };
+      persist({ ...state, ...withGrid(state, data) });
+      return withGrid(state, data);
     });
   },
 
@@ -1501,17 +1537,19 @@ export const useAppStore = create<AppState>((set, get) => ({
         ...state.data,
         mapping: autoMapBindings(documentBindings(doc), state.data.headers, doc.dataColumns),
       };
-      persist({ ...state, data });
-      return { data };
+      persist({ ...state, ...withGrid(state, data) });
+      return withGrid(state, data);
     });
   },
 
   setPreviewRow: (index) => {
     set((state) => {
       const last = Math.max(0, state.data.rows.length - 1);
-      const data = { ...state.data, previewRowIndex: Math.min(Math.max(0, index), last) };
-      persist({ ...state, data });
-      return { data };
+      const previewRowIndex = Math.min(Math.max(0, index), last);
+      if (state.data.previewRowIndex === previewRowIndex) return state;
+      const data = { ...state.data, previewRowIndex };
+      persist({ ...state, ...withGrid(state, data) });
+      return withGrid(state, data);
     });
   },
 
@@ -1581,28 +1619,12 @@ export const useAppStore = create<AppState>((set, get) => ({
     const doc = get().current();
     if (!doc) return;
     set((state) => {
-      if (sameTemplateGrid(doc, state.data) && state.data.rows.length) {
-        const rows = padRows(state.data.rows, state.data.headers);
-        if (rows.length === state.data.rows.length) return state;
-        const data = { ...state.data, rows };
-        persist({ ...state, data });
-        return { data };
-      }
-      if (state.data.headers.length && state.data.rows.length) {
-        const projected = projectRowsOntoSchema(doc, state.data.headers, state.data.rows, state.data.mapping);
-        const data = {
-          fileName: state.data.fileName || doc.name,
-          headers: projected.headers,
-          rows: projected.rows,
-          mapping: projected.mapping,
-          previewRowIndex: state.data.previewRowIndex,
-        };
-        persist({ ...state, data });
-        return { data };
-      }
-      const data = templateGrid(doc);
-      persist({ ...state, data });
-      return { data, dataPast: [], dataFuture: [] };
+      const stored = sameTemplateGrid(doc, state.data) ? state.data : state.templateGrids[doc.id];
+      const data = gridForTemplate(doc, stored);
+      if (data === state.data) return state;
+      const next = withGrid(state, data);
+      persist({ ...state, ...next });
+      return next;
     });
   },
 
@@ -1615,8 +1637,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         Object.fromEntries(state.data.headers.map((header) => [header, ""])),
       );
       const data = { ...state.data, rows: [...state.data.rows, ...extra] };
-      persist({ ...state, data });
-      return { data };
+      persist({ ...state, ...withGrid(state, data) });
+      return withGrid(state, data);
     });
   },
 

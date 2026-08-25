@@ -221,6 +221,7 @@ function ColoredLabelText({
         lineHeight={lineHeight}
         wrap="none"
         padding={0}
+        perfectDrawEnabled={false}
         listening
       />
     );
@@ -251,6 +252,8 @@ function ColoredLabelText({
           fontStyle={fontWeight}
           fontFamily={fontFamily}
           wrap="none"
+          padding={0}
+          perfectDrawEnabled={false}
           listening
         />
       ))}

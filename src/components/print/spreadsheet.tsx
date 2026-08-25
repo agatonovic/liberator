@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { serializeTsv } from "@/lib/grid";
 import type { DataRow } from "@/lib/resolve";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 
 type Sel = { r0: number; c0: number; r1: number; c1: number };
 
@@ -32,6 +32,20 @@ function colLetter(index: number) {
   return out;
 }
 
+function isTypingTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false;
+  const tag = target.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
+}
+
+function upDownPair(options?: string[]) {
+  if (!options?.length) return null;
+  const up = options.find((value) => value.toUpperCase() === "UP");
+  const down = options.find((value) => value.toUpperCase() === "DOWN");
+  if (!up || !down) return null;
+  return { up, down };
+}
+
 const ROW_PX = 24;
 const GROW_BATCH = 24;
 
@@ -39,6 +53,7 @@ export function Spreadsheet({
   headers,
   rows,
   columnHints,
+  columnOptions,
   requiredHeaders,
   issueCells,
   focusCell,
@@ -53,6 +68,7 @@ export function Spreadsheet({
   headers: string[];
   rows: DataRow[];
   columnHints?: Record<string, string>;
+  columnOptions?: Record<string, string[]>;
   requiredHeaders?: Set<string>;
   issueCells?: Set<string>;
   focusCell?: { row: number; header: string; n?: number } | null;
@@ -174,75 +190,103 @@ export function Spreadsheet({
     });
   }
 
+  function applyDirectionKey(key: string, r: number, c: number) {
+    const header = headers[c];
+    const pair = header ? upDownPair(columnOptions?.[header]) : null;
+    if (!pair || (key !== "ArrowUp" && key !== "ArrowDown")) return false;
+    onChangeCell(r, header, key === "ArrowUp" ? pair.up : pair.down);
+    return true;
+  }
+
+  function handleGridKey(event: ReactKeyboardEvent | KeyboardEvent) {
+    if (editing) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        commitEdit();
+        if (!event.shiftKey && active.r >= rows.length - 1 && grow) {
+          pendingDownRef.current = true;
+          grow(rows.length + GROW_BATCH);
+          return;
+        }
+        move(event.shiftKey ? -1 : 1, 0, false);
+      }
+      if (event.key === "Tab") {
+        event.preventDefault();
+        commitEdit();
+        move(0, event.shiftKey ? -1 : 1, false);
+      }
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setEditing(null);
+      }
+      return;
+    }
+    const cmd = event.metaKey || event.ctrlKey;
+    if (cmd && event.key.toLowerCase() === "c") {
+      event.preventDefault();
+      void navigator.clipboard.writeText(serializeTsv(selectedGrid()));
+      return;
+    }
+    if (cmd && event.key.toLowerCase() === "x") {
+      event.preventDefault();
+      void navigator.clipboard.writeText(serializeTsv(selectedGrid()));
+      clearSelection();
+      return;
+    }
+    if (cmd && event.key.toLowerCase() === "v") return;
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      if (!event.shiftKey && applyDirectionKey(event.key, active.r, active.c)) return;
+      move(-1, 0, event.shiftKey);
+    } else if (event.key === "ArrowDown") {
+      event.preventDefault();
+      if (!event.shiftKey && applyDirectionKey(event.key, active.r, active.c)) return;
+      if (!event.shiftKey && active.r >= rows.length - 1 && grow) {
+        pendingDownRef.current = true;
+        grow(rows.length + GROW_BATCH);
+        return;
+      }
+      move(1, 0, event.shiftKey);
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      move(0, -1, event.shiftKey);
+    } else if (event.key === "ArrowRight" || event.key === "Tab") {
+      event.preventDefault();
+      move(0, event.key === "Tab" && event.shiftKey ? -1 : 1, event.key !== "Tab" && event.shiftKey);
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      setEditing({ r: active.r, c: active.c, value: cellValue(active.r, active.c) });
+    } else if (event.key === "Delete" || event.key === "Backspace") {
+      event.preventDefault();
+      clearSelection();
+    } else if (event.key.length === 1 && !cmd && !event.altKey) {
+      setEditing({ r: active.r, c: active.c, value: event.key });
+    }
+  }
+
+  useEffect(() => {
+    rootRef.current?.focus();
+  }, [headers]);
+
+  useEffect(() => {
+    function onWindowKey(event: KeyboardEvent) {
+      if (editing) return;
+      if (isTypingTarget(event.target) && !rootRef.current?.contains(event.target as Node)) return;
+      if (rootRef.current?.contains(event.target as Node) && event.target !== rootRef.current) return;
+      if (event.target === rootRef.current) return;
+      handleGridKey(event);
+    }
+    window.addEventListener("keydown", onWindowKey);
+    return () => window.removeEventListener("keydown", onWindowKey);
+  });
+
   return (
     <div
       ref={rootRef}
       tabIndex={0}
       className="flex h-full min-h-0 flex-col overflow-hidden bg-white outline-none"
       onMouseDown={() => rootRef.current?.focus()}
-      onKeyDown={(event) => {
-        if (editing) {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            commitEdit();
-            if (!event.shiftKey && active.r >= rows.length - 1 && grow) {
-              pendingDownRef.current = true;
-              grow(rows.length + GROW_BATCH);
-              return;
-            }
-            move(event.shiftKey ? -1 : 1, 0, false);
-          }
-          if (event.key === "Tab") {
-            event.preventDefault();
-            commitEdit();
-            move(0, event.shiftKey ? -1 : 1, false);
-          }
-          if (event.key === "Escape") {
-            event.preventDefault();
-            setEditing(null);
-          }
-          return;
-        }
-        const cmd = event.metaKey || event.ctrlKey;
-        if (cmd && event.key.toLowerCase() === "c") {
-          event.preventDefault();
-          void navigator.clipboard.writeText(serializeTsv(selectedGrid()));
-          return;
-        }
-        if (cmd && event.key.toLowerCase() === "x") {
-          event.preventDefault();
-          void navigator.clipboard.writeText(serializeTsv(selectedGrid()));
-          clearSelection();
-          return;
-        }
-        if (cmd && event.key.toLowerCase() === "v") return;
-        if (event.key === "ArrowUp") {
-          event.preventDefault();
-          move(-1, 0, event.shiftKey);
-        } else if (event.key === "ArrowDown") {
-          event.preventDefault();
-          if (!event.shiftKey && active.r >= rows.length - 1 && grow) {
-            pendingDownRef.current = true;
-            grow(rows.length + GROW_BATCH);
-            return;
-          }
-          move(1, 0, event.shiftKey);
-        } else if (event.key === "ArrowLeft") {
-          event.preventDefault();
-          move(0, -1, event.shiftKey);
-        } else if (event.key === "ArrowRight" || event.key === "Tab") {
-          event.preventDefault();
-          move(0, event.key === "Tab" && event.shiftKey ? -1 : 1, event.key !== "Tab" && event.shiftKey);
-        } else if (event.key === "Enter") {
-          event.preventDefault();
-          setEditing({ r: active.r, c: active.c, value: cellValue(active.r, active.c) });
-        } else if (event.key === "Delete" || event.key === "Backspace") {
-          event.preventDefault();
-          clearSelection();
-        } else if (event.key.length === 1 && !cmd && !event.altKey) {
-          setEditing({ r: active.r, c: active.c, value: event.key });
-        }
-      }}
+      onKeyDown={handleGridKey}
       onPaste={(event) => {
         const text = event.clipboardData.getData("text/plain");
         if (!text) return;
@@ -360,7 +404,15 @@ export function Spreadsheet({
                           className="absolute inset-0 z-10 h-full w-full border-2 border-[#217346] bg-white px-1.5 outline-none"
                           onChange={(event) => setEditing({ ...editing, value: event.target.value })}
                           onBlur={commitEdit}
-                          onKeyDown={(event) => event.stopPropagation()}
+                          onKeyDown={(event) => {
+                            if (applyDirectionKey(event.key, r, c)) {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              setEditing(null);
+                              return;
+                            }
+                            event.stopPropagation();
+                          }}
                         />
                       ) : (
                         <span className="block truncate">{row[header]}</span>

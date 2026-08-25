@@ -15,6 +15,7 @@ export type PersistedData = {
 export type PersistedMeta = {
   currentId: string | null;
   data: PersistedData;
+  templateGrids?: Record<string, PersistedData>;
   folders?: TemplateFolder[];
   librarySeeded?: boolean;
   deletedIds?: string[];

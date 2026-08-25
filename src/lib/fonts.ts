@@ -137,10 +137,58 @@ export function ensureGoogleFontsLoaded(families: string[]) {
   const local = [...new Set(families.map(resolveFontFamily).filter(isLocalFont))];
   if (!google.length && !local.length) return Promise.resolve();
   return Promise.all([
-    ...google.map((name) => document.fonts.load(`16px "${name}"`)),
+    ...google.flatMap((name) => [
+      document.fonts.load(`400 64px "${name}"`),
+      document.fonts.load(`700 64px "${name}"`),
+    ]),
     ...local.flatMap((name) => [
-      document.fonts.load(`400 16px "${name}"`),
-      document.fonts.load(`700 16px "${name}"`),
+      document.fonts.load(`400 64px "${name}"`),
+      document.fonts.load(`700 64px "${name}"`),
     ]),
   ]).then(() => undefined);
+}
+
+const printFaces = new Map<string, Promise<FontFace>>();
+
+function fontBinary(bytes: Uint8Array) {
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+}
+
+async function registerPrintFace(family: string, weight: 400 | 700) {
+  const key = `${family}:${weight}`;
+  const hit = printFaces.get(key);
+  if (hit) return hit;
+  const work = (async () => {
+    const bytes = await fetchFontBytes(family, weight);
+    const face = new FontFace(family, fontBinary(bytes), {
+      weight: String(weight),
+      style: "normal",
+      display: "block",
+    });
+    const loaded = await face.load();
+    document.fonts.add(loaded);
+    return loaded;
+  })();
+  printFaces.set(key, work);
+  return work;
+}
+
+/** Full outline files at the sizes Konva will paint — CSS 16px WOFF caches blob when scaled to print. */
+export async function ensurePrintFonts(families: string[], sizesPx: number[] = [64]) {
+  if (typeof document === "undefined") return;
+  const unique = [...new Set(families.map(resolveFontFamily).filter(isEmbeddableFont))];
+  if (!unique.length) return;
+  await Promise.all(unique.flatMap((name) => [registerPrintFace(name, 400), registerPrintFace(name, 700)]));
+  const sizes = [...new Set(sizesPx.map((n) => Math.max(12, Math.round(n))))];
+  await Promise.all(
+    unique.flatMap((name) =>
+      sizes.flatMap((size) => [
+        document.fonts.load(`400 ${size}px "${name}"`),
+        document.fonts.load(`700 ${size}px "${name}"`),
+        document.fonts.load(`normal ${size}px "${name}"`),
+        document.fonts.load(`bold ${size}px "${name}"`),
+      ]),
+    ),
+  );
+  if (document.fonts.ready) await document.fonts.ready;
 }

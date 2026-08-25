@@ -260,13 +260,18 @@ export function PaperSetupDialog({
                     ? `${slots} label${slots === 1 ? "" : "s"} per sheet · ${pageCount} PDF page${pageCount === 1 ? "" : "s"} · max ${fitted.columns} × ${fitted.rows}.`
                     : "Nothing will print until the whole sticker fits on this paper."}
                 </p>
+                <p className="mt-1 text-[11px] text-[#5f6368]">
+                  Print at <span className="font-medium text-[#3c4043]">Actual size / 100%</span>. Fit to page shrinks
+                  the sheet and shifts every label.
+                </p>
               </div>
             </div>
           ) : (
             <p className="rounded-lg border border-[#d0d7de] bg-[#f8f9fa] px-3 py-2 text-[13px] text-[#5f6368]">
               {labelCount} PDF page{labelCount === 1 ? "" : "s"}, each the same size as the sticker. Use this for a
               dedicated label printer. In the system print dialog, set paper to match {doc.page.widthMm} ×{" "}
-              {doc.page.heightMm} mm if your driver allows custom sizes.
+              {doc.page.heightMm} mm if your driver allows custom sizes, and print at Actual size / 100% (not Fit to
+              page).
             </p>
           )}
         </div>

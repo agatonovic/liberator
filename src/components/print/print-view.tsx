@@ -494,6 +494,11 @@ export function PrintView() {
                     .filter((column) => column.values?.length)
                     .map((column) => [columnHeader(column), column.values!.join(" or ")]),
                 )}
+                columnOptions={Object.fromEntries(
+                  columns
+                    .filter((column) => column.values?.length)
+                    .map((column) => [columnHeader(column), column.values!]),
+                )}
                 requiredHeaders={requiredHeaders}
                 issueCells={issueCells}
                 focusCell={gridFocus}

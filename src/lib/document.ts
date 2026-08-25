@@ -478,13 +478,30 @@ export function isDirectionBound(
   return element.type === "image" && isSwappableArrowImage(element);
 }
 
+function explicitArrowDirection(value: string): "UP" | "DOWN" | null {
+  const text = value.trim().toUpperCase();
+  if (!text) return null;
+  if (["UP", "↑", "▲", "U", "GORE"].includes(text)) return "UP";
+  if (["DOWN", "↓", "▼", "D", "DOLJE"].includes(text)) return "DOWN";
+  return null;
+}
+
+/** Default arrow polygon points right; Konva rotation is clockwise. */
+function directionFromRotation(rotation: number): "UP" | "DOWN" {
+  const angle = ((rotation % 360) + 360) % 360;
+  if (angle >= 45 && angle < 135) return "DOWN";
+  if (angle >= 225 && angle < 315) return "UP";
+  return angle >= 135 && angle < 225 ? "DOWN" : "UP";
+}
+
 export function designedArrowDirection(
-  element: Pick<LabelElement, "content" | "imageDataUrl">,
+  element: Pick<LabelElement, "content" | "imageDataUrl" | "rotation">,
 ): "UP" | "DOWN" {
-  const fromContent = parseArrow(element.content ?? "");
+  const fromContent = explicitArrowDirection(element.content ?? "");
   if (fromContent) return fromContent;
   const match = element.imageDataUrl?.match(/\/arrows\/(UP|DOWN)/);
-  return match?.[1] === "DOWN" ? "DOWN" : "UP";
+  if (match?.[1] === "DOWN" || match?.[1] === "UP") return match[1];
+  return directionFromRotation(element.rotation ?? 0);
 }
 
 /** Render-time pose. Does not write data-driven rotation back to the template. */
@@ -812,6 +829,61 @@ export function repairGaAddressFields(doc: LabelDocument): LabelDocument {
     };
   });
   return changed ? { ...doc, elements } : doc;
+}
+
+function isArrowDataColumn(column: DataColumn) {
+  return /arrow/i.test(columnAliases(column).join(" "));
+}
+
+function compareArrowColumns(a: DataColumn, b: DataColumn) {
+  const rank = (column: DataColumn) => {
+    const text = columnAliases(column).join(" ").toLowerCase();
+    if (/\btop\b/.test(text)) return 0;
+    if (/\bbot(tom)?\b/.test(text)) return 1;
+    return 2;
+  };
+  return rank(a) - rank(b) || a.key.localeCompare(b.key);
+}
+
+/** Bind vector arrows to UP/DOWN columns and restore allowed values. */
+export function repairDirectionArrows(doc: LabelDocument): LabelDocument {
+  const columns = [...(doc.dataColumns ?? [])];
+  let columnsChanged = false;
+  const dataColumns = columns.map((column) => {
+    if (!isArrowDataColumn(column) || column.values?.length) return column;
+    columnsChanged = true;
+    return { ...column, values: ["UP", "DOWN"] };
+  });
+  const arrowColumns = dataColumns.filter(isArrowDataColumn);
+  const unbound = doc.elements.filter(
+    (el) =>
+      !el.hidden &&
+      !el.binding?.trim() &&
+      (el.type === "arrow" || el.type === "doubleArrow" || isSwappableArrowImage(el)),
+  );
+  if (!arrowColumns.length || !unbound.length) {
+    return columnsChanged ? { ...doc, dataColumns } : doc;
+  }
+  const cols = [...arrowColumns].sort(compareArrowColumns);
+  const els = [...unbound].sort((a, b) => a.y - b.y || a.x - b.x);
+  const assign = new Map<string, string>();
+  for (let i = 0; i < Math.min(cols.length, els.length); i += 1) {
+    assign.set(els[i].id, cols[i].key);
+  }
+  const elements = doc.elements.map((el) => {
+    const key = assign.get(el.id);
+    if (!key) return el;
+    return { ...el, ...arrowBindingPatch(key, el) };
+  });
+  return {
+    ...doc,
+    dataColumns: columnsChanged ? dataColumns : doc.dataColumns,
+    elements,
+  };
+}
+
+export function repairTemplateDocument(doc: LabelDocument): LabelDocument {
+  return repairCodeElements(repairGaAddressFields(bindFolderImages(repairDirectionArrows(doc))));
 }
 
 /** If a photo has a lookup folder but no column, reuse the packaging binding already on the template. */

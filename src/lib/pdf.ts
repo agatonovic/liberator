@@ -1,7 +1,32 @@
-import { LineCapStyle, PDFDocument, PDFFont, PDFPage, RGB, StandardFonts, degrees, rgb } from "pdf-lib";
+import {
+  LineCapStyle,
+  PDFDocument,
+  PDFFont,
+  PDFPage,
+  PrintScaling,
+  RGB,
+  StandardFonts,
+  degrees,
+  popGraphicsState,
+  pushGraphicsState,
+  rgb,
+  rotateRadians,
+  toRadians,
+  translate,
+} from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import { barcodeDataUrl, dataUrlToBytes, qrDataUrl } from "./codes";
-import { displayPose, isPaintColor, isPolygonType, strokeDashPattern, type LabelDocument, type LabelElement, type SheetLayout, type SheetPageSize } from "./document";
+import {
+  displayPose,
+  isPaintColor,
+  isPolygonType,
+  lineLocalPoints,
+  strokeDashPattern,
+  type LabelDocument,
+  type LabelElement,
+  type SheetLayout,
+  type SheetPageSize,
+} from "./document";
 import { fetchFontBytes, isEmbeddableFont, resolveFontFamily } from "./fonts";
 import { resolveValue, type ColumnMapping, type DataRow } from "./resolve";
 import { isStrokeArrow, pointsToSvgPath, polygonPoints } from "./shapes";
@@ -50,16 +75,43 @@ function roundedRectPath(width: number, height: number, radius: number): string 
   ].join(" ");
 }
 
-function topLeftToPdf(
-  pageHeightPt: number,
-  xMm: number,
-  yMm: number,
-  heightMm: number,
-): { x: number; y: number } {
-  return {
-    x: mmToPt(xMm),
-    y: pageHeightPt - mmToPt(yMm) - mmToPt(heightMm),
-  };
+/** PDF y-up coordinate of a Konva top-left (y-down) point. */
+function pdfTopLeft(pageHeightPt: number, xMm: number, yMm: number): { x: number; y: number } {
+  return { x: mmToPt(xMm), y: pageHeightPt - mmToPt(yMm) };
+}
+
+/**
+ * pdf-lib `drawSvgPath` translates to (x,y), rotates, then `scale(1,-1)` so the
+ * path is SVG/Konva y-down. Origin must be the element's top-left, and path
+ * points must stay in Konva space — do not pre-flip Y or pass the bottom-left.
+ */
+function konvaSvgRotate(rotation: number) {
+  return rotation ? degrees(-rotation) : undefined;
+}
+
+/**
+ * Native PDF operators (rect, image, text) are y-up with origin at the
+ * bottom-left. Konva rotates clockwise around the top-left, so rotated
+ * natives get a matching CTM and then draw at (0, -height).
+ */
+function withKonvaPivot(
+  page: PDFPage,
+  topLeft: { x: number; y: number },
+  boxHeightPt: number,
+  rotation: number,
+  draw: (origin: { x: number; y: number }) => void,
+) {
+  if (!rotation) {
+    draw({ x: topLeft.x, y: topLeft.y - boxHeightPt });
+    return;
+  }
+  page.pushOperators(
+    pushGraphicsState(),
+    translate(topLeft.x, topLeft.y),
+    rotateRadians(toRadians(degrees(-rotation))),
+  );
+  draw({ x: 0, y: -boxHeightPt });
+  page.pushOperators(popGraphicsState());
 }
 
 export function sheetPageSizeMm(pageSize: SheetPageSize) {
@@ -136,13 +188,14 @@ export function paperFitsLabel(
   return fitLabelOnSheet(label, pageSize, gapMm, Math.min(marginMm, maxMarginForLabel(label, pageSize))).fits;
 }
 
+/** Top-left of each sticker in y-down millimetres, same as the designer and paper preview. */
 export function computeSlotOrigins(
   sheet: SheetLayout,
   label: { widthMm: number; heightMm: number },
 ): { xMm: number; yMm: number }[] {
   const page = SHEET_MM[sheet.pageSize];
-  const margin = sheet.marginMm ?? 8;
-  const gap = sheet.gapMm ?? 4;
+  const margin = sheet.marginMm ?? 0;
+  const gap = sheet.gapMm ?? 0;
   const fitted = fitLabelOnSheet(label, sheet.pageSize, gap, margin);
   if (!fitted.fits) return [];
   const columns = Math.min(Math.max(1, sheet.columns), fitted.columns);
@@ -300,7 +353,7 @@ async function drawElement(
   const pose = displayPose(element, value);
   const xMm = origin.xMm + pose.x;
   const yMm = origin.yMm + pose.y;
-  const { x, y } = topLeftToPdf(pageHeightPt, xMm, yMm, element.height);
+  const tl = pdfTopLeft(pageHeightPt, xMm, yMm);
   const width = mmToPt(element.width);
   const height = mmToPt(Math.max(element.height, 0.2));
   const opacity = element.style.opacity ?? 1;
@@ -319,89 +372,72 @@ async function drawElement(
         : element.style.lineCap === "square"
           ? LineCapStyle.Projecting
           : LineCapStyle.Butt;
+  const paintNative = (draw: (box: { x: number; y: number }) => void) =>
+    withKonvaPivot(page, tl, height, rotation, draw);
 
   if (element.type === "rect") {
     const radius = mmToPt(element.style.cornerRadiusMm ?? 0);
     if (radius > 0) {
       page.drawSvgPath(roundedRectPath(width, height, radius), {
-        x,
-        y,
+        x: tl.x,
+        y: tl.y,
         color: hasFill ? fill : undefined,
         borderColor: hasStroke ? stroke : undefined,
         borderWidth: hasStroke ? strokeWidth : 0,
         borderDashArray: dashArray,
         borderLineCap: dashCap,
         opacity,
-        rotate: rotation ? degrees(-rotation) : undefined,
+        rotate: konvaSvgRotate(rotation),
       });
       return;
     }
-    page.drawRectangle({
-      x,
-      y,
-      width,
-      height,
-      color: hasFill ? fill : undefined,
-      borderColor: hasStroke ? stroke : undefined,
-      borderWidth: hasStroke ? strokeWidth : undefined,
-      borderDashArray: dashArray,
-      borderLineCap: dashCap,
-      opacity,
-      rotate: rotation ? degrees(-rotation) : undefined,
+    paintNative((box) => {
+      page.drawRectangle({
+        x: box.x,
+        y: box.y,
+        width,
+        height,
+        color: hasFill ? fill : undefined,
+        borderColor: hasStroke ? stroke : undefined,
+        borderWidth: hasStroke ? strokeWidth : undefined,
+        borderDashArray: dashArray,
+        borderLineCap: dashCap,
+        opacity,
+      });
     });
     return;
   }
 
   if (element.type === "ellipse") {
-    page.drawEllipse({
-      x: x + width / 2,
-      y: y + height / 2,
-      xScale: width / 2,
-      yScale: height / 2,
-      color: hasFill ? fill : undefined,
-      borderColor: hasStroke ? stroke : undefined,
-      borderWidth: hasStroke ? strokeWidth : undefined,
-      borderDashArray: dashArray,
-      borderLineCap: dashCap,
-      opacity,
+    paintNative((box) => {
+      page.drawEllipse({
+        x: box.x + width / 2,
+        y: box.y + height / 2,
+        xScale: width / 2,
+        yScale: height / 2,
+        color: hasFill ? fill : undefined,
+        borderColor: hasStroke ? stroke : undefined,
+        borderWidth: hasStroke ? strokeWidth : undefined,
+        borderDashArray: dashArray,
+        borderLineCap: dashCap,
+        opacity,
+      });
     });
     return;
   }
 
   if (element.type === "line") {
-    const horizontal = element.width >= element.height;
-    const cx = x + width / 2;
-    const cy = y + height / 2;
-    let x1 = horizontal ? x : cx;
-    let y1 = horizontal ? cy : y;
-    let x2 = horizontal ? x + width : cx;
-    let y2 = horizontal ? cy : y + height;
-    if (rotation) {
-      const rad = (-rotation * Math.PI) / 180;
-      const rotate = (px: number, py: number) => {
-        const dx = px - cx;
-        const dy = py - cy;
-        return {
-          x: cx + dx * Math.cos(rad) - dy * Math.sin(rad),
-          y: cy + dx * Math.sin(rad) + dy * Math.cos(rad),
-        };
-      };
-      const start = rotate(x1, y1);
-      const end = rotate(x2, y2);
-      x1 = start.x;
-      y1 = start.y;
-      x2 = end.x;
-      y2 = end.y;
-    }
     if (!hasStroke) return;
-    page.drawLine({
-      start: { x: x1, y: y1 },
-      end: { x: x2, y: y2 },
-      thickness: strokeWidth || mmToPt(0.4),
-      color: stroke,
+    const pts = lineLocalPoints(width, height);
+    page.drawSvgPath(`M ${pts[0]} ${pts[1]} L ${pts[2]} ${pts[3]}`, {
+      x: tl.x,
+      y: tl.y,
+      borderColor: stroke,
+      borderWidth: strokeWidth || mmToPt(0.4),
+      borderLineCap: dashCap,
+      borderDashArray: dashArray,
       opacity,
-      lineCap: dashCap,
-      dashArray,
+      rotate: konvaSvgRotate(rotation),
     });
     return;
   }
@@ -409,37 +445,32 @@ async function drawElement(
   if (isPolygonType(element.type)) {
     const arrowKind = element.style.arrowKind ?? "block";
     const open = (element.type === "arrow" || element.type === "doubleArrow") && isStrokeArrow(arrowKind);
-    const local = polygonPoints(element.type, width, height, arrowKind);
-    const pdfLocal: number[] = [];
-    for (let i = 0; i < local.length; i += 2) {
-      pdfLocal.push(local[i], height - local[i + 1]);
-    }
-    const path = pointsToSvgPath(pdfLocal, !open);
+    const path = pointsToSvgPath(polygonPoints(element.type, width, height, arrowKind), !open);
     if (!path) return;
     const ink = hasFill ? fill : hasStroke ? stroke : rgb(0.07, 0.15, 0.23);
     if (open) {
       page.drawSvgPath(path, {
-        x,
-        y,
+        x: tl.x,
+        y: tl.y,
         borderColor: ink,
         borderWidth: Math.max(strokeWidth, mmToPt(0.45)),
         borderLineCap: LineCapStyle.Round,
         opacity,
-        rotate: rotation ? degrees(-rotation) : undefined,
+        rotate: konvaSvgRotate(rotation),
       });
       return;
     }
     if (hasFill || hasStroke) {
       page.drawSvgPath(path, {
-        x,
-        y,
+        x: tl.x,
+        y: tl.y,
         color: hasFill ? fill : undefined,
         borderColor: hasStroke ? stroke : undefined,
         borderWidth: hasStroke ? strokeWidth : 0,
         borderDashArray: dashArray,
         borderLineCap: dashCap,
         opacity,
-        rotate: rotation ? degrees(-rotation) : undefined,
+        rotate: konvaSvgRotate(rotation),
       });
     }
     return;
@@ -460,65 +491,67 @@ async function drawElement(
       : element.spans;
     const spans = element.transform === "ga_magacin" ? gaMagacinPrefixSpans(text, transferred) : transferred;
     const measure = (line: string, size: number) => font.widthOfTextAtSize(line, size);
-    if (spans?.length) {
-      const runs = runsFromContent(text, defaults, spans);
-      const placed = layoutRuns(
-        runs,
-        width,
-        height,
-        mmToPt,
-        spacing,
-        element.style.lineHeight ?? 1,
-        element.style.align ?? "left",
-        element.style.verticalAlign ?? "middle",
+    paintNative((box) => {
+      if (spans?.length) {
+        const runs = runsFromContent(text, defaults, spans);
+        const placed = layoutRuns(
+          runs,
+          width,
+          height,
+          mmToPt,
+          spacing,
+          element.style.lineHeight ?? 1,
+          element.style.align ?? "left",
+          element.style.verticalAlign ?? "middle",
+          measure,
+        );
+        for (const run of placed) {
+          drawSpacedLine(page, run.text, {
+            x: box.x + run.x,
+            y: box.y + height - run.y - run.fontSize,
+            size: run.fontSize,
+            font,
+            color: parseColor(run.fill, fill),
+            opacity,
+            spacing,
+          });
+        }
+        return;
+      }
+      const fontSize = fitPlainFontSize({
+        text,
+        designed: element.content ?? "",
+        boxW: width,
+        boxH: height,
+        fontSize: designedSize,
+        minFontSize: mmToPt(0.5),
+        letterSpacing: spacing,
+        lineHeight: element.style.lineHeight ?? 1,
         measure,
-      );
-      for (const run of placed) {
-        drawSpacedLine(page, run.text, {
-          x: x + run.x,
-          y: y + height - run.y - run.fontSize,
-          size: run.fontSize,
+      });
+      const lineHeightPt = fontSize * (element.style.lineHeight ?? 1);
+      const lines = wrapTextLines(font, text, fontSize, spacing, width);
+      const blockHeight = lines.length * lineHeightPt;
+      let blockTop = box.y + (height + blockHeight) / 2;
+      if (element.style.verticalAlign === "top") blockTop = box.y + height;
+      if (element.style.verticalAlign === "bottom") blockTop = box.y + blockHeight;
+      for (let i = 0; i < lines.length; i += 1) {
+        const line = lines[i];
+        const lineWidth = textWidthWithSpacing(font, line, fontSize, spacing);
+        let lineX = box.x;
+        if (element.style.align === "center") lineX = box.x + (width - lineWidth) / 2;
+        if (element.style.align === "right") lineX = box.x + width - lineWidth;
+        drawSpacedLine(page, line, {
+          x: Math.max(box.x, lineX),
+          y: blockTop - fontSize - i * lineHeightPt,
+          size: fontSize,
           font,
-          color: parseColor(run.fill, fill),
+          color: fill,
           opacity,
           spacing,
         });
       }
-      return;
-    }
-    const fontSize = fitPlainFontSize({
-      text,
-      designed: element.content ?? "",
-      boxW: width,
-      boxH: height,
-      fontSize: designedSize,
-      minFontSize: mmToPt(0.5),
-      letterSpacing: spacing,
-      lineHeight: element.style.lineHeight ?? 1,
-      measure,
     });
-    const lineHeightPt = fontSize * (element.style.lineHeight ?? 1);
-    const lines = wrapTextLines(font, text, fontSize, spacing, width);
-    const blockHeight = lines.length * lineHeightPt;
-    let blockTop = y + (height + blockHeight) / 2;
-    if (element.style.verticalAlign === "top") blockTop = y + height;
-    if (element.style.verticalAlign === "bottom") blockTop = y + blockHeight;
-    for (let i = 0; i < lines.length; i += 1) {
-      const line = lines[i];
-      const lineWidth = textWidthWithSpacing(font, line, fontSize, spacing);
-      let lineX = x;
-      if (element.style.align === "center") lineX = x + (width - lineWidth) / 2;
-      if (element.style.align === "right") lineX = x + width - lineWidth;
-      drawSpacedLine(page, line, {
-        x: Math.max(x, lineX),
-        y: blockTop - fontSize - i * lineHeightPt,
-        size: fontSize,
-        font,
-        color: fill,
-        opacity,
-        spacing,
-      });
-    }
     return;
   }
 
@@ -533,7 +566,9 @@ async function drawElement(
     );
     const image = await embedImage(pdf, dataUrl);
     if (image) {
-      page.drawImage(image, { x, y, width, height, opacity });
+      paintNative((box) => {
+        page.drawImage(image, { x: box.x, y: box.y, width, height, opacity });
+      });
     }
     return;
   }
@@ -544,12 +579,14 @@ async function drawElement(
     const dataUrl = await qrDataUrl(value, sizePx);
     const image = await embedImage(pdf, dataUrl);
     if (image) {
-      page.drawImage(image, {
-        x: x + (width - side) / 2,
-        y: y + (height - side) / 2,
-        width: side,
-        height: side,
-        opacity,
+      paintNative((box) => {
+        page.drawImage(image, {
+          x: box.x + (width - side) / 2,
+          y: box.y + (height - side) / 2,
+          width: side,
+          height: side,
+          opacity,
+        });
       });
     }
     return;
@@ -565,40 +602,37 @@ async function drawElement(
     if (src) {
       const image = await embedImage(pdf, src);
       if (image) {
-        page.drawImage(image, {
-          x,
-          y,
-          width,
-          height,
-          opacity,
-          rotate: rotation ? degrees(-rotation) : undefined,
+        paintNative((box) => {
+          page.drawImage(image, { x: box.x, y: box.y, width, height, opacity });
         });
         return;
       }
     }
-    page.drawRectangle({
-      x,
-      y,
-      width,
-      height,
-      color: rgb(0.96, 0.95, 0.93),
-      borderColor: rgb(0.85, 0.83, 0.78),
-      borderWidth: 0.75,
-      borderDashArray: [4, 3],
-      opacity,
-    });
-    const label = "IMAGE";
-    const fallback = fonts.get("IBM Plex Sans") ?? [...fonts.values()][0];
-    if (!fallback) return;
-    const fontSize = Math.min(11, Math.max(6, height * 0.18));
-    const textWidth = fallback.regular.widthOfTextAtSize(label, fontSize);
-    page.drawText(label, {
-      x: x + Math.max(0, (width - textWidth) / 2),
-      y: y + (height - fontSize) / 2,
-      size: fontSize,
-      font: fallback.regular,
-      color: rgb(0.54, 0.51, 0.46),
-      opacity,
+    paintNative((box) => {
+      page.drawRectangle({
+        x: box.x,
+        y: box.y,
+        width,
+        height,
+        color: rgb(0.96, 0.95, 0.93),
+        borderColor: rgb(0.85, 0.83, 0.78),
+        borderWidth: 0.75,
+        borderDashArray: [4, 3],
+        opacity,
+      });
+      const label = "IMAGE";
+      const fallback = fonts.get("IBM Plex Sans") ?? [...fonts.values()][0];
+      if (!fallback) return;
+      const fontSize = Math.min(11, Math.max(6, height * 0.18));
+      const textWidth = fallback.regular.widthOfTextAtSize(label, fontSize);
+      page.drawText(label, {
+        x: box.x + Math.max(0, (width - textWidth) / 2),
+        y: box.y + (height - fontSize) / 2,
+        size: fontSize,
+        font: fallback.regular,
+        color: rgb(0.54, 0.51, 0.46),
+        opacity,
+      });
     });
   }
 }
@@ -620,16 +654,92 @@ async function drawLabel(
   }
 }
 
-export async function generatePdf(
+function rowCacheKey(row: DataRow | null) {
+  return row ? JSON.stringify(row) : "__sample__";
+}
+
+async function stampCanvasLabel(
+  pdf: PDFDocument,
+  page: PDFPage,
   doc: LabelDocument,
-  rows: DataRow[],
+  origin: { xMm: number; yMm: number },
+  png: Uint8Array,
+): Promise<void> {
+  const image = await pdf.embedPng(png);
+  const width = mmToPt(doc.page.widthMm);
+  const height = mmToPt(doc.page.heightMm);
+  page.drawImage(image, {
+    x: mmToPt(origin.xMm),
+    y: page.getHeight() - mmToPt(origin.yMm) - height,
+    width,
+    height,
+  });
+}
+
+async function generateCanvasPdf(
+  doc: LabelDocument,
+  dataRows: Array<DataRow | null>,
   mapping: ColumnMapping,
 ): Promise<Uint8Array> {
-  await useAssetStore.getState().hydrate();
+  const { rasterizeLabelPng, composeSheetPng } = await import("@/components/print/raster-label");
+  const pdf = await PDFDocument.create();
+  pdf.catalog.getOrCreateViewerPreferences().setPrintScaling(PrintScaling.None);
+  const cache = new Map<string, Uint8Array>();
+
+  async function pngFor(row: DataRow | null) {
+    const key = rowCacheKey(row);
+    const hit = cache.get(key);
+    if (hit) return hit;
+    const bytes = await rasterizeLabelPng(doc, row, mapping);
+    cache.set(key, bytes);
+    return bytes;
+  }
+
+  const labelSize = { widthPt: mmToPt(doc.page.widthMm), heightPt: mmToPt(doc.page.heightMm) };
+
+  if (!doc.sheet) {
+    for (const row of dataRows) {
+      const page = pdf.addPage([labelSize.widthPt, labelSize.heightPt]);
+      await stampCanvasLabel(pdf, page, doc, { xMm: 0, yMm: 0 }, await pngFor(row));
+    }
+    return pdf.save();
+  }
+
+  const sheet = SHEET_MM[doc.sheet.pageSize];
+  const origins = computeSlotOrigins(doc.sheet, doc.page);
+  if (!origins.length) {
+    const page = sheetPageSizeMm(doc.sheet.pageSize);
+    throw new Error(
+      `This sticker (${doc.page.widthMm} × ${doc.page.heightMm} mm) does not fit on ${doc.sheet.pageSize.replace("-", " ")} (${page.widthMm} × ${page.heightMm} mm). Choose a larger paper size, reduce the margin, or print at sticker size.`,
+    );
+  }
+  const slotsPerPage = Math.max(1, origins.length);
+  for (let i = 0; i < dataRows.length; i += slotsPerPage) {
+    const page = pdf.addPage([mmToPt(sheet.widthMm), mmToPt(sheet.heightMm)]);
+    const chunk = dataRows.slice(i, i + slotsPerPage);
+    const pngs: Uint8Array[] = [];
+    for (const row of chunk) pngs.push(await pngFor(row));
+    const sheetPng = await composeSheetPng(sheet, doc.page, origins, pngs);
+    const image = await pdf.embedPng(sheetPng);
+    page.drawImage(image, {
+      x: 0,
+      y: 0,
+      width: page.getWidth(),
+      height: page.getHeight(),
+    });
+  }
+  return pdf.save();
+}
+
+async function generateVectorPdf(
+  doc: LabelDocument,
+  dataRows: Array<DataRow | null>,
+  mapping: ColumnMapping,
+): Promise<Uint8Array> {
   const pdf = await PDFDocument.create();
   pdf.registerFontkit(fontkit);
+  pdf.catalog.getOrCreateViewerPreferences().setPrintScaling(PrintScaling.None);
   const fonts = await embedDocumentFonts(pdf, doc);
-  const dataRows = rows.length ? rows : [null];
   const labelSize = { widthPt: mmToPt(doc.page.widthMm), heightPt: mmToPt(doc.page.heightMm) };
 
   if (!doc.sheet) {
@@ -657,6 +767,19 @@ export async function generatePdf(
     }
   }
   return pdf.save();
+}
+
+export async function generatePdf(
+  doc: LabelDocument,
+  rows: DataRow[],
+  mapping: ColumnMapping,
+): Promise<Uint8Array> {
+  await useAssetStore.getState().hydrate();
+  const dataRows = rows.length ? rows : [null];
+  if (typeof document !== "undefined") {
+    return generateCanvasPdf(doc, dataRows, mapping);
+  }
+  return generateVectorPdf(doc, dataRows, mapping);
 }
 
 export function pdfFileName(name: string) {

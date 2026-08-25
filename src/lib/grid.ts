@@ -80,6 +80,23 @@ export function sameTemplateGrid(doc: LabelDocument, data: PersistedData) {
   );
 }
 
+/** Build this template's sheet. Never reuse another template's rows. */
+export function gridForTemplate(doc: LabelDocument, stored?: PersistedData | null): PersistedData {
+  if (!stored?.headers.length) return templateGrid(doc);
+  if (sameTemplateGrid(doc, stored)) {
+    if (stored.rows.length >= MIN_GRID_ROWS) return stored;
+    return { ...stored, rows: padRows(stored.rows, stored.headers) };
+  }
+  const projected = projectRowsOntoSchema(doc, stored.headers, stored.rows, stored.mapping);
+  return {
+    fileName: stored.fileName || doc.name,
+    headers: projected.headers,
+    rows: projected.rows,
+    mapping: projected.mapping,
+    previewRowIndex: stored.previewRowIndex ?? 0,
+  };
+}
+
 export function projectRowsOntoSchema(
   doc: LabelDocument,
   sourceHeaders: string[],

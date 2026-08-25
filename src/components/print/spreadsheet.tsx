@@ -67,6 +67,7 @@ export function Spreadsheet({
   onPasteMatrix,
   onEnsureRows,
   onToggleRequired,
+  onDraftChange,
 }: {
   headers: string[];
   rows: DataRow[];
@@ -82,6 +83,7 @@ export function Spreadsheet({
   onPasteMatrix: (rowIndex: number, colIndex: number, text: string) => void;
   onEnsureRows?: (minLength: number) => void;
   onToggleRequired?: (header: string) => void;
+  onDraftChange?: (draft: { row: number; header: string; value: string } | null) => void;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -160,11 +162,21 @@ export function Spreadsheet({
     return String(rows[r]?.[header] ?? "");
   }
 
+  function applyDraft(r: number, c: number, value: string) {
+    const header = headers[c];
+    if (header) onDraftChange?.({ row: r, header, value });
+  }
+
+  function clearDraft() {
+    onDraftChange?.(null);
+  }
+
   function commitEdit() {
     if (!editing) return;
     const header = headers[editing.c];
     if (header) onChangeCell(editing.r, header, editing.value);
     setEditing(null);
+    clearDraft();
   }
 
   function clearSelection() {
@@ -221,22 +233,23 @@ export function Spreadsheet({
     if (editing) {
       if (event.key === "Enter") {
         event.preventDefault();
+        event.stopPropagation();
         commitEdit();
-        if (!event.shiftKey && active.r >= rows.length - 1 && grow) {
-          pendingDownRef.current = true;
-          grow(rows.length + GROW_BATCH);
-          return;
-        }
-        move(event.shiftKey ? -1 : 1, 0, false);
+        return;
       }
       if (event.key === "Tab") {
         event.preventDefault();
+        event.stopPropagation();
         commitEdit();
         move(0, event.shiftKey ? -1 : 1, false);
+        return;
       }
       if (event.key === "Escape") {
         event.preventDefault();
+        event.stopPropagation();
         setEditing(null);
+        clearDraft();
+        return;
       }
       return;
     }
@@ -284,7 +297,9 @@ export function Spreadsheet({
       clearSelection();
     } else if (event.key.length === 1 && !cmd && !event.altKey) {
       if (active.r < 0) return;
+      event.preventDefault();
       setEditing({ r: active.r, c: active.c, value: event.key });
+      applyDraft(active.r, active.c, event.key);
     }
   }
 
@@ -309,7 +324,10 @@ export function Spreadsheet({
       ref={rootRef}
       tabIndex={0}
       className="flex h-full min-h-0 flex-col overflow-hidden bg-white outline-none"
-      onMouseDown={() => rootRef.current?.focus()}
+      onMouseDown={(event) => {
+        if (isTypingTarget(event.target)) return;
+        rootRef.current?.focus();
+      }}
       onKeyDown={handleGridKey}
       onPaste={(event) => {
         const text = event.clipboardData.getData("text/plain");
@@ -331,7 +349,7 @@ export function Spreadsheet({
         <span className="truncate">{editing ? editing.value : cellValue(active.r, active.c)}</span>
       </div>
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto">
-        <table className="w-max min-w-full border-separate border-spacing-0 text-[12px] select-none">
+        <table className="w-max min-w-full border-separate border-spacing-0 text-[12px] select-none [&_input]:select-text">
           <thead className="sticky top-0 z-20">
             <tr>
               <th className="sticky left-0 z-30 h-6 w-10 border-r border-b border-[#d0d7de] bg-[#f8f9fa] font-normal text-[#5f6368]" />
@@ -471,14 +489,26 @@ export function Spreadsheet({
                         <input
                           autoFocus
                           value={editing.value}
-                          className="absolute inset-0 z-10 h-full w-full border-2 border-[#217346] bg-white px-1.5 outline-none"
-                          onChange={(event) => setEditing({ ...editing, value: event.target.value })}
+                          className="absolute inset-0 z-10 h-full w-full border-2 border-[#217346] bg-white px-1.5 outline-none select-text"
+                          onMouseDown={(event) => event.stopPropagation()}
+                          onChange={(event) => {
+                            const value = event.target.value;
+                            setEditing({ ...editing, value });
+                            applyDraft(r, c, value);
+                          }}
                           onBlur={commitEdit}
                           onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === "Tab" || event.key === "Escape") {
+                              handleGridKey(event);
+                              queueMicrotask(() => rootRef.current?.focus());
+                              return;
+                            }
                             if (applyDirectionKey(event.key, r, c)) {
                               event.preventDefault();
                               event.stopPropagation();
                               setEditing(null);
+                              clearDraft();
+                              queueMicrotask(() => rootRef.current?.focus());
                               return;
                             }
                             event.stopPropagation();

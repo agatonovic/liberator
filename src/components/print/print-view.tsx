@@ -129,6 +129,7 @@ export function PrintView() {
   const [paperOpen, setPaperOpen] = useState(false);
   const [attentionOnly, setAttentionOnly] = useState(false);
   const [gridFocus, setGridFocus] = useState<{ row: number; header: string; n: number } | null>(null);
+  const [draft, setDraft] = useState<{ row: number; header: string; value: string } | null>(null);
   const labelsListRef = useRef<HTMLDivElement>(null);
   const [labelsWidth, setLabelsWidth] = useState(() =>
     clamp(readStoredSize(LABELS_WIDTH_KEY, 196), LABELS_MIN, LABELS_MAX),
@@ -139,13 +140,22 @@ export function PrintView() {
 
   const doc = documents.find((item) => item.id === currentId) ?? null;
   const columns = doc ? schemaColumns(doc) : [];
-  const filled = useMemo(() => filledRowIndexes(data.rows, data.headers), [data.headers, data.rows]);
-  const sample = previewRow(data.rows, data.previewRowIndex);
-  const printRows = filled.map((index) => data.rows[index]).filter(Boolean);
+  const liveRows = useMemo(() => {
+    if (!draft || !data.headers.includes(draft.header)) return data.rows;
+    if (draft.row < 0 || draft.row >= data.rows.length) return data.rows;
+    return data.rows.map((row, index) =>
+      index === draft.row ? { ...row, [draft.header]: draft.value } : row,
+    );
+  }, [data.headers, data.rows, draft]);
+  const filled = useMemo(() => filledRowIndexes(liveRows, data.headers), [data.headers, liveRows]);
+  const sample = previewRow(liveRows, data.previewRowIndex);
+  const printRows = filledRowIndexes(data.rows, data.headers)
+    .map((index) => data.rows[index])
+    .filter(Boolean);
   const firstHeader = data.headers[0];
   const runStatus = useMemo(
-    () => (doc ? evaluateGenerateRun(doc, data.rows, data.headers, data.mapping, assets, assetFolders) : null),
-    [assetFolders, assets, data.headers, data.mapping, data.rows, doc],
+    () => (doc ? evaluateGenerateRun(doc, liveRows, data.headers, data.mapping, assets, assetFolders) : null),
+    [assetFolders, assets, data.headers, data.mapping, doc, liveRows],
   );
 
   useEffect(() => {
@@ -155,6 +165,10 @@ export function PrintView() {
   useEffect(() => {
     if (hydrated && doc) markTemplateUsed(doc.id, "open");
   }, [doc?.id, hydrated, markTemplateUsed]);
+
+  useEffect(() => {
+    setDraft(null);
+  }, [doc?.id]);
 
   useEffect(() => {
     if (!runStatus?.attention) setAttentionOnly(false);
@@ -400,7 +414,7 @@ export function PrintView() {
             {labelIndexes.length ? (
               labelIndexes.map((index) => {
                 const active = index === data.previewRowIndex;
-                const value = String(firstHeader ? (data.rows[index]?.[firstHeader] ?? "") : "").trim();
+                const value = String(firstHeader ? (liveRows[index]?.[firstHeader] ?? "") : "").trim();
                 const issue = runStatus?.issues.find((item) => item.rowIndex === index);
                 return (
                   <button
@@ -531,6 +545,7 @@ export function PrintView() {
                 onActiveRow={setPreviewRow}
                 onChangeCell={setGridCell}
                 onChangeCells={setGridCells}
+                onDraftChange={setDraft}
                 onToggleRequired={(header) => setColumnRequired(header, !requiredHeaders.has(header))}
                 onEnsureRows={ensureGridRows}
                 onPasteMatrix={(row, col, text) => {

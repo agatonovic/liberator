@@ -150,17 +150,13 @@ export function ensureGoogleFontsLoaded(families: string[]) {
 
 const printFaces = new Map<string, Promise<FontFace>>();
 
-function fontBinary(bytes: Uint8Array) {
-  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-}
-
 async function registerPrintFace(family: string, weight: 400 | 700) {
   const key = `${family}:${weight}`;
   const hit = printFaces.get(key);
   if (hit) return hit;
   const work = (async () => {
     const bytes = await fetchFontBytes(family, weight);
-    const face = new FontFace(family, fontBinary(bytes), {
+    const face = new FontFace(family, Uint8Array.from(bytes), {
       weight: String(weight),
       style: "normal",
       display: "block",

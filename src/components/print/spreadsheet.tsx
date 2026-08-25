@@ -5,7 +5,10 @@ import { serializeTsv } from "@/lib/grid";
 import type { DataRow } from "@/lib/resolve";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 
+const HEADER_ROW = -1;
+
 type Sel = { r0: number; c0: number; r1: number; c1: number };
+type DragKind = "header" | "cells";
 
 function norm(sel: Sel): Sel {
   return {
@@ -86,6 +89,7 @@ export function Spreadsheet({
   const [sel, setSel] = useState<Sel>({ r0: 0, c0: 0, r1: 0, c1: 0 });
   const [editing, setEditing] = useState<{ r: number; c: number; value: string } | null>(null);
   const dragRef = useRef(false);
+  const dragKindRef = useRef<DragKind | null>(null);
   const active = useMemo(() => ({ r: sel.r0, c: sel.c0 }), [sel.r0, sel.c0]);
   const grow = onEnsureRows;
 
@@ -102,18 +106,24 @@ export function Spreadsheet({
   useEffect(() => {
     function endDrag() {
       dragRef.current = false;
+      dragKindRef.current = null;
     }
     window.addEventListener("mouseup", endDrag);
     return () => window.removeEventListener("mouseup", endDrag);
   }, []);
 
   useEffect(() => {
-    setSel((prev) => ({
-      r0: Math.min(prev.r0, Math.max(0, rows.length - 1)),
-      r1: Math.min(prev.r1, Math.max(0, rows.length - 1)),
-      c0: Math.min(prev.c0, Math.max(0, headers.length - 1)),
-      c1: Math.min(prev.c1, Math.max(0, headers.length - 1)),
-    }));
+    setSel((prev) => {
+      const maxR = Math.max(0, rows.length - 1);
+      const maxC = Math.max(0, headers.length - 1);
+      const clampR = (r: number) => (r < 0 ? HEADER_ROW : Math.min(r, maxR));
+      return {
+        r0: clampR(prev.r0),
+        r1: clampR(prev.r1),
+        c0: Math.min(Math.max(0, prev.c0), maxC),
+        c1: Math.min(Math.max(0, prev.c1), maxC),
+      };
+    });
   }, [headers.length, rows.length]);
 
   useEffect(() => {
@@ -144,6 +154,7 @@ export function Spreadsheet({
   }, [grow, rows.length]);
 
   function cellValue(r: number, c: number) {
+    if (r < 0) return headers[c] ?? "";
     const header = headers[c];
     if (!header) return "";
     return String(rows[r]?.[header] ?? "");
@@ -158,8 +169,9 @@ export function Spreadsheet({
 
   function clearSelection() {
     const box = norm(sel);
+    if (box.r0 < 0 && box.r1 < 0) return;
     const updates: { rowIndex: number; header: string; value: string }[] = [];
-    for (let r = box.r0; r <= box.r1; r += 1) {
+    for (let r = Math.max(0, box.r0); r <= box.r1; r += 1) {
       for (let c = box.c0; c <= box.c1; c += 1) {
         const header = headers[c];
         if (header) updates.push({ rowIndex: r, header, value: "" });
@@ -182,10 +194,17 @@ export function Spreadsheet({
 
   function move(dr: number, dc: number, extend: boolean) {
     setSel((prev) => {
-      const r = Math.min(Math.max(0, (extend ? prev.r1 : prev.r0) + dr), rows.length - 1);
-      const c = Math.min(Math.max(0, (extend ? prev.c1 : prev.c0) + dc), headers.length - 1);
-      const next = extend ? { ...prev, r1: r, c1: c } : { r0: r, c0: c, r1: r, c1: c };
-      onActiveRow(next.r0);
+      const fromR = extend ? prev.r1 : prev.r0;
+      const fromC = extend ? prev.c1 : prev.c0;
+      const c = Math.min(Math.max(0, fromC + dc), headers.length - 1);
+      let r = fromR + dr;
+      if (fromR < 0) r = dr > 0 ? 0 : HEADER_ROW;
+      else if (r < 0) r = HEADER_ROW;
+      else r = Math.min(r, rows.length - 1);
+      const next = extend
+        ? { ...prev, r1: r, c1: c }
+        : { r0: r, c0: c, r1: r, c1: c };
+      if (next.r0 >= 0) onActiveRow(next.r0);
       return next;
     });
   }
@@ -236,11 +255,11 @@ export function Spreadsheet({
     if (cmd && event.key.toLowerCase() === "v") return;
     if (event.key === "ArrowUp") {
       event.preventDefault();
-      if (!event.shiftKey && applyDirectionKey(event.key, active.r, active.c)) return;
+      if (active.r >= 0 && !event.shiftKey && applyDirectionKey(event.key, active.r, active.c)) return;
       move(-1, 0, event.shiftKey);
     } else if (event.key === "ArrowDown") {
       event.preventDefault();
-      if (!event.shiftKey && applyDirectionKey(event.key, active.r, active.c)) return;
+      if (active.r >= 0 && !event.shiftKey && applyDirectionKey(event.key, active.r, active.c)) return;
       if (!event.shiftKey && active.r >= rows.length - 1 && grow) {
         pendingDownRef.current = true;
         grow(rows.length + GROW_BATCH);
@@ -255,11 +274,16 @@ export function Spreadsheet({
       move(0, event.key === "Tab" && event.shiftKey ? -1 : 1, event.key !== "Tab" && event.shiftKey);
     } else if (event.key === "Enter") {
       event.preventDefault();
+      if (active.r < 0) {
+        move(1, 0, false);
+        return;
+      }
       setEditing({ r: active.r, c: active.c, value: cellValue(active.r, active.c) });
     } else if (event.key === "Delete" || event.key === "Backspace") {
       event.preventDefault();
       clearSelection();
     } else if (event.key.length === 1 && !cmd && !event.altKey) {
+      if (active.r < 0) return;
       setEditing({ r: active.r, c: active.c, value: event.key });
     }
   }
@@ -302,8 +326,7 @@ export function Spreadsheet({
     >
       <div className="flex h-7 shrink-0 items-center border-b border-[#d0d7de] bg-[#f3f3f3] px-2 font-mono text-[12px] text-[#1f1f1f]">
         <span className="w-14 shrink-0 text-[#217346]">
-          {colLetter(active.c)}
-          {active.r + 1}
+          {active.r < 0 ? colLetter(active.c) : `${colLetter(active.c)}${active.r + 1}`}
         </span>
         <span className="truncate">{editing ? editing.value : cellValue(active.r, active.c)}</span>
       </div>
@@ -315,33 +338,79 @@ export function Spreadsheet({
               {headers.map((header, c) => {
                 const required = requiredHeaders?.has(header);
                 const hint = columnHints?.[header];
+                const colSelected = c >= Math.min(sel.c0, sel.c1) && c <= Math.max(sel.c0, sel.c1);
+                const headerActive = active.r < 0 && active.c === c;
                 return (
                 <th
                   key={header}
-                  title={
-                    onToggleRequired
-                      ? required
-                        ? "Required. Click to allow empty cells."
-                        : "Optional. Click to require a value."
-                      : hint
-                  }
+                  data-grid-header={c}
+                  title={hint || "Select to copy. Click * to toggle required."}
                   className={cn(
-                    "h-6 min-w-[132px] border-r border-b border-[#d0d7de] bg-[#f8f9fa] px-2 text-left font-semibold text-[#3c4043]",
-                    c >= Math.min(sel.c0, sel.c1) && c <= Math.max(sel.c0, sel.c1) && "bg-[#e6f4ea]",
+                    "h-6 min-w-[132px] cursor-default border-r border-b border-[#d0d7de] bg-[#f8f9fa] px-2 text-left font-semibold text-[#3c4043]",
+                    colSelected && "bg-[#e6f4ea]",
+                    headerActive && "bg-white",
                   )}
+                  onMouseDown={(event) => {
+                    if (event.button !== 0) return;
+                    if ((event.target as HTMLElement).closest("[data-required-toggle]")) return;
+                    commitEdit();
+                    dragRef.current = true;
+                    dragKindRef.current = "header";
+                    const next = event.shiftKey
+                      ? { r0: HEADER_ROW, c0: sel.c0, r1: HEADER_ROW, c1: c }
+                      : { r0: HEADER_ROW, c0: c, r1: HEADER_ROW, c1: c };
+                    setSel(next);
+                  }}
+                  onMouseEnter={() => {
+                    if (!dragRef.current || dragKindRef.current !== "header") return;
+                    setSel((prev) => ({ ...prev, r1: HEADER_ROW, c1: c }));
+                  }}
+                  onMouseUp={() => {
+                    dragRef.current = false;
+                    dragKindRef.current = null;
+                  }}
                 >
-                  {onToggleRequired ? (
+                  <span className="relative flex max-w-full items-center gap-0.5">
                     <button
                       type="button"
-                      className="flex max-w-full items-center gap-0.5 truncate text-left"
-                      onClick={() => onToggleRequired(header)}
+                      className="min-w-0 truncate text-left font-semibold"
+                      onMouseDown={(event) => {
+                        if (event.button !== 0) return;
+                        event.preventDefault();
+                        commitEdit();
+                        dragRef.current = true;
+                        dragKindRef.current = "header";
+                        const next = event.shiftKey
+                          ? { r0: HEADER_ROW, c0: sel.c0, r1: HEADER_ROW, c1: c }
+                          : { r0: HEADER_ROW, c0: c, r1: HEADER_ROW, c1: c };
+                        setSel(next);
+                      }}
                     >
-                      <span className="truncate">{header}</span>
-                      {required ? <span className="text-[#c5221f]">*</span> : null}
+                      {header}
                     </button>
-                  ) : (
-                    header
-                  )}
+                    {onToggleRequired ? (
+                      <button
+                        type="button"
+                        data-required-toggle
+                        aria-label={required ? `${header}, required` : `${header}, optional`}
+                        title={
+                          required
+                            ? "Required. Click to allow empty cells."
+                            : "Optional. Click to require a value."
+                        }
+                        className={cn(
+                          "shrink-0 px-0.5 text-[12px] font-semibold",
+                          required ? "text-[#c5221f]" : "text-[#c4c7c5] hover:text-[#5f6368]",
+                        )}
+                        onClick={() => onToggleRequired(header)}
+                      >
+                        *
+                      </button>
+                    ) : null}
+                    {headerActive ? (
+                      <span className="pointer-events-none absolute inset-[-5px_-8px] border-2 border-[#217346]" />
+                    ) : null}
+                  </span>
                 </th>
                 );
               })}
@@ -380,6 +449,7 @@ export function Spreadsheet({
                         if (isEdit) return;
                         commitEdit();
                         dragRef.current = true;
+                        dragKindRef.current = "cells";
                         const next = event.shiftKey
                           ? { ...sel, r1: r, c1: c }
                           : { r0: r, c0: c, r1: r, c1: c };
@@ -387,7 +457,7 @@ export function Spreadsheet({
                         onActiveRow(r);
                       }}
                       onMouseEnter={() => {
-                        if (!dragRef.current) return;
+                        if (!dragRef.current || dragKindRef.current !== "cells") return;
                         setSel((prev) => ({ ...prev, r1: r, c1: c }));
                       }}
                       onMouseUp={() => {

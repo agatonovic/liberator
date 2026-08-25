@@ -96,7 +96,7 @@ export function schemaColumns(doc: LabelDocument): DataColumn[] {
   return columns;
 }
 
-export function downloadExcelTemplate(doc: LabelDocument): void {
+export function downloadExcelTemplate(doc: LabelDocument, options?: { blank?: boolean }): void {
   const columns = schemaColumns(doc);
   if (!columns.length) {
     throw new Error("This template has no data columns yet.");
@@ -104,7 +104,7 @@ export function downloadExcelTemplate(doc: LabelDocument): void {
   const headers = columns.map((column) => column.headers[0] || column.label);
   const examples = columns.map((column) => column.example);
   const workbook = XLSX.utils.book_new();
-  const sheet = XLSX.utils.aoa_to_sheet([headers, examples]);
+  const sheet = XLSX.utils.aoa_to_sheet(options?.blank ? [headers] : [headers, examples]);
   sheet["!cols"] = headers.map((header) => ({ wch: Math.max(14, header.length + 2) }));
   XLSX.utils.book_append_sheet(workbook, sheet, "Labels");
   const bytes = XLSX.write(workbook, { type: "array", bookType: "xlsx" }) as Uint8Array;

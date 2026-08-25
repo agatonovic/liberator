@@ -55,6 +55,18 @@ function applyTransform(element: LabelElement, raw: string): string {
   return raw;
 }
 
+export function isBoundToData(element: Pick<LabelElement, "binding" | "fallbackBinding">) {
+  return Boolean(element.binding?.trim() || element.fallbackBinding?.trim());
+}
+
+/** Designed sample art only when the field is unbound, or the live cell has a value. */
+export function useDesignedMedia(
+  element: Pick<LabelElement, "binding" | "fallbackBinding">,
+  value: string,
+) {
+  return !isBoundToData(element) || Boolean(value.trim());
+}
+
 export function resolveValue(
   element: LabelElement,
   row: DataRow | null | undefined,
@@ -62,14 +74,24 @@ export function resolveValue(
   columns: DataColumn[] = [],
 ): string {
   const binding = element.binding?.trim();
+  const fallbackKey = element.fallbackBinding?.trim();
+  const live = row != null;
   let raw = "";
   if (binding && row) {
     raw = lookupRowValue(row, binding, mapping, columns);
   }
-  if (!raw && element.fallbackBinding && row) {
-    raw = lookupRowValue(row, element.fallbackBinding, mapping, columns);
+  if (!raw.trim() && fallbackKey && row) {
+    raw = lookupRowValue(row, fallbackKey, mapping, columns);
   }
-  if (raw) return applyTransform(element, raw) || (element.content ?? "");
+  raw = raw.trim();
+  if (raw) {
+    const next = applyTransform(element, raw);
+    if (next) return next;
+    return live && (binding || fallbackKey) ? "" : (element.content ?? "");
+  }
+  // Generate / PDF pass a data row: empty bound cells stay empty instead of
+  // painting the designed sample (e.g. catalog part numbers).
+  if (live && (binding || fallbackKey)) return "";
   if (element.transform === "arrow" && element.content) {
     return applyTransform(element, element.content);
   }

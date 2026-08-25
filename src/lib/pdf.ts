@@ -28,7 +28,7 @@ import {
   type SheetPageSize,
 } from "./document";
 import { fetchFontBytes, isEmbeddableFont, resolveFontFamily } from "./fonts";
-import { resolveValue, type ColumnMapping, type DataRow } from "./resolve";
+import { resolveValue, useDesignedMedia, type ColumnMapping, type DataRow } from "./resolve";
 import { isStrokeArrow, pointsToSvgPath, polygonPoints } from "./shapes";
 import { layoutRuns, runsFromContent, transferSpans } from "./text-color";
 import { fitPlainFontSize, wrapPlainLines } from "./text-fit";
@@ -478,12 +478,13 @@ async function drawElement(
   }
 
   if (element.type === "text") {
+    if (!value.trim()) return;
     const pair =
       fonts.get(resolveFontFamily(element.style.fontFamily)) ?? fonts.get("IBM Plex Sans") ?? [...fonts.values()][0];
     if (!pair) return;
     const designedSize = mmToPt(element.style.fontSizeMm ?? 4);
     const font = element.style.fontWeight === "bold" ? pair.bold : pair.regular;
-    const text = value || " ";
+    const text = value;
     const spacing = mmToPt(element.style.letterSpacingMm ?? 0);
     const defaultFill = element.style.fill || "#12263A";
     const defaults = { fill: defaultFill, fontSizeMm: element.style.fontSizeMm ?? 4 };
@@ -557,6 +558,7 @@ async function drawElement(
   }
 
   if (element.type === "barcode") {
+    if (!value.trim()) return;
     const printPx = (mm: number) => Math.round((mm * 300) / 25.4);
     const dataUrl = barcodeDataUrl(
       value,
@@ -575,6 +577,7 @@ async function drawElement(
   }
 
   if (element.type === "qr") {
+    if (!value.trim()) return;
     const side = Math.min(width, height);
     const sizePx = Math.round((Math.min(element.width, element.height) * 300) / 25.4);
     const dataUrl = await qrDataUrl(value, sizePx);
@@ -596,7 +599,7 @@ async function drawElement(
   if (element.type === "image") {
     let src =
       resolveBoundImageSrc(element, value, useAssetStore.getState().assets, useAssetStore.getState().folders) ??
-      resolvePublicSrc(element.imageDataUrl);
+      (useDesignedMedia(element, value) ? resolvePublicSrc(element.imageDataUrl) : undefined);
     if (src && /\/arrows\/(?:UP|DOWN)/.test(src) && value.trim()) {
       src = src.replace(/UP|DOWN/, normalizeArrow(value));
     }
@@ -609,6 +612,7 @@ async function drawElement(
         return;
       }
     }
+    if (!useDesignedMedia(element, value)) return;
     paintNative((box) => {
       page.drawRectangle({
         x: box.x,

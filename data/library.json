@@ -1967,7 +1967,7 @@
       "version": 1,
       "id": "0bc3bdcb-e913-4015-bb02-d95a0d17c39e",
       "name": "HBC A4 Shelf",
-      "updatedAt": "2026-08-21T10:25:43.705Z",
+      "updatedAt": "2026-08-25T10:35:00.000Z",
       "page": {
         "widthMm": 210,
         "heightMm": 188
@@ -2309,6 +2309,8 @@
             "opacity": 1
           },
           "content": "98 456 969 80",
+          "binding": "lvl4",
+          "transform": "part_number",
           "spans": [
             {
               "start": 0,
@@ -2379,6 +2381,8 @@
             "opacity": 1
           },
           "content": "98 456 969 80",
+          "binding": "lvl3",
+          "transform": "part_number",
           "spans": [
             {
               "start": 0,
@@ -2450,6 +2454,8 @@
             "opacity": 1
           },
           "content": "98 456 969 80",
+          "binding": "lvl2",
+          "transform": "part_number",
           "spans": [
             {
               "start": 0,
@@ -2520,6 +2526,8 @@
             "opacity": 1
           },
           "content": "98 456 969 80",
+          "binding": "lvl1",
+          "transform": "part_number",
           "spans": [
             {
               "start": 0,
@@ -2614,6 +2622,8 @@
             "opacity": 1
           },
           "content": "98 456 969 80",
+          "binding": "lvl5",
+          "transform": "part_number",
           "spans": [
             {
               "start": 0,

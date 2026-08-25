@@ -6,7 +6,7 @@ import { useAssetStore } from "@/lib/asset-store";
 import { dataUrlToBytes } from "@/lib/codes";
 import type { LabelDocument } from "@/lib/document";
 import { ensurePrintFonts } from "@/lib/fonts";
-import { resolveValue, type ColumnMapping, type DataRow } from "@/lib/resolve";
+import { resolveValue, useDesignedMedia, type ColumnMapping, type DataRow } from "@/lib/resolve";
 import { CSS_DPI, mmToPx } from "@/lib/units";
 import Konva from "konva";
 import { useEffect, useRef } from "react";
@@ -60,11 +60,10 @@ function needsBitmap(
   if (element.type !== "image") return false;
   const value = resolveValue(element, row, mapping, doc.dataColumns);
   const assets = useAssetStore.getState();
-  return Boolean(
-    resolveBoundImageSrc(element, value, assets.assets, assets.folders) ||
-      element.imageDataUrl ||
-      /^(data:image|blob:|https?:|\/)/i.test(value.trim()),
-  );
+  const bound = resolveBoundImageSrc(element, value, assets.assets, assets.folders);
+  if (bound) return true;
+  if (!useDesignedMedia(element, value)) return false;
+  return Boolean(element.imageDataUrl || /^(data:image|blob:|https?:|\/)/i.test(value.trim()));
 }
 
 function bitmapsSettled(stage: Konva.Stage) {

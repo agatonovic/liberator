@@ -5,7 +5,7 @@ import { PaperSetupDialog } from "@/components/print/paper-setup-dialog";
 import { PrintTemplateSelect } from "@/components/print/template-select";
 import { Spreadsheet } from "@/components/print/spreadsheet";
 import { Button } from "@/components/ui/button";
-import { schemaColumns } from "@/lib/excel";
+import { downloadExcelTemplate, schemaColumns } from "@/lib/excel";
 import { columnHeader, filledRowIndexes, headerForColumn } from "@/lib/grid";
 import { generatePdf, pdfFileName } from "@/lib/pdf";
 import type { LabelDocument, SheetLayout } from "@/lib/document";
@@ -229,6 +229,16 @@ export function PrintView() {
       return;
     }
     setPaperOpen(true);
+  }
+
+  function downloadBlankExcel() {
+    if (!doc) return;
+    try {
+      downloadExcelTemplate(doc, { blank: true });
+      toast.success("Downloaded a blank Excel with this template’s columns");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not build Excel");
+    }
   }
 
   async function confirmPaper(action: "print" | "download", current: LabelDocument, sheet: SheetLayout | undefined) {
@@ -479,11 +489,25 @@ export function PrintView() {
 
         <section className="flex min-h-0 min-w-0 flex-1 flex-col bg-white">
           <div className="border-b border-[#d0d7de] px-3 py-2">
-            <div className="text-sm font-medium">Add data</div>
-            <p className="text-[11px] text-[#5f6368]">
-              Load Excel or paste rows. One filled row becomes one label. * required — click a column name to allow
-              empty cells.
-            </p>
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-sm font-medium">Add data</div>
+                <p className="text-[11px] text-[#5f6368]">
+                  Download a blank Excel and fill it, or select column titles and copy them. One filled row becomes one
+                  label. * required — click the star to allow empty cells.
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto shrink-0 px-1.5 py-1 text-[#1b4f9c] hover:bg-transparent hover:text-[#153e7a]"
+                disabled={!columns.length}
+                onClick={downloadBlankExcel}
+              >
+                <Download className="size-3.5" />
+                Download Excel
+              </Button>
+            </div>
           </div>
           {data.headers.length ? (
             <div className="min-h-0 flex-1">

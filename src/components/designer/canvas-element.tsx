@@ -12,6 +12,7 @@ import {
 import { resolveBoundImageSrc, type AssetFolder, type AssetRecord } from "@/lib/assets";
 import { useAssetStore } from "@/lib/asset-store";
 import { gaMagacinPrefixSpans, normalizeArrow } from "@/lib/format";
+import { useDesignedMedia } from "@/lib/resolve";
 import { isStrokeArrow, polygonPoints } from "@/lib/shapes";
 import { layoutRuns, runsFromContent, transferSpans } from "@/lib/text-color";
 import { fitPlainFontSize, wrapPlainLines } from "@/lib/text-fit";
@@ -122,12 +123,14 @@ function ColoredLabelText({
   width,
   height,
   zoom,
+  interactive,
 }: {
   element: LabelElement;
   value: string;
   width: number;
   height: number;
   zoom: number;
+  interactive: boolean;
 }) {
   const fontSize = mmToPx(element.style.fontSizeMm ?? 4, zoom);
   const letterSpacing = mmToPx(element.style.letterSpacingMm ?? 0, zoom);
@@ -137,7 +140,7 @@ function ColoredLabelText({
   const defaultFill = element.style.fill || "#12263A";
   const fontFamily = canvasFontFamily(element.style.fontFamily);
   const fontWeight = element.style.fontWeight === "bold" ? "bold" : "normal";
-  const display = value || "Text";
+  const display = value || (interactive ? "Text" : "");
   const defaults = { fill: defaultFill, fontSizeMm: element.style.fontSizeMm ?? 4 };
   const transferred = value ? transferSpans(element.content ?? value, element.spans, value, defaults) : (element.spans ?? []);
   const spans = element.transform === "ga_magacin" ? gaMagacinPrefixSpans(value, transferred) : transferred;
@@ -274,6 +277,7 @@ function imageSource(
 ): string | undefined {
   const bound = resolveBoundImageSrc(element, value, assets, folders);
   if (bound) return bound;
+  if (!useDesignedMedia(element, value)) return undefined;
   const src = element.imageDataUrl;
   if (src) {
     if (/\/arrows\/(?:UP|DOWN)/.test(src) && value.trim()) {
@@ -381,7 +385,7 @@ export function CanvasElement({
   const pixelRatio = Konva.pixelRatio || (typeof window !== "undefined" ? window.devicePixelRatio : 1) || 1;
 
   const barcodeCanvas = useMemo(() => {
-    if (element.type !== "barcode") return null;
+    if (element.type !== "barcode" || !value.trim()) return null;
     return renderBarcodeCanvas(
       value,
       element.style.barcodeSymbology ?? "code128",
@@ -400,7 +404,10 @@ export function CanvasElement({
   ]);
 
   useEffect(() => {
-    if (element.type !== "qr") return;
+    if (element.type !== "qr" || !value.trim()) {
+      setQrSrc(undefined);
+      return;
+    }
     let cancelled = false;
     const size = Math.round(Math.max(width, height) * pixelRatio);
     void qrDataUrl(value, size).then((url) => {
@@ -523,13 +530,22 @@ export function CanvasElement({
           dash={showStroke || openArrow ? dash : undefined}
         />
       ) : null}
-      {element.type === "text" && !editing ? (
-        <ColoredLabelText element={element} value={value} width={width} height={height} zoom={zoom} />
+      {element.type === "text" && !editing && (value || interactive) ? (
+        <ColoredLabelText
+          element={element}
+          value={value}
+          width={width}
+          height={height}
+          zoom={zoom}
+          interactive={interactive}
+        />
       ) : null}
-      {element.type === "barcode" ? (
+      {element.type === "barcode" && value.trim() ? (
         <CodeImage canvas={barcodeCanvas} width={width} height={height} crisp />
       ) : null}
-      {element.type === "qr" ? <CodeImage src={qrSrc} width={width} height={height} crisp /> : null}
+      {element.type === "qr" && value.trim() ? (
+        <CodeImage src={qrSrc} width={width} height={height} crisp />
+      ) : null}
       {element.type === "image" ? (
         <CodeImage src={imageSource(element, value, assets, folders)} width={width} height={height} emptyLabel="Image" />
       ) : null}

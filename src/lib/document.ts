@@ -916,9 +916,68 @@ export function repairPartNumberFields(doc: LabelDocument): LabelDocument {
   return changed ? { ...doc, elements } : doc;
 }
 
+const HBC_LEVEL_KEYS = ["lvl5", "lvl4", "lvl3", "lvl2", "lvl1"] as const;
+
+/**
+ * Designed HBC shelf labels keep one grouped drawing-number field per level
+ * instead of the catalog's four part boxes. Bind those fields to lvl5→lvl1 by
+ * top-to-bottom order so Generate can fill Broj Crteža without a catalog bump.
+ */
+export function repairHbcDrawingNumbers(doc: LabelDocument): LabelDocument {
+  const columns = doc.dataColumns ?? [];
+  const levelKeys = HBC_LEVEL_KEYS.filter((key) => findColumnByName(columns, key));
+  if (!levelKeys.length) return doc;
+
+  const boundKeys = new Set(
+    doc.elements
+      .map((el) => el.binding?.trim())
+      .filter((key): key is string => Boolean(key) && levelKeys.includes(key as (typeof HBC_LEVEL_KEYS)[number])),
+  );
+  const unusedKeys = levelKeys.filter((key) => !boundKeys.has(key));
+  const unbound = doc.elements
+    .filter(
+      (el) =>
+        el.type === "text" &&
+        !el.hidden &&
+        !el.binding?.trim() &&
+        looksLikeGroupedPartNumber(el.content ?? ""),
+    )
+    .slice()
+    .sort((a, b) => a.y - b.y || a.x - b.x);
+
+  const assign = new Map<string, string>();
+  for (let i = 0; i < Math.min(unbound.length, unusedKeys.length); i += 1) {
+    assign.set(unbound[i]!.id, unusedKeys[i]!);
+  }
+
+  let changed = false;
+  const elements = doc.elements.map((el) => {
+    const key = assign.get(el.id);
+    if (key) {
+      changed = true;
+      return { ...el, binding: key, transform: "part_number" as const };
+    }
+    if (
+      el.type === "text" &&
+      el.binding &&
+      levelKeys.includes(el.binding as (typeof HBC_LEVEL_KEYS)[number]) &&
+      looksLikeGroupedPartNumber(el.content ?? "") &&
+      el.partIndex == null &&
+      el.transform !== "part_number"
+    ) {
+      changed = true;
+      return { ...el, transform: "part_number" as const };
+    }
+    return el;
+  });
+  return changed ? { ...doc, elements } : doc;
+}
+
 export function repairTemplateDocument(doc: LabelDocument): LabelDocument {
   return repairCodeElements(
-    repairPartNumberFields(repairGaAddressFields(bindFolderImages(repairDirectionArrows(doc)))),
+    repairHbcDrawingNumbers(
+      repairPartNumberFields(repairGaAddressFields(bindFolderImages(repairDirectionArrows(doc)))),
+    ),
   );
 }
 

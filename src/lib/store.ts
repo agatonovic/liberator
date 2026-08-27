@@ -78,6 +78,7 @@ import {
 } from "./versions";
 
 export type Tool = "select" | ElementType;
+export type ColorSampleProperty = "fill" | "stroke" | "background";
 
 type AppState = {
   hydrated: boolean;
@@ -153,8 +154,8 @@ type AppState = {
   distributeSelected: (axis: "horizontal" | "vertical") => void;
   beginPropertyEdit: () => void;
   endPropertyEdit: () => void;
-  colorSample: { targetIds: string[]; property: "fill" | "stroke" } | null;
-  beginColorSample: (property: "fill" | "stroke") => void;
+  colorSample: { targetIds: string[]; property: ColorSampleProperty } | null;
+  beginColorSample: (property: ColorSampleProperty) => void;
   applySampledColor: (color: string) => void;
   cancelColorSample: () => void;
   editingTextId: string | null;
@@ -1361,15 +1362,13 @@ export const useAppStore = create<AppState>((set, get) => ({
     get().updateElements(
       sample.targetIds.map((id) => {
         const target = current.elements.find((el) => el.id === id);
-        return {
-          id,
-          patch: {
-            style:
-              sample.property === "stroke"
-                ? { stroke: hex, strokeWidth: Math.max(target?.style.strokeWidth ?? 0, 0.35) }
-                : { fill: hex },
-          },
-        };
+        const style =
+          sample.property === "stroke"
+            ? { stroke: hex, strokeWidth: Math.max(target?.style.strokeWidth ?? 0, 0.35) }
+            : sample.property === "background"
+              ? { background: hex }
+              : { fill: hex };
+        return { id, patch: { style } };
       }),
     );
     set({ colorSample: null, selectedIds: sample.targetIds });

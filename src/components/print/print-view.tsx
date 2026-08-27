@@ -6,7 +6,7 @@ import { PrintTemplateSelect } from "@/components/print/template-select";
 import { Spreadsheet } from "@/components/print/spreadsheet";
 import { Button } from "@/components/ui/button";
 import { downloadExcelTemplate, schemaColumns } from "@/lib/excel";
-import { columnHeader, filledRowIndexes, headerForColumn } from "@/lib/grid";
+import { columnHeader, headerForColumn, printDataRows, printLabelIndexes } from "@/lib/grid";
 import { generatePdf, pdfFileName } from "@/lib/pdf";
 import type { LabelDocument, SheetLayout } from "@/lib/document";
 import { previewRow } from "@/lib/resolve";
@@ -147,11 +147,13 @@ export function PrintView() {
       index === draft.row ? { ...row, [draft.header]: draft.value } : row,
     );
   }, [data.headers, data.rows, draft]);
-  const filled = useMemo(() => filledRowIndexes(liveRows, data.headers), [data.headers, liveRows]);
+  const staticTemplate = columns.length === 0;
+  const filled = useMemo(
+    () => (doc ? printLabelIndexes(doc, liveRows, data.headers) : []),
+    [doc, data.headers, liveRows],
+  );
   const sample = previewRow(liveRows, data.previewRowIndex);
-  const printRows = filledRowIndexes(data.rows, data.headers)
-    .map((index) => data.rows[index])
-    .filter(Boolean);
+  const printRows = doc ? printDataRows(doc, data.rows, data.headers) : [];
   const firstHeader = data.headers[0];
   const runStatus = useMemo(
     () => (doc ? evaluateGenerateRun(doc, liveRows, data.headers, data.mapping, assets, assetFolders) : null),
@@ -445,7 +447,9 @@ export function PrintView() {
                         aria-hidden
                       />
                     ) : null}
-                    <span className="min-w-0 truncate text-[13px]">{value || "—"}</span>
+                    <span className="min-w-0 truncate text-[13px]">
+                      {staticTemplate ? doc.name : value || "—"}
+                    </span>
                   </button>
                 );
               })
@@ -507,8 +511,9 @@ export function PrintView() {
               <div className="min-w-0">
                 <div className="text-sm font-medium">Add data</div>
                 <p className="text-[11px] text-[#5f6368]">
-                  Download a blank Excel and fill it, or select column titles and copy them. One filled row becomes one
-                  label. * required — click the star to allow empty cells.
+                  {staticTemplate
+                    ? "This sticker prints as designed. Bind fields in Designer if you later need a spreadsheet batch."
+                    : "Download a blank Excel and fill it, or select column titles and copy them. One filled row becomes one label. * required — click the star to allow empty cells."}
                 </p>
               </div>
               <Button
@@ -559,8 +564,8 @@ export function PrintView() {
           ) : (
             <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center text-sm text-[#5f6368]">
               <FileSpreadsheet className="size-8 text-[#d0d7de]" />
-              <p>This template has no bound columns yet.</p>
-              <p>In Designer, select a field and set Bind to column.</p>
+              <p>No spreadsheet columns — this template is a single sticker.</p>
+              <p>Print or download the PDF as designed, or bind fields in Designer for a batch.</p>
               <Button variant="outline" size="sm" onClick={() => router.push("/designer")}>
                 Open designer
               </Button>

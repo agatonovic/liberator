@@ -89,13 +89,20 @@ export function barcodeDataUrl(
   return renderBarcodeCanvas(value, symbology, displayValue, widthPx, heightPx).toDataURL("image/png");
 }
 
-export async function qrDataUrl(value: string, sizePx = 512): Promise<string> {
+export async function qrDataUrl(
+  value: string,
+  sizePx = 512,
+  options?: { dark?: string; light?: string; margin?: number },
+): Promise<string> {
   const size = Math.max(64, Math.round(sizePx));
   return QRCode.toDataURL(value || " ", {
-    margin: 4,
+    margin: options?.margin ?? 0,
     width: size,
     errorCorrectionLevel: "M",
-    color: { dark: "#000000", light: "#ffffff" },
+    color: {
+      dark: options?.dark ?? "#000000",
+      light: options?.light ?? "#00000000",
+    },
   });
 }
 

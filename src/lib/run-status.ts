@@ -59,6 +59,9 @@ export function evaluateGenerateRun(
   folders: AssetFolder[] = [],
 ): GenerateRunStatus {
   const columns = schemaColumns(doc);
+  if (!columns.length) {
+    return { filled: 1, ready: 1, attention: 0, issues: [] };
+  }
   const filledIndexes = filledRowIndexes(rows, headers);
   const addressKeys = new Set(
     doc.elements.filter((el) => isGaAddressTransform(el.transform) && el.binding).map((el) => el.binding as string),

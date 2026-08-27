@@ -67,12 +67,14 @@ export function ColorPickerPopover({
   onChange,
   elements,
   onClose,
+  onEyedrop,
   style,
 }: {
   value: string;
   onChange: (hex: string) => void;
   elements: LabelElement[];
   onClose: () => void;
+  onEyedrop?: () => void;
   style: { top: number; left: number; width: number };
 }) {
   const savedColors = useAppStore((s) => s.savedColors);
@@ -165,11 +167,15 @@ export function ColorPickerPopover({
       <div className="mt-2 flex items-center gap-1.5">
         <div className="size-6 shrink-0 rounded-[5px] border border-black/20" style={{ backgroundColor: current }} />
         <p className="min-w-0 flex-1 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">{current}</p>
-        <Hint label="Pick from screen">
+        <Hint label="Pick color from another element">
           <button
             type="button"
             className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
             onClick={() => {
+              if (onEyedrop) {
+                onEyedrop();
+                return;
+              }
               void pickScreenColor().then((hex) => {
                 if (hex) onChange(hex);
               });

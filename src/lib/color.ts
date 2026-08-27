@@ -84,6 +84,7 @@ export function documentColors(elements: LabelElement[]): string[] {
   for (const el of elements) {
     add(el.style.fill);
     add(el.style.stroke);
+    add(el.style.background);
     for (const span of el.spans ?? []) add(span.fill);
   }
   return colors;

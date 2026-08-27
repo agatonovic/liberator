@@ -50,6 +50,23 @@ export function filledRowIndexes(rows: DataRow[], headers: string[]) {
   return rows.map((row, index) => (rowHasValue(row, headers) ? index : -1)).filter((index) => index >= 0);
 }
 
+/** Designed as a one-off sticker: no spreadsheet columns, so one printable label. */
+export function isStaticTemplate(doc: LabelDocument) {
+  return schemaColumns(doc).length === 0;
+}
+
+export function printLabelIndexes(doc: LabelDocument, rows: DataRow[], headers: string[]) {
+  if (isStaticTemplate(doc)) return [0];
+  return filledRowIndexes(rows, headers);
+}
+
+export function printDataRows(doc: LabelDocument, rows: DataRow[], headers: string[]): DataRow[] {
+  if (isStaticTemplate(doc)) return [{}];
+  return filledRowIndexes(rows, headers)
+    .map((index) => rows[index])
+    .filter((row): row is DataRow => Boolean(row));
+}
+
 export function padRows(rows: DataRow[], headers: string[], min = MIN_GRID_ROWS) {
   const next = rows.map((row) => {
     const copy = blankRow(headers);

@@ -25,6 +25,7 @@ import {
   isPaintColor,
   isPolygonType,
   lineLocalPoints,
+  qrAppearance,
   strokeDashPattern,
   type LabelDocument,
   type LabelElement,
@@ -582,18 +583,38 @@ async function drawElement(
   }
 
   if (element.type === "qr") {
-    if (!value.trim()) return;
+    const look = qrAppearance(element.style, Math.min(element.width, element.height));
+    const pad = mmToPt(look.paddingMm);
+    const radius = mmToPt(look.cornerRadiusMm);
     const side = Math.min(width, height);
-    const sizePx = Math.round((Math.min(element.width, element.height) * 300) / 25.4);
-    const dataUrl = await qrDataUrl(value, sizePx);
+    const inner = Math.max(1, side - pad * 2);
+    if (look.plate) {
+      const plate = parseColor(look.plate, rgb(1, 1, 1));
+      if (radius > 0) {
+        page.drawSvgPath(roundedRectPath(width, height, radius), {
+          x: tl.x,
+          y: tl.y,
+          color: plate,
+          opacity,
+          rotate: konvaSvgRotate(rotation),
+        });
+      } else {
+        paintNative((box) => {
+          page.drawRectangle({ x: box.x, y: box.y, width, height, color: plate, opacity });
+        });
+      }
+    }
+    if (!value.trim()) return;
+    const sizePx = Math.max(64, Math.round((Math.max(0.2, Math.min(element.width, element.height) - look.paddingMm * 2) * 300) / 25.4));
+    const dataUrl = await qrDataUrl(value, sizePx, { dark: look.code, light: "#00000000", margin: 0 });
     const image = await embedImage(pdf, dataUrl);
     if (image) {
       paintNative((box) => {
         page.drawImage(image, {
-          x: box.x + (width - side) / 2,
-          y: box.y + (height - side) / 2,
-          width: side,
-          height: side,
+          x: box.x + (width - inner) / 2,
+          y: box.y + (height - inner) / 2,
+          width: inner,
+          height: inner,
           opacity,
         });
       });

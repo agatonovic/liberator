@@ -14,8 +14,9 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PageSizeFields } from "@/components/page-size-fields";
 import { Input } from "@/components/ui/input";
-import { PAGE_PRESETS, type LabelDocument } from "@/lib/document";
+import { clampPageMm, type LabelDocument } from "@/lib/document";
 import { MY_TEMPLATES_FOLDER_ID } from "@/lib/library";
 import {
   TEMPLATE_SORTS,
@@ -201,7 +202,8 @@ export function TemplatesView() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("Untitled template");
-  const [presetId, setPresetId] = useState("100x50");
+  const [widthMm, setWidthMm] = useState(100);
+  const [heightMm, setHeightMm] = useState(50);
   const [blankFolderId, setBlankFolderId] = useState<string>("");
   const [newFolderOpen, setNewFolderOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("New folder");
@@ -565,20 +567,14 @@ export function TemplatesView() {
                 ))}
               </select>
             </label>
-            <label className="grid gap-1 text-sm">
-              Size
-              <select
-                className="h-8 rounded-lg border border-input bg-transparent px-2 text-sm"
-                value={presetId}
-                onChange={(event) => setPresetId(event.target.value)}
-              >
-                {PAGE_PRESETS.filter((preset) => preset.id !== "custom").map((preset) => (
-                  <option key={preset.id} value={preset.id}>
-                    {preset.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <PageSizeFields
+              widthMm={widthMm}
+              heightMm={heightMm}
+              onChange={(nextWidth, nextHeight) => {
+                setWidthMm(nextWidth);
+                setHeightMm(nextHeight);
+              }}
+            />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>
@@ -586,9 +582,8 @@ export function TemplatesView() {
             </Button>
             <Button
               onClick={() => {
-                const preset = PAGE_PRESETS.find((item) => item.id === presetId) ?? PAGE_PRESETS[1];
                 const id = createBlank(
-                  { widthMm: preset.widthMm, heightMm: preset.heightMm },
+                  { widthMm: clampPageMm(widthMm), heightMm: clampPageMm(heightMm) },
                   name.trim() || "Untitled template",
                   blankFolderId || undefined,
                 );

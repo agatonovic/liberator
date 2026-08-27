@@ -12,22 +12,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PageSizeFields } from "@/components/page-size-fields";
 import { Input } from "@/components/ui/input";
-import { PAGE_PRESETS, type LabelDocument } from "@/lib/document";
+import { clampPageMm, pageSizeCaption, type LabelDocument } from "@/lib/document";
 import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Check, ChevronDown, Pencil, Ratio } from "lucide-react";
 import { useMemo, useState } from "react";
-
-function pageLabel(widthMm: number, heightMm: number) {
-  const preset = PAGE_PRESETS.find(
-    (item) =>
-      item.id !== "custom" &&
-      Math.abs(item.widthMm - widthMm) < 0.05 &&
-      Math.abs(item.heightMm - heightMm) < 0.05,
-  );
-  return preset ? preset.label : `${widthMm} × ${heightMm} mm`;
-}
 
 export function TemplateNavigator({ document: doc }: { document: LabelDocument }) {
   const documents = useAppStore((s) => s.documents);
@@ -39,7 +30,6 @@ export function TemplateNavigator({ document: doc }: { document: LabelDocument }
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameValue, setRenameValue] = useState(doc.name);
   const [sizeOpen, setSizeOpen] = useState(false);
-  const [presetId, setPresetId] = useState("custom");
   const [widthMm, setWidthMm] = useState(doc.page.widthMm);
   const [heightMm, setHeightMm] = useState(doc.page.heightMm);
 
@@ -64,22 +54,14 @@ export function TemplateNavigator({ document: doc }: { document: LabelDocument }
   }
 
   function openSize() {
-    const match = PAGE_PRESETS.find(
-      (preset) =>
-        preset.id !== "custom" &&
-        Math.abs(preset.widthMm - doc.page.widthMm) < 0.05 &&
-        Math.abs(preset.heightMm - doc.page.heightMm) < 0.05,
-    );
-    setPresetId(match?.id ?? "custom");
     setWidthMm(doc.page.widthMm);
     setHeightMm(doc.page.heightMm);
     setSizeOpen(true);
   }
 
   function applySize() {
-    const w = presetId === "custom" ? widthMm : (PAGE_PRESETS.find((item) => item.id === presetId)?.widthMm ?? widthMm);
-    const h = presetId === "custom" ? heightMm : (PAGE_PRESETS.find((item) => item.id === presetId)?.heightMm ?? heightMm);
-    if (!Number.isFinite(w) || !Number.isFinite(h) || w <= 0 || h <= 0) return;
+    const w = clampPageMm(widthMm);
+    const h = clampPageMm(heightMm);
     setPageSize(w, h);
     setSizeOpen(false);
   }
@@ -108,7 +90,7 @@ export function TemplateNavigator({ document: doc }: { document: LabelDocument }
           <DropdownMenuItem onClick={openSize}>
             <Ratio className="size-4" />
             Page size
-            <span className="ml-auto text-[11px] text-muted-foreground">{pageLabel(doc.page.widthMm, doc.page.heightMm)}</span>
+            <span className="ml-auto text-[11px] text-muted-foreground">{pageSizeCaption(doc.page.widthMm, doc.page.heightMm)}</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <div className="px-1.5 pb-1">
@@ -188,60 +170,16 @@ export function TemplateNavigator({ document: doc }: { document: LabelDocument }
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Page size</DialogTitle>
-            <DialogDescription>Choose a preset or enter a custom size in millimetres.</DialogDescription>
+            <DialogDescription>Choose a label or paper size, or type the exact millimetres.</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-3">
-            <label className="grid gap-1 text-sm">
-              Preset
-              <select
-                className="h-8 rounded-lg border border-input bg-transparent px-2 text-sm"
-                value={presetId}
-                onChange={(event) => {
-                  const id = event.target.value;
-                  setPresetId(id);
-                  const preset = PAGE_PRESETS.find((item) => item.id === id);
-                  if (preset && preset.id !== "custom") {
-                    setWidthMm(preset.widthMm);
-                    setHeightMm(preset.heightMm);
-                  }
-                }}
-              >
-                {PAGE_PRESETS.map((preset) => (
-                  <option key={preset.id} value={preset.id}>
-                    {preset.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              <label className="grid gap-1 text-sm">
-                Width (mm)
-                <Input
-                  type="number"
-                  min={1}
-                  step={0.1}
-                  value={widthMm}
-                  onChange={(event) => {
-                    setPresetId("custom");
-                    setWidthMm(Number(event.target.value));
-                  }}
-                />
-              </label>
-              <label className="grid gap-1 text-sm">
-                Height (mm)
-                <Input
-                  type="number"
-                  min={1}
-                  step={0.1}
-                  value={heightMm}
-                  onChange={(event) => {
-                    setPresetId("custom");
-                    setHeightMm(Number(event.target.value));
-                  }}
-                />
-              </label>
-            </div>
-          </div>
+          <PageSizeFields
+            widthMm={widthMm}
+            heightMm={heightMm}
+            onChange={(nextWidth, nextHeight) => {
+              setWidthMm(nextWidth);
+              setHeightMm(nextHeight);
+            }}
+          />
           <DialogFooter>
             <Button variant="outline" onClick={() => setSizeOpen(false)}>
               Cancel

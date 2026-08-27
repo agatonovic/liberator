@@ -1,6 +1,6 @@
 import { looksLikeGroupedPartNumber, parseArrow } from "./format";
 import { createId } from "./ids";
-import { roundMm } from "./units";
+import { formatMm, roundMm } from "./units";
 
 export const DOCUMENT_VERSION = 1;
 
@@ -126,6 +126,10 @@ export type ElementStyle = {
   lineHeight?: number;
   barcodeSymbology?: BarcodeSymbology;
   barcodeDisplayValue?: boolean;
+  /** Fill behind a QR plate. `transparent` leaves the label showing through. */
+  background?: string;
+  /** Inner inset around a QR code, in millimetres. */
+  paddingMm?: number;
   cornerRadiusMm?: number;
   direction?: ShapeDirection;
   arrowKind?: ArrowKind;
@@ -239,14 +243,83 @@ export type PagePreset = {
   heightMm: number;
 };
 
-export const PAGE_PRESETS: PagePreset[] = [
+export type PageOrientation = "portrait" | "landscape";
+
+export const LABEL_SIZE_PRESETS: PagePreset[] = [
   { id: "50x30", label: "50 × 30 mm", widthMm: 50, heightMm: 30 },
+  { id: "70x40", label: "70 × 40 mm", widthMm: 70, heightMm: 40 },
   { id: "100x50", label: "100 × 50 mm", widthMm: 100, heightMm: 50 },
   { id: "100x150", label: "100 × 150 mm", widthMm: 100, heightMm: 150 },
   { id: "4x6in", label: "4 × 6 in", widthMm: 101.6, heightMm: 152.4 },
-  { id: "a6", label: "A6", widthMm: 105, heightMm: 148 },
-  { id: "a4", label: "A4 portrait", widthMm: 210, heightMm: 297 },
-  { id: "a3", label: "A3 landscape", widthMm: 420, heightMm: 297 },
+];
+
+export const PAPER_SIZES: { id: string; label: string; shortMm: number; longMm: number }[] = [
+  { id: "a6", label: "A6", shortMm: 105, longMm: 148 },
+  { id: "a5", label: "A5", shortMm: 148, longMm: 210 },
+  { id: "a4", label: "A4", shortMm: 210, longMm: 297 },
+  { id: "a3", label: "A3", shortMm: 297, longMm: 420 },
+  { id: "letter", label: "Letter", shortMm: 215.9, longMm: 279.4 },
+  { id: "legal", label: "Legal", shortMm: 215.9, longMm: 355.6 },
+];
+
+export function paperDimensions(paper: (typeof PAPER_SIZES)[number], orientation: PageOrientation) {
+  return orientation === "landscape"
+    ? { widthMm: paper.longMm, heightMm: paper.shortMm }
+    : { widthMm: paper.shortMm, heightMm: paper.longMm };
+}
+
+export function clampPageMm(value: number) {
+  if (!Number.isFinite(value)) return 1;
+  return Math.min(2000, Math.max(1, roundMm(value)));
+}
+
+export function matchPageSize(
+  widthMm: number,
+  heightMm: number,
+):
+  | { kind: "label"; id: string }
+  | { kind: "paper"; id: string; orientation: PageOrientation }
+  | { kind: "custom" } {
+  const w = roundMm(widthMm);
+  const h = roundMm(heightMm);
+  const label = LABEL_SIZE_PRESETS.find(
+    (item) => Math.abs(item.widthMm - w) < 0.05 && Math.abs(item.heightMm - h) < 0.05,
+  );
+  if (label) return { kind: "label", id: label.id };
+  for (const paper of PAPER_SIZES) {
+    const portrait = paperDimensions(paper, "portrait");
+    if (Math.abs(portrait.widthMm - w) < 0.05 && Math.abs(portrait.heightMm - h) < 0.05) {
+      return { kind: "paper", id: paper.id, orientation: "portrait" };
+    }
+    const landscape = paperDimensions(paper, "landscape");
+    if (Math.abs(landscape.widthMm - w) < 0.05 && Math.abs(landscape.heightMm - h) < 0.05) {
+      return { kind: "paper", id: paper.id, orientation: "landscape" };
+    }
+  }
+  return { kind: "custom" };
+}
+
+export function pageSizeCaption(widthMm: number, heightMm: number) {
+  const match = matchPageSize(widthMm, heightMm);
+  const size = `${formatMm(widthMm)} × ${formatMm(heightMm)} mm`;
+  if (match.kind === "label") {
+    const label = LABEL_SIZE_PRESETS.find((item) => item.id === match.id);
+    return label ? label.label : size;
+  }
+  if (match.kind === "paper") {
+    const paper = PAPER_SIZES.find((item) => item.id === match.id);
+    if (!paper) return size;
+    return `${paper.label} ${match.orientation} · ${size}`;
+  }
+  return size;
+}
+
+export const PAGE_PRESETS: PagePreset[] = [
+  ...LABEL_SIZE_PRESETS,
+  ...PAPER_SIZES.flatMap((paper) => [
+    { id: `${paper.id}-portrait`, label: `${paper.label} portrait`, ...paperDimensions(paper, "portrait") },
+    { id: `${paper.id}-landscape`, label: `${paper.label} landscape`, ...paperDimensions(paper, "landscape") },
+  ]),
   { id: "custom", label: "Custom", widthMm: 100, heightMm: 50 },
 ];
 
@@ -304,6 +377,23 @@ export function defaultSizeForType(type: ElementType): { width: number; height: 
 
 /** Smallest square that still scans on typical warehouse printers and phones. */
 export const QR_MIN_SIDE_MM = 12;
+export const QR_DEFAULT_PADDING_MM = 1;
+export const QR_DEFAULT_RADIUS_MM = 2;
+export const QR_DEFAULT_PLATE = "#ffffff";
+export const QR_DEFAULT_CODE = "#12263A";
+
+export function qrAppearance(style: ElementStyle, sideMm = 20) {
+  const requested = Number.isFinite(style.paddingMm) ? Math.max(0, style.paddingMm as number) : QR_DEFAULT_PADDING_MM;
+  const maxPad = Math.max(0, sideMm / 2 - 2);
+  const plate =
+    style.background === undefined ? QR_DEFAULT_PLATE : isPaintColor(style.background) ? style.background : undefined;
+  return {
+    plate,
+    code: isPaintColor(style.fill) ? style.fill : "#000000",
+    paddingMm: roundMm(Math.min(maxPad, requested)),
+    cornerRadiusMm: Math.max(0, style.cornerRadiusMm ?? 0),
+  };
+}
 export const BARCODE_MIN_WIDTH_MM = 18;
 export const BARCODE_MIN_HEIGHT_MM = 8;
 
@@ -383,7 +473,15 @@ export function createElement(
                 barcodeDisplayValue: false,
                 opacity: 1,
               }
-            : { fill: "#000000", opacity: 1 };
+            : type === "qr"
+              ? {
+                  fill: QR_DEFAULT_CODE,
+                  background: QR_DEFAULT_PLATE,
+                  paddingMm: QR_DEFAULT_PADDING_MM,
+                  cornerRadiusMm: QR_DEFAULT_RADIUS_MM,
+                  opacity: 1,
+                }
+              : { fill: "#000000", opacity: 1 };
 
   const content =
     type === "text"

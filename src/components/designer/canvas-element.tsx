@@ -7,6 +7,7 @@ import {
   isPaintColor,
   isPolygonType,
   lineLocalPoints,
+  qrAppearance,
   strokeDashPattern,
   type ImageFit,
   type LabelElement,
@@ -310,11 +311,28 @@ function ImagePlaceholder({ width, height, label }: { width: number; height: num
   );
 }
 
+function clipRoundedRect(ctx: Konva.Context, width: number, height: number, radius: number) {
+  const r = Math.max(0, Math.min(radius, width / 2, height / 2));
+  ctx.beginPath();
+  if (r <= 0) {
+    ctx.rect(0, 0, width, height);
+    return;
+  }
+  ctx.moveTo(r, 0);
+  ctx.arcTo(width, 0, width, height, r);
+  ctx.arcTo(width, height, 0, height, r);
+  ctx.arcTo(0, height, 0, 0, r);
+  ctx.arcTo(0, 0, width, 0, r);
+  ctx.closePath();
+}
+
 function CodeImage({
   src,
   canvas,
   width,
   height,
+  x = 0,
+  y = 0,
   emptyLabel,
   crisp,
 }: {
@@ -322,6 +340,8 @@ function CodeImage({
   canvas?: HTMLCanvasElement | null;
   width: number;
   height: number;
+  x?: number;
+  y?: number;
   emptyLabel?: string;
   crisp?: boolean;
 }) {
@@ -329,11 +349,13 @@ function CodeImage({
   const source = canvas ?? image;
   if (!source) {
     if (emptyLabel && !src) return <ImagePlaceholder width={width} height={height} label={emptyLabel} />;
-    return <Rect width={width} height={height} fill="#f6f3ec" stroke="#d9d4c8" dash={[4, 3]} />;
+    return <Rect x={x} y={y} width={width} height={height} fill="#f6f3ec" stroke="#d9d4c8" dash={[4, 3]} />;
   }
   return (
     <KonvaImage
       image={source}
+      x={x}
+      y={y}
       width={width}
       height={height}
       imageSmoothingEnabled={!crisp}
@@ -414,6 +436,10 @@ export function CanvasElement({
   const height = Math.max(mmToPx(element.height, zoom), 2);
   const pixelRatio = Konva.pixelRatio || (typeof window !== "undefined" ? window.devicePixelRatio : 1) || 1;
 
+  const qrLook = element.type === "qr" ? qrAppearance(element.style, Math.min(element.width, element.height)) : null;
+  const qrPadPx = qrLook ? mmToPx(qrLook.paddingMm, zoom) : 0;
+  const qrInnerPx = qrLook ? Math.max(2, Math.min(width, height) - qrPadPx * 2) : 0;
+
   const barcodeCanvas = useMemo(() => {
     if (element.type !== "barcode" || !value.trim()) return null;
     return renderBarcodeCanvas(
@@ -434,19 +460,20 @@ export function CanvasElement({
   ]);
 
   useEffect(() => {
-    if (element.type !== "qr" || !value.trim()) {
+    if (element.type !== "qr" || !value.trim() || !qrLook) {
       setQrSrc(undefined);
       return;
     }
     let cancelled = false;
-    const size = Math.round(Math.max(width, height) * pixelRatio);
-    void qrDataUrl(value, size).then((url) => {
+    const size = Math.round(qrInnerPx * pixelRatio);
+    const dark = qrLook.code;
+    void qrDataUrl(value, size, { dark, light: "#00000000", margin: 0 }).then((url) => {
       if (!cancelled) setQrSrc(url);
     });
     return () => {
       cancelled = true;
     };
-  }, [element.type, height, pixelRatio, value, width]);
+  }, [element.type, element.style.fill, pixelRatio, qrInnerPx, value]);
 
   const fill = paint(element.style.fill);
   const stroke = paint(element.style.stroke);
@@ -573,8 +600,34 @@ export function CanvasElement({
       {element.type === "barcode" && value.trim() ? (
         <CodeImage canvas={barcodeCanvas} width={width} height={height} crisp />
       ) : null}
-      {element.type === "qr" && value.trim() ? (
-        <CodeImage src={qrSrc} width={width} height={height} crisp />
+      {element.type === "qr" ? (
+        <Group
+          listening={false}
+          clipFunc={
+            qrLook && qrLook.cornerRadiusMm > 0
+              ? (ctx) => clipRoundedRect(ctx, width, height, mmToPx(qrLook.cornerRadiusMm, zoom))
+              : undefined
+          }
+        >
+          {qrLook?.plate ? (
+            <Rect
+              width={width}
+              height={height}
+              fill={qrLook.plate}
+              cornerRadius={mmToPx(qrLook.cornerRadiusMm, zoom)}
+            />
+          ) : null}
+          {value.trim() ? (
+            <CodeImage
+              src={qrSrc}
+              x={(width - qrInnerPx) / 2}
+              y={(height - qrInnerPx) / 2}
+              width={qrInnerPx}
+              height={qrInnerPx}
+              crisp
+            />
+          ) : null}
+        </Group>
       ) : null}
       {element.type === "image" ? (
         <LabelPhoto

@@ -1,7 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { PAGE_PRESETS, type LabelDocument } from "@/lib/document";
+import { pageSizeCaption, type LabelDocument } from "@/lib/document";
 import { schemaColumns } from "@/lib/excel";
 import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -14,16 +14,6 @@ const Thumb = dynamic(() => import("@/components/templates/template-thumbnail").
   ssr: false,
   loading: () => <div className="h-full w-full bg-[#e8eaed]" />,
 });
-
-function pageSizeLabel(widthMm: number, heightMm: number) {
-  const preset = PAGE_PRESETS.find(
-    (item) =>
-      item.id !== "custom" &&
-      Math.abs(item.widthMm - widthMm) < 0.05 &&
-      Math.abs(item.heightMm - heightMm) < 0.05,
-  );
-  return preset ? `${preset.label} · ${widthMm} × ${heightMm} mm` : `${widthMm} × ${heightMm} mm`;
-}
 
 function matchesQuery(doc: LabelDocument, folderName: string | undefined, query: string) {
   if (!query) return true;
@@ -214,7 +204,7 @@ export function PrintTemplateSelect({ current }: { current: LabelDocument }) {
                                 {selected ? <Check className="size-3.5 shrink-0 text-[#1b4f9c]" /> : null}
                               </span>
                               <span className="mt-0.5 block truncate text-[11px] text-[#5f6368]">
-                                {pageSizeLabel(item.page.widthMm, item.page.heightMm)}
+                                {pageSizeCaption(item.page.widthMm, item.page.heightMm)}
                               </span>
                               <span className="block truncate text-[11px] text-[#80868b]">
                                 {[
@@ -238,7 +228,7 @@ export function PrintTemplateSelect({ current }: { current: LabelDocument }) {
               <div className="shrink-0 border-t border-[#d0d7de] px-3 py-1.5 text-[11px] text-[#80868b]">
                 {current.name}
                 {" · "}
-                {pageSizeLabel(current.page.widthMm, current.page.heightMm)}
+                {pageSizeCaption(current.page.widthMm, current.page.heightMm)}
                 {currentFolder ? ` · ${currentFolder}` : ""}
                 {currentColumns ? ` · ${currentColumns} columns` : ""}
               </div>

@@ -14,6 +14,7 @@ import {
   BARCODE_MIN_WIDTH_MM,
   IMAGE_FITS,
   LINE_CAPS,
+  QR_DEFAULT_PADDING_MM,
   QR_MIN_SIDE_MM,
   STROKE_STYLES,
   arrowBindingPatch,
@@ -42,7 +43,7 @@ import { boxMatchingAspect, probeImageSrc } from "@/lib/image";
 import { resolvePublicSrc } from "@/lib/public-path";
 import { schemaColumns } from "@/lib/excel";
 import { applyCharStyle, stripSpanKey, styleInRange } from "@/lib/text-color";
-import { useAppStore } from "@/lib/store";
+import { useAppStore, type ColorSampleProperty } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import {
   AlignHorizontalJustifyCenter,
@@ -762,7 +763,7 @@ function ColorField({
   value: string | undefined;
   fallback: string;
   allowNone?: boolean;
-  property?: "fill" | "stroke";
+  property?: ColorSampleProperty;
   onChange: (value: string) => void;
 }) {
   const none = isNone(value);
@@ -894,6 +895,12 @@ function ColorField({
               onChange={(next) => {
                 setHex(hexDigits(next, fallback));
                 onChange(next);
+              }}
+              onEyedrop={() => {
+                closePicker();
+                requestAnimationFrame(() => {
+                  void pickColor();
+                });
               }}
               onClose={closePicker}
             />,
@@ -1055,6 +1062,38 @@ function InspectorTypeFields({
               placeholder="sku"
               value={element.binding ?? ""}
               onChange={(event) => onChange({ binding: event.target.value || undefined })}
+            />
+          </Field>
+        </>
+      ) : null}
+
+      {element.type === "qr" ? (
+        <>
+          <ColorField
+            label="Plate"
+            value={style.background ?? "#ffffff"}
+            fallback="#ffffff"
+            allowNone
+            property="background"
+            onChange={(background) => setStyle({ background })}
+          />
+          <ColorField
+            label="Code"
+            value={style.fill}
+            fallback="#12263A"
+            property="fill"
+            onChange={(fill) => setStyle({ fill })}
+          />
+          <Field label="Padding (mm)">
+            <NumberField
+              value={style.paddingMm ?? QR_DEFAULT_PADDING_MM}
+              onChange={(paddingMm) => setStyle({ paddingMm: Math.max(0, paddingMm) })}
+            />
+          </Field>
+          <Field label="Corner radius (mm)">
+            <NumberField
+              value={style.cornerRadiusMm ?? 0}
+              onChange={(cornerRadiusMm) => setStyle({ cornerRadiusMm: Math.max(0, cornerRadiusMm) })}
             />
           </Field>
         </>

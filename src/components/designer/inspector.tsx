@@ -1,23 +1,25 @@
 "use client";
 
-import { ColorPickerPopover, ColorSwatchButton } from "@/components/designer/color-picker";
+import { ColorPickerPopover, NativeColorWell } from "@/components/designer/color-picker";
 import { FontPicker } from "@/components/designer/font-picker";
 import { Hint } from "@/components/hint";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { hexDigits, normalizeHex } from "@/lib/color";
+import { hexDigits, normalizeHex, canPickScreenColor, pickScreenColor } from "@/lib/color";
 import {
   ARROW_KINDS,
   BARCODE_MIN_HEIGHT_MM,
   BARCODE_MIN_WIDTH_MM,
+  IMAGE_FITS,
   LINE_CAPS,
   QR_MIN_SIDE_MM,
   STROKE_STYLES,
   arrowBindingPatch,
   clampQrSideMm,
   designedArrowDirection,
+  imageFitOf,
   isSwappableArrowImage,
   isGaAddressTransform,
   isHorizontalLine,
@@ -34,8 +36,10 @@ import {
   type TextAlign,
   type VerticalAlign,
 } from "@/lib/document";
-import { folderPath } from "@/lib/assets";
+import { folderPath, resolveBoundImageSrc } from "@/lib/assets";
 import { useAssetStore } from "@/lib/asset-store";
+import { boxMatchingAspect, probeImageSrc } from "@/lib/image";
+import { resolvePublicSrc } from "@/lib/public-path";
 import { schemaColumns } from "@/lib/excel";
 import { applyCharStyle, stripSpanKey, styleInRange } from "@/lib/text-color";
 import { useAppStore } from "@/lib/store";
@@ -49,6 +53,7 @@ import {
   AlignVerticalJustifyEnd,
   AlignVerticalJustifyStart,
   AlignVerticalSpaceBetween,
+  Palette,
   Pipette,
   Trash2,
 } from "lucide-react";
@@ -785,6 +790,14 @@ function ColorField({
   }
 
   function pickColor() {
+    if (canPickScreenColor()) {
+      void pickScreenColor().then((hex) => {
+        if (!hex) return;
+        setHex(hexDigits(hex, fallback));
+        onChange(hex);
+      });
+      return;
+    }
     if (property) beginColorSample(property);
   }
 
@@ -793,7 +806,7 @@ function ColorField({
     const width = 220;
     const left = Math.min(Math.max(8, rect.left), window.innerWidth - width - 8);
     const below = rect.bottom + 6;
-    const height = 320;
+    const height = 360;
     const top = below + height > window.innerHeight - 8 ? Math.max(8, rect.top - height - 6) : below;
     setPicker({ top, left, width });
   }
@@ -822,7 +835,16 @@ function ColorField({
       ) : (
         <>
           <div className="flex h-8 items-center gap-1.5 rounded-lg border border-input bg-background pr-0.5 pl-1">
-            <ColorSwatchButton color={swatch} label={label} onOpen={openPicker} />
+            <NativeColorWell
+              color={swatch}
+              label={label}
+              onBegin={beginPropertyEdit}
+              onEnd={endPropertyEdit}
+              onChange={(next) => {
+                setHex(hexDigits(next, fallback));
+                onChange(next);
+              }}
+            />
             <span className="text-[11px] text-muted-foreground">#</span>
             <input
               value={hex}
@@ -852,7 +874,16 @@ function ColorField({
                 }
               }}
             />
-            <Hint label={sampling ? "Click the canvas to sample" : "Pick color from canvas"}>
+            <Hint label="Color palette">
+              <button
+                type="button"
+                className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+                onClick={(event) => openPicker(event.currentTarget.getBoundingClientRect())}
+              >
+                <Palette className="size-3.5" />
+              </button>
+            </Hint>
+            <Hint label={sampling ? "Click the canvas to sample" : "Pick color from another element"}>
               <button
                 type="button"
                 className={cn(
@@ -1104,6 +1135,47 @@ function InspectorTypeFields({
               </Button>
             ) : null}
           </div>
+          <div className="grid gap-1">
+            <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">Photo in box</span>
+            <div className="grid grid-cols-3 gap-0.5 rounded-lg border border-input p-0.5">
+              {IMAGE_FITS.map((option) => {
+                const active = imageFitOf(element) === option.id;
+                return (
+                  <Hint key={option.id} label={option.hint}>
+                    <button
+                      type="button"
+                      className={cn(
+                        "h-7 w-full rounded-md text-xs",
+                        active ? "bg-muted font-medium text-foreground" : "text-muted-foreground hover:text-foreground",
+                      )}
+                      onClick={() => onChange({ imageFit: option.id })}
+                    >
+                      {option.label}
+                    </button>
+                  </Hint>
+                );
+              })}
+            </div>
+          </div>
+          {!shared && !isSwappableArrowImage(element) ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                const assets = useAssetStore.getState();
+                const src =
+                  (element.imageDataUrl ? resolvePublicSrc(element.imageDataUrl) : undefined) ??
+                  resolveBoundImageSrc(element, element.content ?? "", assets.assets, assets.folders);
+                if (!src) return;
+                void probeImageSrc(src).then((natural) => {
+                  if (!natural?.width || !natural.height) return;
+                  onChange(boxMatchingAspect({ width: element.width, height: element.height }, natural));
+                });
+              }}
+            >
+              Match photo
+            </Button>
+          ) : null}
         </>
       ) : null}
 

@@ -65,6 +65,17 @@ export type ShapeDirection = "right" | "down" | "left" | "up";
 export type ArrowKind = "block" | "triangle" | "barbed" | "chevron" | "line" | "pentagon" | "open";
 export type LineCap = "butt" | "round" | "square";
 export type StrokeStyleKind = "solid" | "dashed" | "dotted";
+export type ImageFit = "fit" | "fill" | "stretch";
+
+export const IMAGE_FITS: { id: ImageFit; label: string; hint: string }[] = [
+  { id: "fit", label: "Fit", hint: "Whole photo, keep proportions" },
+  { id: "fill", label: "Fill", hint: "Fill the box, crop overflow" },
+  { id: "stretch", label: "Stretch", hint: "Stretch to the box" },
+];
+
+export function imageFitOf(element: Pick<LabelElement, "imageFit">): ImageFit {
+  return element.imageFit ?? "stretch";
+}
 
 export const ARROW_KINDS: { id: ArrowKind; label: string }[] = [
   { id: "block", label: "Block" },
@@ -171,6 +182,8 @@ export type LabelElement = {
   /** Asset-library folder used to look up an image by the bound column value. */
   assetFolderId?: string;
   imageDataUrl?: string;
+  /** How the photo sits in the placeholder. Missing means stretch, so existing templates stay as designed. */
+  imageFit?: ImageFit;
   partIndex?: number;
   transform?: ElementTransform;
   fallbackBinding?: string;

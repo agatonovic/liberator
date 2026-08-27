@@ -7,8 +7,11 @@ import {
   RGB,
   StandardFonts,
   degrees,
+  clip,
+  endPath,
   popGraphicsState,
   pushGraphicsState,
+  rectangle,
   rgb,
   rotateRadians,
   toRadians,
@@ -18,6 +21,7 @@ import fontkit from "@pdf-lib/fontkit";
 import { barcodeDataUrl, dataUrlToBytes, qrDataUrl } from "./codes";
 import {
   displayPose,
+  imageFitOf,
   isPaintColor,
   isPolygonType,
   lineLocalPoints,
@@ -36,6 +40,7 @@ import { resolveBoundImageSrc } from "./assets";
 import { useAssetStore } from "./asset-store";
 import { gaMagacinPrefixSpans, normalizeArrow } from "./format";
 import { resolvePublicSrc } from "./public-path";
+import { imageDestination } from "./image";
 import { mmToPt } from "./units";
 
 const SHEET_MM: Record<SheetPageSize, { widthMm: number; heightMm: number }> = {
@@ -607,7 +612,19 @@ async function drawElement(
       const image = await embedImage(pdf, src);
       if (image) {
         paintNative((box) => {
-          page.drawImage(image, { x: box.x, y: box.y, width, height, opacity });
+          const fit = imageFitOf(element);
+          const dest = imageDestination(width, height, image.width, image.height, fit);
+          if (fit !== "stretch") {
+            page.pushOperators(pushGraphicsState(), rectangle(box.x, box.y, width, height), clip(), endPath());
+          }
+          page.drawImage(image, {
+            x: box.x + dest.x,
+            y: box.y + height - dest.y - dest.height,
+            width: dest.width,
+            height: dest.height,
+            opacity,
+          });
+          if (fit !== "stretch") page.pushOperators(popGraphicsState());
         });
         return;
       }

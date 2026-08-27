@@ -11,8 +11,10 @@ import { orientLine, rotateAroundCenter, type ElementType } from "@/lib/document
 import { applyVersionSnapshot, versionLabel } from "@/lib/versions";
 import { schemaColumns } from "@/lib/excel";
 import { designerPreviewRow, identityMapping } from "@/lib/grid";
+import { clipboardImageFiles, fileToImageDataUrl, placedImageBox } from "@/lib/image";
 import { useAppStore } from "@/lib/store";
 import { toolFromShortcut } from "@/lib/tool-shortcuts";
+import { pxToMm } from "@/lib/units";
 import { Maximize2, Redo2, Undo2, ZoomIn, ZoomOut } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -71,6 +73,7 @@ export function DesignerView() {
   const mapping = useMemo(() => (viewDoc ? identityMapping(schemaColumns(viewDoc)) : {}), [viewDoc]);
   const imageInput = useRef<HTMLInputElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
+  const lastPointerRef = useRef<{ x: number; y: number } | null>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [sidebarWidth, setSidebarWidth] = useState(() =>
     clamp(readStoredSize(SIDEBAR_WIDTH_KEY, 280), SIDEBAR_MIN, SIDEBAR_MAX),
@@ -101,6 +104,74 @@ export function DesignerView() {
     if (!node) return { x: 0, y: 0 };
     return { x: node.clientWidth / 2, y: node.clientHeight / 2 };
   }
+
+  function paperPointAt(clientX?: number, clientY?: number) {
+    const node = viewportRef.current;
+    const state = useAppStore.getState();
+    const current = state.current();
+    if (!node || !current) return { x: 10, y: 10 };
+    const bounds = node.getBoundingClientRect();
+    const fallback = lastPointerRef.current;
+    const px = (clientX ?? fallback?.x ?? bounds.left + bounds.width / 2) - bounds.left;
+    const py = (clientY ?? fallback?.y ?? bounds.top + bounds.height / 2) - bounds.top;
+    return {
+      x: pxToMm(px - state.panX, state.zoom),
+      y: pxToMm(py - state.panY, state.zoom),
+    };
+  }
+
+  async function placeClipboardImages(files: File[], clientX?: number, clientY?: number) {
+    const state = useAppStore.getState();
+    const current = state.current();
+    if (!current || previewingRef.current) return;
+    const decoded: { dataUrl: string; width: number; height: number }[] = [];
+    for (const file of files) {
+      try {
+        decoded.push(await fileToImageDataUrl(file));
+      } catch {
+        /* skip unreadable files */
+      }
+    }
+    if (!decoded.length) {
+      toast.error("Could not read that image");
+      return;
+    }
+    const selectedImageIds = state.selectedIds.filter(
+      (id) => current.elements.find((el) => el.id === id)?.type === "image",
+    );
+    if (decoded.length === 1 && selectedImageIds.length) {
+      const { dataUrl } = decoded[0];
+      const patches = selectedImageIds.map((id) => {
+        const el = current.elements.find((item) => item.id === id);
+        return { id, patch: { imageDataUrl: dataUrl, imageFit: el?.imageFit ?? "fit" } };
+      });
+      if (patches.length === 1) state.updateElement(patches[0].id, patches[0].patch);
+      else state.updateElements(patches);
+      toast.success(selectedImageIds.length === 1 ? "Image placed" : `Image applied to ${selectedImageIds.length} placeholders`);
+      return;
+    }
+    const at = paperPointAt(clientX, clientY);
+    const ids: string[] = [];
+    decoded.forEach((item, index) => {
+      const box = placedImageBox(
+        { width: item.width || 400, height: item.height || 280 },
+        current.page,
+        { x: at.x + index * 4, y: at.y + index * 4 },
+      );
+      const id = state.addElementAt("image", box.x, box.y, {
+        width: box.width,
+        height: box.height,
+        imageDataUrl: item.dataUrl,
+        imageFit: "fit",
+      });
+      if (id) ids.push(id);
+    });
+    if (ids.length) state.select(ids);
+    toast.success(ids.length === 1 ? "Pasted image" : `Pasted ${ids.length} images`);
+  }
+
+  const placeImagesRef = useRef(placeClipboardImages);
+  placeImagesRef.current = placeClipboardImages;
 
   function fitToScreen() {
     const node = viewportRef.current;
@@ -342,8 +413,15 @@ export function DesignerView() {
         event.preventDefault();
         return;
       }
-      const inPlace = mods.shift && (mods.meta || mods.ctrl);
+      const images = clipboardImageFiles(event.clipboardData);
       const text = event.clipboardData?.getData("text/plain") ?? "";
+      const hasLayers = text.includes("labelator.elements");
+      if (images.length && !hasLayers) {
+        event.preventDefault();
+        void placeImagesRef.current(images);
+        return;
+      }
+      const inPlace = mods.shift && (mods.meta || mods.ctrl);
       if (!useAppStore.getState().pasteClipboard(text, { inPlace })) return;
       event.preventDefault();
       toast.success(inPlace ? "Pasted in place" : "Pasted");
@@ -476,16 +554,35 @@ export function DesignerView() {
             const current = state.current();
             const ids = state.selectedIds.filter((id) => current?.elements.find((el) => el.id === id)?.type === "image");
             if (!ids.length) return;
-            const reader = new FileReader();
-            reader.onload = () => {
-              const dataUrl = String(reader.result);
-              if (ids.length === 1) updateElement(ids[0], { imageDataUrl: dataUrl });
-              else updateElements(ids.map((id) => ({ id, patch: { imageDataUrl: dataUrl } })));
-            };
-            reader.readAsDataURL(file);
+            void fileToImageDataUrl(file).then(({ dataUrl }) => {
+              const latest = useAppStore.getState().current();
+              const patches = ids.map((id) => {
+                const el = latest?.elements.find((item) => item.id === id);
+                return { id, patch: { imageDataUrl: dataUrl, imageFit: el?.imageFit ?? "fit" } };
+              });
+              if (patches.length === 1) updateElement(patches[0].id, patches[0].patch);
+              else updateElements(patches);
+            });
           }}
         />
-        <div ref={viewportRef} className="relative flex min-h-0 min-w-0 flex-1 touch-none overscroll-none">
+        <div
+          ref={viewportRef}
+          className="relative flex min-h-0 min-w-0 flex-1 touch-none overscroll-none"
+          onPointerMove={(event) => {
+            lastPointerRef.current = { x: event.clientX, y: event.clientY };
+          }}
+          onDragOver={(event) => {
+            if (![...event.dataTransfer.types].includes("Files")) return;
+            event.preventDefault();
+            event.dataTransfer.dropEffect = "copy";
+          }}
+          onDrop={(event) => {
+            const files = clipboardImageFiles(event.dataTransfer);
+            if (!files.length) return;
+            event.preventDefault();
+            void placeImagesRef.current(files, event.clientX, event.clientY);
+          }}
+        >
           <Canvas
             document={viewDoc ?? doc}
             zoom={zoom}
@@ -539,7 +636,7 @@ export function DesignerView() {
               Drag to draw, or click once for a default size. After placing, select is restored. Esc cancels.
               {tool === "line" ? " Drag horizontally or vertically." : ""}
               {tool === "image"
-                ? " Places a placeholder — bind a column or choose a file in the inspector."
+                ? " Places a placeholder — paste or drop a photo, or choose a file. Fit keeps proportions."
                 : ""}
             </p>
           ) : null}

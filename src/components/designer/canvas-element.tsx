@@ -3,12 +3,15 @@
 import { qrDataUrl, renderBarcodeCanvas } from "@/lib/codes";
 import {
   displayPose,
+  imageFitOf,
   isPaintColor,
   isPolygonType,
   lineLocalPoints,
   strokeDashPattern,
+  type ImageFit,
   type LabelElement,
 } from "@/lib/document";
+import { imageDestination } from "@/lib/image";
 import { resolveBoundImageSrc, type AssetFolder, type AssetRecord } from "@/lib/assets";
 import { useAssetStore } from "@/lib/asset-store";
 import { gaMagacinPrefixSpans, normalizeArrow } from "@/lib/format";
@@ -339,6 +342,36 @@ function CodeImage({
   );
 }
 
+function LabelPhoto({
+  src,
+  width,
+  height,
+  fit,
+}: {
+  src?: string;
+  width: number;
+  height: number;
+  fit: ImageFit;
+}) {
+  const image = useHtmlImage(src);
+  if (!image) {
+    if (src) return <Rect width={width} height={height} fill="#f6f3ec" stroke="#d9d4c8" dash={[4, 3]} />;
+    return <ImagePlaceholder width={width} height={height} label="Image" />;
+  }
+  const dest = imageDestination(
+    width,
+    height,
+    image.naturalWidth || image.width,
+    image.naturalHeight || image.height,
+    fit,
+  );
+  return (
+    <Group clipX={0} clipY={0} clipWidth={width} clipHeight={height} listening={false}>
+      <KonvaImage image={image} x={dest.x} y={dest.y} width={dest.width} height={dest.height} />
+    </Group>
+  );
+}
+
 export function CanvasElement({
   element,
   zoom,
@@ -544,7 +577,12 @@ export function CanvasElement({
         <CodeImage src={qrSrc} width={width} height={height} crisp />
       ) : null}
       {element.type === "image" ? (
-        <CodeImage src={imageSource(element, value, assets, folders)} width={width} height={height} emptyLabel="Image" />
+        <LabelPhoto
+          src={imageSource(element, value, assets, folders)}
+          width={width}
+          height={height}
+          fit={imageFitOf(element)}
+        />
       ) : null}
     </Group>
   );

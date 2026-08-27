@@ -1012,7 +1012,12 @@ export const useAppStore = create<AppState>((set, get) => ({
     set((state) => {
       const current = state.current();
       if (!current) return state;
-      const element = createElement(type, x, y, extras);
+      const element = createElement(
+        type,
+        x,
+        y,
+        type === "image" && extras?.imageFit === undefined ? { imageFit: "fit", ...extras } : extras,
+      );
       created = element.id;
       const next = withHistory(state, { ...current, elements: [...current.elements, element] });
       persist({ ...state, ...next, currentId: state.currentId, data: state.data });

@@ -89,6 +89,22 @@ export function documentColors(elements: LabelElement[]): string[] {
   return colors;
 }
 
+export async function pickScreenColor(): Promise<string | null> {
+  if (typeof window === "undefined") return null;
+  const Ctor = (window as unknown as { EyeDropper?: new () => { open: () => Promise<{ sRGBHex: string }> } }).EyeDropper;
+  if (!Ctor) return null;
+  try {
+    const result = await new Ctor().open();
+    return normalizeHex(result.sRGBHex);
+  } catch {
+    return null;
+  }
+}
+
+export function canPickScreenColor() {
+  return typeof window !== "undefined" && "EyeDropper" in window;
+}
+
 export function mergeSavedColors(...lists: (string[] | undefined)[]) {
   const seen = new Set<string>();
   const colors: string[] = [];

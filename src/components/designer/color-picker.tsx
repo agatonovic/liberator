@@ -1,11 +1,11 @@
 "use client";
 
-import { documentColors, hexToHsv, hsvToHex, normalizeHex, type Hsv } from "@/lib/color";
+import { documentColors, hexToHsv, hsvToHex, normalizeHex, pickScreenColor, type Hsv } from "@/lib/color";
 import type { LabelElement } from "@/lib/document";
 import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Hint } from "@/components/hint";
-import { Plus, X } from "lucide-react";
+import { Pipette, Plus, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -162,6 +162,23 @@ export function ColorPickerPopover({
         }}
         onChange={(event) => commit({ ...local, h: Number(event.target.value) })}
       />
+      <div className="mt-2 flex items-center gap-1.5">
+        <NativeColorWell color={current} label="System color picker" onChange={onChange} />
+        <p className="min-w-0 flex-1 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">{current}</p>
+        <Hint label="Pick from screen">
+          <button
+            type="button"
+            className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+            onClick={() => {
+              void pickScreenColor().then((hex) => {
+                if (hex) onChange(hex);
+              });
+            }}
+          >
+            <Pipette className="size-3.5" />
+          </button>
+        </Hint>
+      </div>
       {documentSwatches.length ? (
         <div className="mt-2.5">
           <p className="mb-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">Document</p>
@@ -222,29 +239,39 @@ export function ColorPickerPopover({
   );
 }
 
-export function ColorSwatchButton({
+export function NativeColorWell({
   color,
   label,
-  onOpen,
+  onChange,
+  onBegin,
+  onEnd,
 }: {
   color: string;
   label: string;
-  onOpen: (rect: DOMRect) => void;
+  onChange: (hex: string) => void;
+  onBegin?: () => void;
+  onEnd?: () => void;
 }) {
-  const ref = useRef<HTMLButtonElement>(null);
+  const value = (normalizeHex(color) ?? "#12263A").toLowerCase();
   return (
     <Hint label="Open color picker">
-      <button
-        ref={ref}
-        type="button"
-        className="relative block h-6 min-h-6 w-6 min-w-6 shrink-0 overflow-hidden rounded-[5px] border border-black/20"
-        style={{ backgroundColor: color }}
-        aria-label={`${label} color`}
-        onClick={() => {
-          const rect = ref.current?.getBoundingClientRect();
-          if (rect) onOpen(rect);
-        }}
-      />
+      <label
+        className="relative block h-6 min-h-6 w-6 min-w-6 shrink-0 cursor-pointer overflow-hidden rounded-[5px] border border-black/20"
+        style={{ backgroundColor: value }}
+      >
+        <input
+          type="color"
+          value={value}
+          aria-label={`${label} color picker`}
+          className="absolute -inset-2 h-[200%] w-[200%] cursor-pointer opacity-0"
+          onFocus={onBegin}
+          onBlur={onEnd}
+          onInput={(event) => {
+            const next = normalizeHex(event.currentTarget.value);
+            if (next) onChange(next);
+          }}
+        />
+      </label>
     </Hint>
   );
 }

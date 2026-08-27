@@ -41,6 +41,10 @@ function colLetter(index: number) {
   return out;
 }
 
+function isGridClipboard(text: string) {
+  return /[\t\n\r]/.test(text);
+}
+
 function isTypingTarget(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false;
   const tag = target.tagName;
@@ -230,6 +234,18 @@ export function Spreadsheet({
 
   function clearDraft() {
     onDraftChange?.(null);
+  }
+
+  function pasteClipboardText(text: string, rowIndex: number, colIndex: number) {
+    if (!text) return;
+    setEditing(null);
+    clearDraft();
+    const box = norm(sel);
+    const r0 = Math.max(0, rowIndex);
+    onPasteMatrix(r0, colIndex, text, {
+      rows: Math.max(1, box.r1 - r0 + 1),
+      cols: Math.max(1, box.c1 - box.c0 + 1),
+    });
   }
 
   function commitEdit() {
@@ -440,15 +456,10 @@ export function Spreadsheet({
       onPaste={(event) => {
         const text = event.clipboardData.getData("text/plain");
         if (!text) return;
+        if (editing && !isGridClipboard(text)) return;
         event.preventDefault();
         event.stopPropagation();
-        if (editing) return;
-        const box = norm(sel);
-        const r0 = Math.max(0, box.r0);
-        onPasteMatrix(r0, box.c0, text, {
-          rows: Math.max(1, box.r1 - r0 + 1),
-          cols: Math.max(1, box.c1 - box.c0 + 1),
-        });
+        pasteClipboardText(text, editing?.r ?? Math.max(0, norm(sel).r0), editing?.c ?? norm(sel).c0);
       }}
       onCopy={(event) => {
         event.preventDefault();
@@ -639,6 +650,13 @@ export function Spreadsheet({
                             const value = event.target.value;
                             setEditing({ ...editing, value });
                             applyDraft(r, c, value);
+                          }}
+                          onPaste={(event) => {
+                            const text = event.clipboardData.getData("text/plain");
+                            if (!text || !isGridClipboard(text)) return;
+                            event.preventDefault();
+                            event.stopPropagation();
+                            pasteClipboardText(text, r, c);
                           }}
                           onBlur={commitEdit}
                           onKeyDown={(event) => {

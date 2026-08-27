@@ -163,7 +163,7 @@ export function ColorPickerPopover({
         onChange={(event) => commit({ ...local, h: Number(event.target.value) })}
       />
       <div className="mt-2 flex items-center gap-1.5">
-        <NativeColorWell color={current} label="System color picker" onChange={onChange} />
+        <div className="size-6 shrink-0 rounded-[5px] border border-black/20" style={{ backgroundColor: current }} />
         <p className="min-w-0 flex-1 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">{current}</p>
         <Hint label="Pick from screen">
           <button
@@ -239,39 +239,29 @@ export function ColorPickerPopover({
   );
 }
 
-export function NativeColorWell({
+export function ColorSwatchButton({
   color,
   label,
-  onChange,
-  onBegin,
-  onEnd,
+  onOpen,
 }: {
   color: string;
   label: string;
-  onChange: (hex: string) => void;
-  onBegin?: () => void;
-  onEnd?: () => void;
+  onOpen: (rect: DOMRect) => void;
 }) {
-  const value = (normalizeHex(color) ?? "#12263A").toLowerCase();
+  const ref = useRef<HTMLButtonElement>(null);
   return (
-    <Hint label="Open color picker">
-      <label
-        className="relative block h-6 min-h-6 w-6 min-w-6 shrink-0 cursor-pointer overflow-hidden rounded-[5px] border border-black/20"
-        style={{ backgroundColor: value }}
-      >
-        <input
-          type="color"
-          value={value}
-          aria-label={`${label} color picker`}
-          className="absolute -inset-2 h-[200%] w-[200%] cursor-pointer opacity-0"
-          onFocus={onBegin}
-          onBlur={onEnd}
-          onInput={(event) => {
-            const next = normalizeHex(event.currentTarget.value);
-            if (next) onChange(next);
-          }}
-        />
-      </label>
+    <Hint label="Open color palette">
+      <button
+        ref={ref}
+        type="button"
+        className="relative block h-6 min-h-6 w-6 min-w-6 shrink-0 overflow-hidden rounded-[5px] border border-black/20"
+        style={{ backgroundColor: color }}
+        aria-label={`${label} color palette`}
+        onClick={() => {
+          const rect = ref.current?.getBoundingClientRect();
+          if (rect) onOpen(rect);
+        }}
+      />
     </Hint>
   );
 }

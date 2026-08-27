@@ -1,6 +1,6 @@
 "use client";
 
-import { ColorPickerPopover, NativeColorWell } from "@/components/designer/color-picker";
+import { ColorPickerPopover, ColorSwatchButton } from "@/components/designer/color-picker";
 import { FontPicker } from "@/components/designer/font-picker";
 import { Hint } from "@/components/hint";
 import { Button } from "@/components/ui/button";
@@ -53,7 +53,6 @@ import {
   AlignVerticalJustifyEnd,
   AlignVerticalJustifyStart,
   AlignVerticalSpaceBetween,
-  Palette,
   Pipette,
   Trash2,
 } from "lucide-react";
@@ -835,16 +834,7 @@ function ColorField({
       ) : (
         <>
           <div className="flex h-8 items-center gap-1.5 rounded-lg border border-input bg-background pr-0.5 pl-1">
-            <NativeColorWell
-              color={swatch}
-              label={label}
-              onBegin={beginPropertyEdit}
-              onEnd={endPropertyEdit}
-              onChange={(next) => {
-                setHex(hexDigits(next, fallback));
-                onChange(next);
-              }}
-            />
+            <ColorSwatchButton color={swatch} label={label} onOpen={openPicker} />
             <span className="text-[11px] text-muted-foreground">#</span>
             <input
               value={hex}
@@ -874,15 +864,6 @@ function ColorField({
                 }
               }}
             />
-            <Hint label="Color palette">
-              <button
-                type="button"
-                className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
-                onClick={(event) => openPicker(event.currentTarget.getBoundingClientRect())}
-              >
-                <Palette className="size-3.5" />
-              </button>
-            </Hint>
             <Hint label={sampling ? "Click the canvas to sample" : "Pick color from another element"}>
               <button
                 type="button"

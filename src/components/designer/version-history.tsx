@@ -8,7 +8,8 @@ import type { LabelDocument, TemplateVersion } from "@/lib/document";
 import { relativeUsed } from "@/lib/template-library";
 import { useAppStore } from "@/lib/store";
 import { formatVersionDate, versionLabel } from "@/lib/versions";
-import { Eye, History, Pencil, RotateCcw, Save, Trash2 } from "lucide-react";
+import { downloadTemplateJson } from "@/lib/template-json";
+import { Download, Eye, History, Pencil, RotateCcw, Save, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -45,6 +46,7 @@ export function DesignerSaveControls({
   onPreviewVersion: (id: string | null) => void;
 }) {
   const saveVersion = useAppStore((s) => s.saveVersion);
+  const publishCurrent = useAppStore((s) => s.publishCurrent);
   const restoreVersion = useAppStore((s) => s.restoreVersion);
   const renameVersion = useAppStore((s) => s.renameVersion);
   const deleteVersion = useAppStore((s) => s.deleteVersion);
@@ -104,10 +106,37 @@ export function DesignerSaveControls({
   return (
     <div className="relative flex items-center gap-1" ref={panelRef}>
       <SaveStatus />
+      <Hint label="Download Labelator template JSON">
+        <Button
+          size="sm"
+          variant="outline"
+          className="px-2 text-xs"
+          onClick={() => {
+            downloadTemplateJson(doc, { exportScope: "working" });
+            toast.success("Downloaded template JSON");
+          }}
+        >
+          <Download className="size-3.5" />
+          Download JSON
+        </Button>
+      </Hint>
       <Hint label="Save a named checkpoint" shortcut="⇧⌘S">
         <Button size="sm" variant="outline" className="px-2 text-xs" onClick={save}>
           <Save className="size-3.5" />
           Save version
+        </Button>
+      </Hint>
+      <Hint label={doc.status === "published" ? "Edit first — operators keep using the published version" : "Publish this working copy"}>
+        <Button
+          size="sm"
+          variant="outline"
+          className="px-2 text-xs"
+          disabled={doc.status === "published"}
+          onClick={() => {
+            if (publishCurrent()) toast.success("Published");
+          }}
+        >
+          Publish{doc.versionNumber ? ` v${doc.versionNumber}` : ""}
         </Button>
       </Hint>
       <Hint label="Version history">

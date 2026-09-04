@@ -8,6 +8,8 @@ import {
   type SheetLayout,
 } from "./document";
 
+/** Industrial catalog only. Do not add Shopify templates here — they would seed into Stellantis workspaces. See `catalog-registry.ts`. */
+
 const PT = 25.4 / 72;
 const INK = "#221F1F";
 const RED = "#E01E2B";

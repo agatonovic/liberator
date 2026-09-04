@@ -1,3 +1,5 @@
+import { recordsForOrganization } from "./workspace-scope";
+
 export const PACKAGING_FOLDER_ID = "asset-folder-packaging";
 
 export type AssetKind = "static" | "blob";
@@ -7,6 +9,7 @@ export type AssetFolder = {
   name: string;
   parentId?: string;
   createdAt: string;
+  organizationId?: string;
 };
 
 export type AssetRecord = {
@@ -21,6 +24,7 @@ export type AssetRecord = {
   width?: number;
   height?: number;
   createdAt: string;
+  organizationId?: string;
 };
 
 const IMAGE_EXT = /\.(jpe?g|png|webp|gif|svg)$/i;
@@ -125,6 +129,14 @@ export function assetSrc(asset: AssetRecord | undefined): string | undefined {
   if (!asset) return undefined;
   if (asset.kind === "static" && asset.url) return asset.url;
   return objectUrls.get(asset.id);
+}
+
+export function assetsForOrganization(assets: AssetRecord[], organizationId: string | null | undefined) {
+  return recordsForOrganization(assets, organizationId);
+}
+
+export function foldersForOrganization(folders: AssetFolder[], organizationId: string | null | undefined) {
+  return recordsForOrganization(folders, organizationId);
 }
 
 export function resolveBoundImageSrc(

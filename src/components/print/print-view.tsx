@@ -5,12 +5,25 @@ import { PaperSetupDialog } from "@/components/print/paper-setup-dialog";
 import { PrintTemplateSelect } from "@/components/print/template-select";
 import { Spreadsheet } from "@/components/print/spreadsheet";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { applyVersionSnapshot } from "@/lib/versions";
 import { downloadExcelTemplate, schemaColumns } from "@/lib/excel";
 import { columnHeader, headerForColumn, printDataRows, printLabelIndexes } from "@/lib/grid";
 import { generatePdf, pdfFileName } from "@/lib/pdf";
 import type { LabelDocument, SheetLayout } from "@/lib/document";
 import { previewRow } from "@/lib/resolve";
-import { evaluateGenerateRun, generateIssueCellKeys, runStatusLabel } from "@/lib/run-status";
+import { evaluateGenerateRun, generateIssueCellKeys, runStatusAttentionLabel, runStatusLabel, summarizeGenerateIssues } from "@/lib/run-status";
+import { generationVersion } from "@/lib/workspace";
+import { assetsForOrganization, foldersForOrganization } from "@/lib/assets";
+import { templateStatusOf } from "@/lib/template-library";
+import { canGenerateTemplate } from "@/lib/roles";
 import { useAssetStore } from "@/lib/asset-store";
 import { useAppStore } from "@/lib/store";
 import { Download, FileSpreadsheet, Printer, Upload } from "lucide-react";
@@ -119,14 +132,21 @@ export function PrintView() {
   const loadWorkbook = useAppStore((s) => s.loadWorkbook);
   const setSheet = useAppStore((s) => s.setSheet);
   const markTemplateUsed = useAppStore((s) => s.markTemplateUsed);
+  const completeLabelJob = useAppStore((s) => s.completeLabelJob);
+  const role = useAppStore((s) => s.role());
+  const orgId = useAppStore((s) => s.currentOrganizationId);
   const setColumnRequired = useAppStore((s) => s.setColumnRequired);
-  const assets = useAssetStore((s) => s.assets);
-  const assetFolders = useAssetStore((s) => s.folders);
+  const assetsAll = useAssetStore((s) => s.assets);
+  const assetFoldersAll = useAssetStore((s) => s.folders);
+  const assets = useMemo(() => assetsForOrganization(assetsAll, orgId), [assetsAll, orgId]);
+  const assetFolders = useMemo(() => foldersForOrganization(assetFoldersAll, orgId), [assetFoldersAll, orgId]);
   const fileRef = useRef<HTMLInputElement>(null);
   const splitRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [busy, setBusy] = useState<"print" | "download" | null>(null);
   const [paperOpen, setPaperOpen] = useState(false);
+  const [validationOpen, setValidationOpen] = useState(false);
+  const [validOnly, setValidOnly] = useState(true);
   const [attentionOnly, setAttentionOnly] = useState(false);
   const [gridFocus, setGridFocus] = useState<{ row: number; header: string; n: number } | null>(null);
   const [draft, setDraft] = useState<{ row: number; header: string; value: string } | null>(null);
@@ -139,7 +159,16 @@ export function PrintView() {
   );
 
   const doc = documents.find((item) => item.id === currentId) ?? null;
-  const columns = doc ? schemaColumns(doc) : [];
+  const layoutDoc = useMemo(() => {
+    if (!doc) return null;
+    if (role === "operator") {
+      const info = generationVersion(doc, "operator");
+      return info.snapshot ? applyVersionSnapshot(doc, info.snapshot) : null;
+    }
+    return doc;
+  }, [doc, role]);
+  const template = role === "operator" ? layoutDoc : doc;
+  const columns = template ? schemaColumns(template) : [];
   const liveRows = useMemo(() => {
     if (!draft || !data.headers.includes(draft.header)) return data.rows;
     if (draft.row < 0 || draft.row >= data.rows.length) return data.rows;
@@ -149,16 +178,20 @@ export function PrintView() {
   }, [data.headers, data.rows, draft]);
   const staticTemplate = columns.length === 0;
   const filled = useMemo(
-    () => (doc ? printLabelIndexes(doc, liveRows, data.headers) : []),
-    [doc, data.headers, liveRows],
+    () => (template ? printLabelIndexes(template, liveRows, data.headers) : []),
+    [template, data.headers, liveRows],
   );
   const sample = previewRow(liveRows, data.previewRowIndex);
-  const printRows = doc ? printDataRows(doc, data.rows, data.headers) : [];
   const firstHeader = data.headers[0];
   const runStatus = useMemo(
-    () => (doc ? evaluateGenerateRun(doc, liveRows, data.headers, data.mapping, assets, assetFolders) : null),
-    [assetFolders, assets, data.headers, data.mapping, doc, liveRows],
+    () => (template ? evaluateGenerateRun(template, liveRows, data.headers, data.mapping, assets, assetFolders) : null),
+    [assetFolders, assets, data.headers, data.mapping, liveRows, template],
   );
+  const allPrintRows = template ? printDataRows(template, data.rows, data.headers) : [];
+  const printIndexes = template ? printLabelIndexes(template, data.rows, data.headers) : [];
+  const invalidIndexes = new Set(runStatus?.issues.map((issue) => issue.rowIndex) ?? []);
+  const validPrintRows = allPrintRows.filter((_, index) => !invalidIndexes.has(printIndexes[index] ?? -1));
+  const printRows = validOnly && runStatus?.issues.length ? validPrintRows : allPrintRows;
 
   useEffect(() => {
     if (hydrated && doc) ensurePrintGrid();
@@ -223,27 +256,58 @@ export function PrintView() {
     return () => window.removeEventListener("resize", fit);
   }, []);
 
-  async function withRows(kind: "print" | "download", run: (rows: typeof printRows) => Promise<void>) {
+  async function withRows(kind: "print" | "download", run: (rows: typeof allPrintRows) => Promise<void>) {
     if (!doc) return;
-    if (!printRows.length) {
-      toast.error("Fill at least one row first");
+    const rows = validOnly && runStatus?.issues.length ? validPrintRows : allPrintRows;
+    if (!rows.length) {
+      toast.error(runStatus?.issues.length ? "No valid rows to generate" : "Fill at least one row first");
+      return;
+    }
+    if (!canGenerateTemplate(role ?? "admin", templateStatusOf(doc))) {
+      toast.error("This template is archived and cannot be generated");
+      return;
+    }
+    if (role === "operator" && !layoutDoc) {
+      toast.error("No published version is available for operators");
       return;
     }
     setBusy(kind);
     try {
-      await run(printRows);
+      await run(rows);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not create PDF");
+      const message = error instanceof Error ? error.message : "Could not create PDF";
+      const version = generationVersion(doc, role === "operator" ? "operator" : "designer");
+      completeLabelJob({
+        templateId: doc.id,
+        templateName: doc.name,
+        templateVersionId: version.versionId,
+        templateVersionNumber: version.versionNumber,
+        quantity: 0,
+        sourceType: data.fileName ? "excel" : "manual",
+        action: kind,
+        fileName: data.fileName ?? undefined,
+        rowCount: rows.length,
+        successCount: 0,
+        failedCount: rows.length,
+        status: "failed",
+        error: message,
+      });
+      toast.error(message);
     } finally {
       setBusy(null);
     }
   }
 
   function openPaperSetup() {
-    if (!printRows.length) {
+    if (!printRows.length && !allPrintRows.length) {
       toast.error("Fill at least one row first");
       return;
     }
+    if (runStatus?.issues.length) {
+      setValidationOpen(true);
+      return;
+    }
+    setValidOnly(false);
     setPaperOpen(true);
   }
 
@@ -259,9 +323,12 @@ export function PrintView() {
 
   async function confirmPaper(action: "print" | "download", current: LabelDocument, sheet: SheetLayout | undefined) {
     if (sheet) setSheet(sheet);
-    const working = { ...current, sheet };
-    await withRows(action, async (rows) => {
-      const bytes = await generatePdf(working, rows, data.mapping);
+    const source = template ?? current;
+    const working = { ...source, sheet };
+    const rowsForJob = validOnly && runStatus?.issues.length ? validPrintRows : allPrintRows;
+    await withRows(action, async () => {
+      if (!rowsForJob.length) throw new Error("No valid rows to generate");
+      const bytes = await generatePdf(working, rowsForJob, data.mapping);
       if (action === "download") {
         const blob = new Blob([new Uint8Array(bytes)], { type: "application/pdf" });
         const url = URL.createObjectURL(blob);
@@ -277,6 +344,21 @@ export function PrintView() {
         await printPdfBytes(bytes);
         toast.success("Print dialog opened");
       }
+      const version = generationVersion(current, role === "operator" ? "operator" : "designer");
+      completeLabelJob({
+        templateId: current.id,
+        templateName: current.name,
+        templateVersionId: version.versionId,
+        templateVersionNumber: version.versionNumber,
+        quantity: rowsForJob.length,
+        sourceType: data.fileName ? "excel" : "manual",
+        action,
+        fileName: data.fileName ?? undefined,
+        pageSize: sheet?.pageSize ?? `${current.page.widthMm}×${current.page.heightMm}mm`,
+        rowCount: allPrintRows.length,
+        successCount: rowsForJob.length,
+        failedCount: Math.max(0, allPrintRows.length - rowsForJob.length),
+      });
       setPaperOpen(false);
       markTemplateUsed(current.id, "generate");
     });
@@ -294,6 +376,17 @@ export function PrintView() {
       </div>
     );
   }
+
+  if (role === "operator" && !layoutDoc) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
+        <p className="text-sm text-muted-foreground">This template has no published version yet. Ask an admin to publish it.</p>
+        <Button onClick={() => router.push("/templates")}>Back to templates</Button>
+      </div>
+    );
+  }
+
+  const archived = !canGenerateTemplate(role ?? "admin", templateStatusOf(doc));
 
   const filtering = Boolean(attentionOnly && runStatus?.attention);
   const allLabelIndexes = filled;
@@ -369,14 +462,14 @@ export function PrintView() {
             <Upload className="size-3.5" />
             Load Excel
           </Button>
-          <Button variant="outline" size="sm" disabled={Boolean(busy) || !printRows.length} onClick={openPaperSetup}>
+          <Button variant="outline" size="sm" disabled={Boolean(busy) || !allPrintRows.length || archived} onClick={openPaperSetup}>
             <Download className="size-3.5" />
             Download PDF
           </Button>
           <Button
             size="sm"
             className="bg-[#1b4f9c] text-white hover:bg-[#163f7c]"
-            disabled={Boolean(busy) || !printRows.length}
+            disabled={Boolean(busy) || !allPrintRows.length || archived}
             onClick={openPaperSetup}
           >
             <Printer className="size-3.5" />
@@ -488,7 +581,7 @@ export function PrintView() {
             </p>
           </div>
           <div className="min-h-0 flex-1">
-            <Preview document={doc} row={sample} mapping={data.mapping} />
+            <Preview document={layoutDoc ?? doc} row={sample} mapping={data.mapping} />
           </div>
         </section>
         </div>
@@ -513,7 +606,7 @@ export function PrintView() {
                 <p className="text-[11px] text-[#5f6368]">
                   {staticTemplate
                     ? "This sticker prints as designed. Bind fields in Designer if you later need a spreadsheet batch."
-                    : "Download a blank Excel and fill it, or select column titles and copy them. One filled row becomes one label. * required — click the star to allow empty cells."}
+                    : "Download a blank Excel and fill it, or select column titles and copy them. One filled row becomes one label. Validate, then print or download. Results appear in History. * required — click the star to allow empty cells."}
                 </p>
               </div>
               <Button
@@ -574,10 +667,71 @@ export function PrintView() {
         </section>
       </div>
 
+      <Dialog open={validationOpen} onOpenChange={setValidationOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Validate data before generating</DialogTitle>
+            <DialogDescription>
+              {runStatus
+                ? `${runStatus.ready} of ${runStatus.filled} rows are ready. ${runStatusAttentionLabel(runStatus)} Invalid rows are not printed until they are fixed.`
+                : "Invalid rows are not printed until they are fixed."}
+            </DialogDescription>
+          </DialogHeader>
+          {runStatus ? (
+            <div className="space-y-2 text-sm text-[#3c4043]">
+              <p>
+                {runStatus.ready} of {runStatus.filled} rows are ready
+              </p>
+              {runStatus.issues.length ? (
+                <p>
+                  {runStatus.issues.length} row{runStatus.issues.length === 1 ? "" : "s"} need
+                  {runStatus.issues.length === 1 ? "s" : ""} attention
+                </p>
+              ) : null}
+              {(() => {
+                const summary = summarizeGenerateIssues(runStatus);
+                return (
+                  <>
+                    {summary.image ? <p>⚠ {summary.image} missing packaging images</p> : null}
+                    {summary.address ? <p>⚠ {summary.address} invalid warehouse addresses</p> : null}
+                    {summary.barcode ? <p>⚠ {summary.barcode} invalid barcodes</p> : null}
+                    {summary.missing ? <p>✕ {summary.missing} missing required values</p> : null}
+                    {summary.invalid ? <p>✕ {summary.invalid} invalid values</p> : null}
+                    {summary.bindings ? (
+                      <p>✕ {summary.bindings} missing column binding{summary.bindings === 1 ? "" : "s"}</p>
+                    ) : null}
+                  </>
+                );
+              })()}
+            </div>
+          ) : null}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setValidationOpen(false);
+                showAttentionRows();
+              }}
+            >
+              Review rejected rows
+            </Button>
+            <Button
+              disabled={!validPrintRows.length}
+              onClick={() => {
+                setValidOnly(true);
+                setValidationOpen(false);
+                setPaperOpen(true);
+              }}
+            >
+              Generate valid rows
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <PaperSetupDialog
         open={paperOpen}
         onOpenChange={setPaperOpen}
-        doc={doc}
+        doc={layoutDoc ?? doc}
         labelCount={printRows.length}
         busy={busy}
         onConfirm={(action, current, sheet) => void confirmPaper(action, current, sheet)}

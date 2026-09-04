@@ -1,6 +1,7 @@
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
 import type { ActivityEvent } from "./activity";
 import type { LabelDocument } from "./document";
+import type { LabelJob, Organization, OrganizationMembership, User } from "./domain";
 import type { TemplateFolder } from "./library";
 import type { ColumnMapping, DataRow } from "./resolve";
 
@@ -23,6 +24,13 @@ export type PersistedMeta = {
   deletedFolderIds?: string[];
   savedColors?: string[];
   activity?: ActivityEvent[];
+  organizations?: Organization[];
+  users?: User[];
+  memberships?: OrganizationMembership[];
+  jobs?: LabelJob[];
+  workspaceMigrationRev?: number;
+  currentUserId?: string | null;
+  currentOrganizationId?: string | null;
 };
 
 interface LabelatorDB extends DBSchema {

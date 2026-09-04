@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#E0F7FA"/>
+  <path d="M120 140 h160 l-16 180 H136 z" fill="#4DD0E1"/>
+  <path d="M150 140 q50 -80 100 0" fill="none" stroke="#00838F" stroke-width="12"/>
+  <text x="200" y="372" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, sans-serif" font-size="22" font-weight="600" fill="#006064">Tote</text>
+</svg>

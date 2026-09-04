@@ -15,14 +15,18 @@ import {
 import { PageSizeFields } from "@/components/page-size-fields";
 import { Input } from "@/components/ui/input";
 import { clampPageMm, pageSizeCaption, type LabelDocument } from "@/lib/document";
+import { foldersInOrganization } from "@/lib/library";
+import { visibleTemplates } from "@/lib/template-library";
 import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Check, ChevronDown, Pencil, Ratio } from "lucide-react";
 import { useMemo, useState } from "react";
 
 export function TemplateNavigator({ document: doc }: { document: LabelDocument }) {
-  const documents = useAppStore((s) => s.documents);
-  const folders = useAppStore((s) => s.folders);
+  const documentsAll = useAppStore((s) => s.documents);
+  const foldersAll = useAppStore((s) => s.folders);
+  const orgId = useAppStore((s) => s.currentOrganizationId);
+  const role = useAppStore((s) => s.role());
   const openDocument = useAppStore((s) => s.openDocument);
   const renameDocument = useAppStore((s) => s.renameDocument);
   const setPageSize = useAppStore((s) => s.setPageSize);
@@ -32,6 +36,8 @@ export function TemplateNavigator({ document: doc }: { document: LabelDocument }
   const [sizeOpen, setSizeOpen] = useState(false);
   const [widthMm, setWidthMm] = useState(doc.page.widthMm);
   const [heightMm, setHeightMm] = useState(doc.page.heightMm);
+  const documents = useMemo(() => visibleTemplates(documentsAll, role, orgId), [documentsAll, orgId, role]);
+  const folders = useMemo(() => foldersInOrganization(foldersAll, orgId), [foldersAll, orgId]);
 
   const grouped = useMemo(() => {
     const q = query.trim().toLowerCase();

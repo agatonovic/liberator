@@ -42,3 +42,7 @@ next-env.d.ts
 
 # copied into public/ during the GitHub Pages build
 /public/library.json
+
+# local Pilot SQLite (Node / cloud mode)
+/data/labelator.db
+/data/labelator.db-journal

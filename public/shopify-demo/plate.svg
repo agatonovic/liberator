@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#FAFAFA"/>
+  <circle cx="200" cy="200" r="120" fill="#EEEEEE" stroke="#BDBDBD" stroke-width="10"/>
+  <circle cx="200" cy="200" r="70" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="6"/>
+  <text x="200" y="372" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, sans-serif" font-size="22" font-weight="600" fill="#424242">Plate</text>
+</svg>

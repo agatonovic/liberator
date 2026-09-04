@@ -2,6 +2,7 @@ import { create } from "zustand";
 import {
   deleteAssetMedia,
   loadAssetLibrary,
+  markAssetWorkspaceMigrated,
   markPackagingSeeded,
   putAssetBlob,
   putAssetThumb,
@@ -21,6 +22,8 @@ import {
 } from "./assets";
 import { createId } from "./ids";
 import { publicPath } from "./public-path";
+import { STELLANTIS_ORG_ID, WORKSPACE_MIGRATION_REV } from "./domain";
+import { useAppStore } from "./store";
 
 export type AssetStore = {
   hydrated: boolean;
@@ -36,6 +39,23 @@ export type AssetStore = {
   moveAsset: (id: string, folderId: string) => void;
   deleteAssets: (ids: string[]) => Promise<void>;
 };
+
+function currentOrgId() {
+  return useAppStore.getState().currentOrganizationId ?? STELLANTIS_ORG_ID;
+}
+
+function recordAssetActivity(
+  type: "asset_uploaded" | "asset_deleted",
+  name: string,
+  count = 1,
+) {
+  useAppStore.getState().recordActivity({
+    type,
+    templateId: currentOrgId(),
+    templateName: name,
+    labelCount: count,
+  });
+}
 
 let persistTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -93,7 +113,7 @@ async function seedPackaging(existing: AssetRecord[], folders: AssetFolder[]) {
     const now = new Date().toISOString();
     const nextFolders = folders.some((folder) => folder.id === PACKAGING_FOLDER_ID)
       ? folders
-      : [...folders, { id: PACKAGING_FOLDER_ID, name: "packaging", createdAt: now }];
+      : [...folders, { id: PACKAGING_FOLDER_ID, name: "packaging", createdAt: now, organizationId: STELLANTIS_ORG_ID }];
     const have = new Map(existing.map((asset) => [asset.id, asset]));
     const seeded = files.map((name) => {
       const stem = assetLookupKey(name);
@@ -107,6 +127,7 @@ async function seedPackaging(existing: AssetRecord[], folders: AssetFolder[]) {
         kind: "static" as const,
         url: publicPath(`/assets/packaging/${encodeURIComponent(name)}`),
         createdAt: now,
+        organizationId: STELLANTIS_ORG_ID,
       };
     });
     const byId = new Map(seeded.map((asset) => [asset.id, asset]));
@@ -141,17 +162,28 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
     for (const item of stored.thumbs) thumbs[item.id] = rememberObjectUrl(`thumb:${item.id}`, item.blob);
     for (const item of stored.blobs) rememberObjectUrl(item.id, item.blob);
     const seeded = await seedPackaging(stored.assets, stored.folders);
-    const seededPackaging = seeded.folders.some((folder) => folder.id === PACKAGING_FOLDER_ID);
+    let folders = seeded.folders;
+    let assets = seeded.assets;
+    if (stored.workspaceMigrationRev < WORKSPACE_MIGRATION_REV) {
+      folders = folders.map((folder) =>
+        folder.organizationId ? folder : { ...folder, organizationId: STELLANTIS_ORG_ID },
+      );
+      assets = assets.map((asset) =>
+        asset.organizationId ? asset : { ...asset, organizationId: STELLANTIS_ORG_ID },
+      );
+      await markAssetWorkspaceMigrated(WORKSPACE_MIGRATION_REV);
+    }
+    const seededPackaging = folders.some((folder) => folder.id === PACKAGING_FOLDER_ID);
     if (seededPackaging) {
       await markPackagingSeeded();
-      if (seeded.assets !== stored.assets || seeded.folders !== stored.folders) {
-        await Promise.all([saveAssetFolders(seeded.folders), saveAssetRecords(seeded.assets)]);
+      if (seeded.assets !== stored.assets || seeded.folders !== stored.folders || stored.workspaceMigrationRev < WORKSPACE_MIGRATION_REV) {
+        await Promise.all([saveAssetFolders(folders), saveAssetRecords(assets)]);
       }
     }
     set({
       hydrated: true,
-      folders: seeded.folders,
-      assets: seeded.assets,
+      folders,
+      assets,
       thumbUrls: thumbs,
     });
   },
@@ -164,6 +196,7 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
       name: name.trim() || "Untitled folder",
       parentId: parent && get().folders.some((item) => item.id === parent) ? parent : undefined,
       createdAt: new Date().toISOString(),
+      organizationId: currentOrgId(),
     };
     set((state) => ({ folders: [...state.folders, folder] }));
     persistMeta();
@@ -193,6 +226,9 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
       thumbUrls: Object.fromEntries(Object.entries(state.thumbUrls).filter(([key]) => !removed.some((asset) => asset.id === key))),
     }));
     persistMeta();
+    if (removed.length) {
+      recordAssetActivity("asset_deleted", removed.length === 1 ? removed[0].name : `${removed.length} assets`, removed.length);
+    }
   },
 
   uploadFiles: async (folderId, files) => {
@@ -214,6 +250,7 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
         width: size?.width,
         height: size?.height,
         createdAt: new Date().toISOString(),
+        organizationId: currentOrgId(),
       };
       rememberObjectUrl(id, file);
       await putAssetBlob(id, file);
@@ -229,6 +266,13 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
       thumbUrls: { ...state.thumbUrls, ...thumbs },
     }));
     persistMeta();
+    if (added.length) {
+      recordAssetActivity(
+        "asset_uploaded",
+        added.length === 1 ? added[0].name : `${added.length} assets`,
+        added.length,
+      );
+    }
     return added.length;
   },
 
@@ -263,5 +307,8 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
       thumbUrls: Object.fromEntries(Object.entries(state.thumbUrls).filter(([key]) => !remove.has(key))),
     }));
     persistMeta();
+    if (gone.length) {
+      recordAssetActivity("asset_deleted", gone.length === 1 ? gone[0].name : `${gone.length} assets`, gone.length);
+    }
   },
 }));

@@ -13,12 +13,24 @@ export function snapshotTemplate(doc: LabelDocument): TemplateVersionSnapshot {
   };
 }
 
-export function makeTemplateVersion(doc: LabelDocument, name = ""): TemplateVersion {
+export function nextVersionNumber(versions: TemplateVersion[] | undefined) {
+  return Math.max(0, ...(versions ?? []).map((item) => item.number ?? 0)) + 1;
+}
+
+export function makeTemplateVersion(
+  doc: LabelDocument,
+  name = "",
+  extras?: { createdBy?: string; status?: TemplateVersion["status"] },
+): TemplateVersion {
+  const number = nextVersionNumber(doc.versions);
   return {
     id: createId(),
-    name: name.trim(),
+    name: name.trim() || `v${number}`,
     createdAt: new Date().toISOString(),
     snapshot: snapshotTemplate(doc),
+    number,
+    status: extras?.status ?? "draft",
+    createdBy: extras?.createdBy,
   };
 }
 

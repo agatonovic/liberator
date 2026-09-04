@@ -1,6 +1,7 @@
 import { looksLikeGroupedPartNumber, parseArrow } from "./format";
 import { createId } from "./ids";
 import { formatMm, roundMm } from "./units";
+import type { TemplateStatus } from "./domain";
 
 export const DOCUMENT_VERSION = 1;
 
@@ -221,6 +222,12 @@ export type LabelDocument = {
   lastUsedAt?: string;
   lastGeneratedAt?: string;
   versions?: TemplateVersion[];
+  organizationId?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  status?: TemplateStatus;
+  versionNumber?: number;
+  publishedVersionId?: string;
 };
 
 /** Point-in-time copy of a template layout. Nested versions are never stored. */
@@ -234,6 +241,9 @@ export type TemplateVersion = {
   name: string;
   createdAt: string;
   snapshot: TemplateVersionSnapshot;
+  number?: number;
+  status?: "draft" | "published";
+  createdBy?: string;
 };
 
 export type PagePreset = {
@@ -660,6 +670,8 @@ export function createDocument(
     updatedAt: new Date().toISOString(),
     page,
     elements: [],
+    status: "draft",
+    versionNumber: 1,
   };
 }
 

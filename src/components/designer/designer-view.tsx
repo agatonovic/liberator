@@ -13,10 +13,12 @@ import { schemaColumns } from "@/lib/excel";
 import { designerPreviewRow, identityMapping } from "@/lib/grid";
 import { clipboardImageFiles, fileToImageDataUrl, placedImageBox } from "@/lib/image";
 import { useAppStore } from "@/lib/store";
+import { canEditTemplates } from "@/lib/roles";
 import { toolFromShortcut } from "@/lib/tool-shortcuts";
 import { pxToMm } from "@/lib/units";
 import { Maximize2, Redo2, Undo2, ZoomIn, ZoomOut } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -46,6 +48,8 @@ export function DesignerView() {
   const hydrated = useAppStore((s) => s.hydrated);
   const documents = useAppStore((s) => s.documents);
   const currentId = useAppStore((s) => s.currentId);
+  const role = useAppStore((s) => s.role());
+  const router = useRouter();
   const selectedIds = useAppStore((s) => s.selectedIds);
   const tool = useAppStore((s) => s.tool);
   const zoom = useAppStore((s) => s.zoom);
@@ -452,6 +456,15 @@ export function DesignerView() {
 
   if (!hydrated) {
     return <div className="flex h-full items-center justify-center text-sm text-muted-foreground">Loading…</div>;
+  }
+
+  if (role && !canEditTemplates(role)) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
+        <p className="text-sm text-muted-foreground">Operators can generate published labels, not edit templates.</p>
+        <Button onClick={() => router.push("/generate")}>Go to Generate</Button>
+      </div>
+    );
   }
 
   if (!doc) {

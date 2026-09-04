@@ -34,14 +34,16 @@ export async function loadAssetLibrary(): Promise<{
   blobs: { id: string; blob: Blob }[];
   thumbs: { id: string; blob: Blob }[];
   packagingSeeded: boolean;
+  workspaceMigrationRev: number;
 }> {
   const database = await db();
-  const [folders, assets, blobKeys, thumbKeys, packagingSeeded] = await Promise.all([
+  const [folders, assets, blobKeys, thumbKeys, packagingSeeded, workspaceMigrationRev] = await Promise.all([
     database.getAll("folders"),
     database.getAll("assets"),
     database.getAllKeys("blobs"),
     database.getAllKeys("thumbs"),
     database.get("kv", "packagingSeeded"),
+    database.get("kv", "workspaceMigrationRev"),
   ]);
   const blobs: { id: string; blob: Blob }[] = [];
   for (const key of blobKeys) {
@@ -59,6 +61,7 @@ export async function loadAssetLibrary(): Promise<{
     blobs,
     thumbs,
     packagingSeeded: Boolean(packagingSeeded),
+    workspaceMigrationRev: Number(workspaceMigrationRev) || 0,
   };
 }
 
@@ -107,4 +110,9 @@ export async function deleteAssetMedia(id: string) {
 export async function markPackagingSeeded() {
   const database = await db();
   await database.put("kv", true, "packagingSeeded");
+}
+
+export async function markAssetWorkspaceMigrated(rev: number) {
+  const database = await db();
+  await database.put("kv", rev, "workspaceMigrationRev");
 }

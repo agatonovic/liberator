@@ -9,7 +9,6 @@ import {
   documentBindings,
   expandGroupSelection,
   isPaintColor,
-  normalizeImportedDocument,
   repairTemplateDocument,
   packGroupedElements,
   remapPastedGroups,
@@ -19,6 +18,7 @@ import {
   type LabelElement,
   type SheetLayout,
 } from "./document";
+import { normalizeImportedTemplateJson } from "./template-json";
 import {
   deleteStoredDocument,
   EMPTY_DATA,
@@ -35,16 +35,20 @@ import {
   type ActivityDraft,
   type ActivityEvent,
 } from "./activity";
+import { STELLANTIS_ORG_ID, DEMO_ADMIN_ID, type LabelJob, type LabelJobOutput, type LabelJobSource, type Organization, type OrganizationMembership, type Role, type SessionSnapshot, type User } from "./domain";
+import { makeLabelJob } from "./jobs";
+import { canArchiveTemplates, canEditTemplates, canManageUsers, canPublishTemplates } from "./roles";
+import { demoSession } from "./session";
 import { MAX_SAVED_COLORS, mergeSavedColors, normalizeHex } from "./color";
 import { elementAabb } from "./guides";
-import { parseWorkbook, schemaColumns } from "./excel";
+import { schemaColumns } from "./excel";
+import { loadExcelLabelData } from "./data/excel-provider";
 import {
   filledRowIndexes,
   gridForTemplate,
   headerForColumn,
   looksLikeHeaderRow,
   parseSpreadsheetPaste,
-  projectRowsOntoSchema,
   sameTemplateGrid,
   templateGrid,
   tileClipboard,
@@ -53,20 +57,13 @@ import { createId } from "./ids";
 import { publicPath } from "./public-path";
 import {
   MY_TEMPLATES_FOLDER_ID,
-  collapseCatalogDuplicates,
-  excludeDeletedDocuments,
-  excludeDeletedFolders,
   folderIdFromName,
-  inferDeletedDefaultFolders,
-  mergeDocuments,
-  mergeFolders,
   mergeIdLists,
   consumePublishedLibraryStamp,
   publishedLibraryStamp,
-  restoreOrphanedTemplates,
-  seedTemplateLibrary,
   type TemplateFolder,
 } from "./library";
+import { assembleHydratedLibrary } from "./library-hydrate";
 import { autoMapBindings, type ColumnMapping } from "./resolve";
 import { clampZoom, fitZoom, mmToPx, panAfterZoom, roundMm } from "./units";
 import {
@@ -76,6 +73,15 @@ import {
   prependVersion,
   stripDocumentVersions,
 } from "./versions";
+import { stampLegacyOrganizationIds } from "./workspace-scope";
+import {
+  archiveDocument as archiveWorkspaceDocument,
+  migrateWorkspace,
+  publishDocument as publishWorkspaceDocument,
+  recordCompletedJob,
+  workingCopyOnEdit,
+  adminCount,
+} from "./workspace";
 
 export type Tool = "select" | ElementType;
 export type ColorSampleProperty = "fill" | "stroke" | "background";
@@ -105,8 +111,17 @@ type AppState = {
   templateGrids: Record<string, PersistedData>;
   savedColors: string[];
   activity: ActivityEvent[];
+  organizations: Organization[];
+  users: User[];
+  memberships: OrganizationMembership[];
+  jobs: LabelJob[];
+  workspaceMigrationRev: number;
+  currentOrganizationId: string | null;
+  currentUserId: string | null;
   hydrate: () => Promise<void>;
   current: () => LabelDocument | null;
+  session: () => SessionSnapshot | null;
+  role: () => SessionSnapshot["membership"]["role"] | null;
   createBlank: (page?: { widthMm: number; heightMm: number }, name?: string, folderId?: string) => string;
   createFromCatalog: (catalogId: string) => string;
   openDocument: (id: string) => void;
@@ -190,6 +205,30 @@ type AppState = {
   addGridRows: (count?: number) => void;
   clearData: () => void;
   importDocument: (raw: unknown) => void;
+  publishCurrent: () => boolean;
+  archiveDocument: (id: string) => boolean;
+  completeLabelJob: (input: {
+    templateId: string;
+    templateName: string;
+    templateVersionId: string;
+    templateVersionNumber: number;
+    quantity: number;
+    sourceType: LabelJobSource;
+    action: "print" | "download";
+    fileName?: string;
+    pageSize?: string;
+    rowCount?: number;
+    successCount?: number;
+    failedCount?: number;
+    error?: string;
+    status?: "completed" | "failed";
+    organizationId?: string;
+  }) => void;
+  setCurrentUser: (userId: string) => boolean;
+  updateOrganization: (patch: { name?: string; description?: string; companyName?: string }) => boolean;
+  addMember: (input: { name: string; email: string; role: Role }) => string | null;
+  updateMemberRole: (membershipId: string, role: Role) => boolean;
+  removeMember: (membershipId: string) => boolean;
   saveState: "saved" | "pending" | "saving";
   saveNow: () => Promise<void>;
 };
@@ -309,7 +348,7 @@ async function fetchRemoteLibrary(): Promise<RemoteLibrary | null> {
     : ["/api/library", "/library.json"];
   for (const path of paths) {
     try {
-      const res = await fetch(publicPath(path));
+      const res = await fetch(publicPath(path), { signal: AbortSignal.timeout(8000) });
       if (!res.ok) continue;
       const json = (await res.json()) as RemoteLibrary | null;
       if (json && Array.isArray(json.documents) && Array.isArray(json.folders)) return json;
@@ -340,34 +379,23 @@ function persistMeta(state: AppState) {
     deletedFolderIds: state.deletedFolderIds,
     savedColors: state.savedColors,
     activity: state.activity,
+    organizations: state.organizations,
+    users: state.users,
+    memberships: state.memberships,
+    jobs: state.jobs,
+    workspaceMigrationRev: state.workspaceMigrationRev,
+    currentUserId: state.currentUserId,
+    currentOrganizationId: state.currentOrganizationId,
   };
 }
 
+/**
+ * Phase 3: do not autosave the working IndexedDB library onto `data/library.json`.
+ * That file is the committed Industrial seed/recovery snapshot. Designer edits stay in IDB.
+ * `/api/library` PUT remains available for explicit tooling and uses a geometry-preserving merge.
+ */
 async function writeLibraryBackup() {
-  const latest = useAppStore.getState();
-  if (!latest.hydrated) return;
-  if (!latest.documents.length && !latest.deletedIds.length) return;
-  try {
-    await fetch(publicPath("/api/library"), {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        documents: latest.documents,
-        folders: latest.folders,
-        currentId: latest.currentId,
-        data: latest.data,
-        templateGrids: latest.templateGrids,
-        librarySeeded: true,
-        deletedIds: latest.deletedIds,
-        deletedCatalogIds: latest.deletedCatalogIds,
-        deletedFolderIds: latest.deletedFolderIds,
-        savedColors: latest.savedColors,
-        activity: latest.activity,
-      }),
-    });
-  } catch {
-    /* disk backup is best-effort */
-  }
+  return;
 }
 
 function persist(_state?: unknown) {
@@ -497,12 +525,48 @@ function withDataHistory(state: AppState, data: PersistedData): Partial<AppState
   };
 }
 
+function actorOf(state: { currentUserId: string | null }) {
+  return state.currentUserId || DEMO_ADMIN_ID;
+}
+
+let sessionCache: SessionSnapshot | null = null;
+
+function sessionOf(state: {
+  users: User[];
+  organizations: Organization[];
+  memberships: OrganizationMembership[];
+  currentUserId: string | null;
+  currentOrganizationId: string | null;
+}): SessionSnapshot | null {
+  const user = state.users.find((item) => item.id === state.currentUserId) ?? state.users[0];
+  const organization =
+    state.organizations.find((item) => item.id === state.currentOrganizationId) ?? state.organizations[0];
+  const next: SessionSnapshot = (() => {
+    if (!user || !organization) return demoSession();
+    const membership =
+      state.memberships.find((item) => item.userId === user.id && item.organizationId === organization.id) ??
+      state.memberships.find((item) => item.userId === user.id);
+    if (!membership) return { ...demoSession(), user, organization };
+    return { user, organization, membership };
+  })();
+  if (
+    sessionCache &&
+    sessionCache.user === next.user &&
+    sessionCache.organization === next.organization &&
+    sessionCache.membership === next.membership
+  ) {
+    return sessionCache;
+  }
+  sessionCache = next;
+  return next;
+}
+
 function withHistory(state: AppState, nextDoc: LabelDocument): Partial<AppState> {
   const current = state.documents.find((d) => d.id === state.currentId);
   const past = current
     ? [...state.past, stripDocumentVersions(cloneDocument(current))].slice(-HISTORY_LIMIT)
     : state.past;
-  const updated = { ...nextDoc, updatedAt: new Date().toISOString() };
+  const updated = workingCopyOnEdit(nextDoc, actorOf(state));
   return {
     past,
     future: [],
@@ -541,12 +605,23 @@ export const useAppStore = create<AppState>((set, get) => ({
   templateGrids: {},
   savedColors: [],
   activity: [],
+  organizations: [],
+  users: [],
+  memberships: [],
+  jobs: [],
+  workspaceMigrationRev: 0,
+  currentOrganizationId: null,
+  currentUserId: null,
   saveState: "saved",
 
   current: () => {
     const { documents, currentId } = get();
     return documents.find((d) => d.id === currentId) ?? null;
   },
+
+  session: () => sessionOf(get()),
+
+  role: () => sessionOf(get())?.membership.role ?? null,
 
   hydrate: async () => {
     if (get().hydrated) {
@@ -580,35 +655,18 @@ export const useAppStore = create<AppState>((set, get) => ({
         activity: remote.activity,
       };
     }
-    let deletedIds = mergeIdLists(meta?.deletedIds, remote?.deletedIds);
-    let deletedCatalogIds = mergeIdLists(meta?.deletedCatalogIds, remote?.deletedCatalogIds);
-    const mergedDocs = excludeDeletedDocuments(
-      mergeDocuments(stored, remote?.documents ?? []),
-      deletedIds,
-      deletedCatalogIds,
-    );
-    const alreadySeeded = Boolean(meta?.librarySeeded || remote?.librarySeeded || mergedDocs.length);
-    let deletedFolderIds = mergeIdLists(
-      meta?.deletedFolderIds,
-      remote?.deletedFolderIds,
-      inferDeletedDefaultFolders(meta?.folders ?? remote?.folders, alreadySeeded),
-    );
-    const mergedFolders = excludeDeletedFolders(
-      mergeFolders(meta?.folders ?? [], remote?.folders ?? []),
-      deletedFolderIds,
-    );
-    const seeded = seedTemplateLibrary(mergedDocs, mergedFolders, alreadySeeded, deletedFolderIds);
-    let documents = excludeDeletedDocuments(seeded.documents, deletedIds, deletedCatalogIds);
-    const restoreKey = "labelator.stellantis-restore-v1";
-    const alreadyRestored = typeof window !== "undefined" && window.localStorage.getItem(restoreKey);
-    if (!alreadyRestored) {
-      const restored = restoreOrphanedTemplates(documents, seeded.folders);
-      if (restored !== documents) documents = restored;
-      window.localStorage.setItem(restoreKey, "1");
-    }
-    const collapsed = collapseCatalogDuplicates(documents);
-    documents = collapsed.documents.map((doc) => repairTemplateDocument(doc));
-    if (collapsed.droppedIds.length) deletedIds = mergeIdLists(deletedIds, collapsed.droppedIds);
+    const assembled = assembleHydratedLibrary({
+      stored,
+      remote,
+      meta,
+      restoreOrphans: typeof window !== "undefined",
+    });
+    const documents = assembled.documents;
+    const folders = assembled.folders;
+    const deletedIds = assembled.deletedIds;
+    const deletedCatalogIds = assembled.deletedCatalogIds;
+    const deletedFolderIds = assembled.deletedFolderIds;
+    const workspace = assembled.workspace;
     const currentId =
       (meta?.currentId && documents.some((d) => d.id === meta.currentId) && meta.currentId) ||
       (remote?.currentId && documents.some((d) => d.id === remote.currentId) && remote.currentId) ||
@@ -627,10 +685,28 @@ export const useAppStore = create<AppState>((set, get) => ({
       templateGrids[currentDoc.id] = data;
     }
     const clipped = readStoredClipboard();
+    const activity = stampLegacyOrganizationIds(
+      mergeActivity(meta?.activity, remote?.activity).map((event) =>
+        event.organizationId ? event : { ...event, organizationId: STELLANTIS_ORG_ID },
+      ),
+    );
+    const restoredOrgId = meta?.currentOrganizationId;
+    const orgId =
+      (restoredOrgId && workspace.organizations.some((item) => item.id === restoredOrgId)
+        ? restoredOrgId
+        : undefined) ??
+      workspace.organizations.find((item) => item.id === STELLANTIS_ORG_ID)?.id ??
+      workspace.organizations[0]?.id ??
+      STELLANTIS_ORG_ID;
+    const restoredUserId = meta?.currentUserId;
+    const currentUserId =
+      (restoredUserId && workspace.users.some((user) => user.id === restoredUserId)
+        ? restoredUserId
+        : workspace.users[0]?.id) ?? DEMO_ADMIN_ID;
     set({
       hydrated: true,
       documents,
-      folders: seeded.folders,
+      folders,
       deletedIds,
       deletedCatalogIds,
       deletedFolderIds,
@@ -640,16 +716,47 @@ export const useAppStore = create<AppState>((set, get) => ({
       clipboard: clipped?.elements ?? [],
       clipboardSourceId: clipped?.sourceId ?? null,
       savedColors: mergeSavedColors(meta?.savedColors, remote?.savedColors),
-      activity: mergeActivity(meta?.activity, remote?.activity),
+      activity,
+      organizations: workspace.organizations,
+      users: workspace.users,
+      memberships: workspace.memberships,
+      jobs: workspace.jobs,
+      workspaceMigrationRev: workspace.workspaceMigrationRev,
+      currentOrganizationId: orgId,
+      currentUserId,
     });
     persist();
   },
 
   createBlank: (page, name, folderId) => {
+    const session = get().session();
     const doc = createDocument(name, page);
     doc.folderId = folderId || get().folders.find((folder) => folder.id === MY_TEMPLATES_FOLDER_ID)?.id || get().folders[0]?.id;
+    doc.organizationId = session?.organization.id ?? get().currentOrganizationId ?? STELLANTIS_ORG_ID;
+    doc.createdBy = session?.user.id ?? get().currentUserId ?? DEMO_ADMIN_ID;
+    doc.updatedBy = doc.createdBy;
+    doc.status = "draft";
+    doc.versionNumber = 1;
     set((state) => {
-      const next = { documents: [doc, ...state.documents], currentId: doc.id, selectedIds: [], past: [], future: [] };
+      const activity = prependActivity(
+        state.activity,
+        makeActivityEvent({
+          type: "template_created",
+          templateId: doc.id,
+          templateName: doc.name,
+          organizationId: doc.organizationId,
+          userId: doc.createdBy,
+          userName: session?.user.name,
+        }),
+      );
+      const next = {
+        documents: [doc, ...state.documents],
+        currentId: doc.id,
+        selectedIds: [],
+        past: [],
+        future: [],
+        activity,
+      };
       persist({ ...state, ...next });
       return next;
     });
@@ -664,6 +771,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       (fromGroup && get().folders.some((folder) => folder.id === fromGroup) ? fromGroup : undefined) ||
       get().folders.find((folder) => folder.id === MY_TEMPLATES_FOLDER_ID)?.id ||
       get().folders[0]?.id;
+    doc.organizationId = get().currentOrganizationId ?? STELLANTIS_ORG_ID;
+    doc.createdBy = get().currentUserId ?? DEMO_ADMIN_ID;
+    doc.status = "draft";
+    doc.versionNumber = 1;
     set((state) => {
       const next = {
         documents: [doc, ...state.documents],
@@ -715,6 +826,12 @@ export const useAppStore = create<AppState>((set, get) => ({
     copy.lastUsedAt = undefined;
     copy.lastGeneratedAt = undefined;
     copy.versions = undefined;
+    copy.status = "draft";
+    copy.versionNumber = 1;
+    copy.publishedVersionId = undefined;
+    copy.organizationId = source.organizationId ?? get().currentOrganizationId ?? STELLANTIS_ORG_ID;
+    copy.createdBy = get().currentUserId ?? DEMO_ADMIN_ID;
+    copy.updatedBy = copy.createdBy;
     set((state) => {
       const next = { documents: [copy, ...state.documents], currentId: copy.id, selectedIds: [], past: [], future: [] };
       persist({ ...state, ...next });
@@ -761,7 +878,13 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   recordActivity: (draft) => {
-    const event = makeActivityEvent(draft);
+    const session = get().session();
+    const event = makeActivityEvent({
+      ...draft,
+      organizationId: draft.organizationId ?? session?.organization.id,
+      userId: draft.userId ?? session?.user.id,
+      userName: draft.userName ?? session?.user.name,
+    });
     set((state) => {
       const activity = prependActivity(state.activity, event);
       persist();
@@ -796,13 +919,27 @@ export const useAppStore = create<AppState>((set, get) => ({
   saveVersion: (name) => {
     const current = get().current();
     if (!current) return null;
-    const version = makeTemplateVersion(current, name);
+    const role = get().role();
+    if (role && !canEditTemplates(role)) return null;
+    const version = makeTemplateVersion(current, name, { createdBy: actorOf(get()) });
     set((state) => {
       const documents = state.documents.map((doc) =>
         doc.id === current.id ? { ...doc, versions: prependVersion(doc.versions, version) } : doc,
       );
+      const activity = prependActivity(
+        state.activity,
+        makeActivityEvent({
+          type: "version_created",
+          templateId: current.id,
+          templateName: current.name,
+          versionNumber: version.number,
+          organizationId: current.organizationId,
+          userId: actorOf(state),
+          userName: sessionOf(state)?.user.name,
+        }),
+      );
       persist();
-      return { documents };
+      return { documents, activity };
     });
     return version.id;
   },
@@ -892,7 +1029,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   createFolder: (name) => {
-    const folder: TemplateFolder = { id: createId(), name: name.trim() || "Untitled folder" };
+    const folder: TemplateFolder = {
+      id: createId(),
+      name: name.trim() || "Untitled folder",
+      organizationId: get().currentOrganizationId ?? STELLANTIS_ORG_ID,
+    };
     set((state) => {
       const folders = [...state.folders, folder];
       persist({ ...state, folders });
@@ -1509,19 +1650,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   loadWorkbook: async (file) => {
-    const parsed = await parseWorkbook(file);
     const doc = get().current();
-    const bindings = doc ? documentBindings(doc) : [];
-    const mapping = autoMapBindings(bindings, parsed.headers, doc?.dataColumns);
+    const loaded = await loadExcelLabelData(file, doc);
     set((state) => {
-      const projected = doc
-        ? projectRowsOntoSchema(doc, parsed.headers, parsed.rows, mapping)
-        : { headers: parsed.headers, rows: parsed.rows, mapping };
       const data: PersistedData = {
-        fileName: parsed.fileName,
-        headers: projected.headers,
-        rows: projected.rows,
-        mapping: projected.mapping,
+        fileName: loaded.fileName ?? file.name,
+        headers: loaded.headers,
+        rows: loaded.rows,
+        mapping: loaded.mapping,
         previewRowIndex: 0,
       };
       const next = withDataHistory(state, data);
@@ -1670,14 +1806,294 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   importDocument: (raw) => {
-    const doc = normalizeImportedDocument(raw);
+    const doc = normalizeImportedTemplateJson(raw);
     doc.folderId =
       get().folders.find((folder) => folder.id === MY_TEMPLATES_FOLDER_ID)?.id || get().folders[0]?.id;
+    doc.organizationId = get().currentOrganizationId ?? STELLANTIS_ORG_ID;
+    doc.createdBy = get().currentUserId ?? DEMO_ADMIN_ID;
+    doc.status = doc.status ?? "draft";
     set((state) => {
       const next = { documents: [doc, ...state.documents], currentId: doc.id, selectedIds: [], past: [], future: [] };
       persist({ ...state, ...next });
       return next;
     });
+  },
+
+  publishCurrent: () => {
+    const current = get().current();
+    const role = get().role();
+    if (!current || (role && !canPublishTemplates(role))) return false;
+    const actor = actorOf(get());
+    const published = publishWorkspaceDocument(current, actor);
+    set((state) => {
+      const documents = state.documents.map((doc) => (doc.id === current.id ? published : doc));
+      const activity = prependActivity(
+        state.activity,
+        makeActivityEvent({
+          type: "published",
+          templateId: current.id,
+          templateName: current.name,
+          versionNumber: published.versionNumber,
+          organizationId: published.organizationId,
+          userId: actor,
+          userName: sessionOf(state)?.user.name,
+        }),
+      );
+      persist();
+      return { documents, activity };
+    });
+    return true;
+  },
+
+  archiveDocument: (id) => {
+    const role = get().role();
+    if (role && !canArchiveTemplates(role)) return false;
+    const actor = actorOf(get());
+    let archivedName = "";
+    set((state) => {
+      const target = state.documents.find((doc) => doc.id === id);
+      if (!target) return state;
+      archivedName = target.name;
+      const documents = state.documents.map((doc) =>
+        doc.id === id ? archiveWorkspaceDocument(doc, actor) : doc,
+      );
+      const activity = prependActivity(
+        state.activity,
+        makeActivityEvent({
+          type: "archived",
+          templateId: id,
+          templateName: archivedName,
+          organizationId: target.organizationId,
+          userId: actor,
+          userName: sessionOf(state)?.user.name,
+        }),
+      );
+      persist();
+      return { documents, activity };
+    });
+    return Boolean(archivedName);
+  },
+
+  completeLabelJob: (input) => {
+    const session = get().session();
+    if (!session) return;
+    const failed = input.status === "failed";
+    const successCount = failed ? 0 : Math.max(0, input.successCount ?? input.quantity);
+    const failedCount = Math.max(0, input.failedCount ?? (failed ? input.quantity : 0));
+    const outputType: LabelJobOutput = input.action === "print" ? "print" : "pdf";
+    const organizationId = input.organizationId ?? session.organization.id;
+    const job = makeLabelJob({
+      organizationId,
+      templateId: input.templateId,
+      templateName: input.templateName,
+      templateVersionId: input.templateVersionId,
+      templateVersionNumber: input.templateVersionNumber,
+      createdBy: session.user.id,
+      createdByName: session.user.name,
+      quantity: successCount,
+      sourceType: input.sourceType,
+      status: failed ? "failed" : "completed",
+      fileName: input.fileName,
+      pageSize: input.pageSize,
+      error: input.error,
+      rowCount: input.rowCount,
+      successCount,
+      failedCount,
+      outputType,
+    });
+    set((state) => {
+      const nextWorkspace = recordCompletedJob(
+        {
+          organizations: state.organizations,
+          users: state.users,
+          memberships: state.memberships,
+          jobs: state.jobs,
+          workspaceMigrationRev: state.workspaceMigrationRev,
+        },
+        job,
+      );
+      const activity = prependActivity(
+        state.activity,
+        makeActivityEvent({
+          type: failed ? "generate_failed" : input.action === "print" ? "print" : "generate",
+          templateId: input.templateId,
+          templateName: input.templateName,
+          labelCount: successCount,
+          fileName: input.fileName,
+          pageSize: input.pageSize,
+          organizationId,
+          userId: session.user.id,
+          userName: session.user.name,
+          versionNumber: input.templateVersionNumber,
+        }),
+      );
+      persist();
+      return {
+        jobs: nextWorkspace.jobs,
+        organizations: nextWorkspace.organizations,
+        activity,
+      };
+    });
+  },
+
+  setCurrentUser: (userId) => {
+    const state = get();
+    const orgId = state.currentOrganizationId;
+    const user = state.users.find((item) => item.id === userId);
+    const membership = state.memberships.find(
+      (item) => item.userId === userId && (!orgId || item.organizationId === orgId),
+    );
+    if (!user || !membership) return false;
+    set({ currentUserId: userId });
+    persist();
+    return true;
+  },
+
+  updateOrganization: (patch) => {
+    const role = get().role();
+    if (role && !canManageUsers(role)) return false;
+    const orgId = get().currentOrganizationId;
+    if (!orgId) return false;
+    let changed = false;
+    set((state) => {
+      const organizations = state.organizations.map((org) => {
+        if (org.id !== orgId) return org;
+        const name = patch.name?.trim();
+        const next = {
+          ...org,
+          ...(name ? { name } : {}),
+          ...(patch.description !== undefined ? { description: patch.description.trim() } : {}),
+          ...(patch.companyName !== undefined ? { companyName: patch.companyName.trim() } : {}),
+          updatedAt: new Date().toISOString(),
+        };
+        changed = true;
+        return next;
+      });
+      if (!changed) return state;
+      const org = organizations.find((item) => item.id === orgId);
+      const activity = prependActivity(
+        state.activity,
+        makeActivityEvent({
+          type: "workspace_updated",
+          templateId: orgId,
+          templateName: org?.name || "Workspace",
+          organizationId: orgId,
+          userId: actorOf(state),
+          userName: sessionOf(state)?.user.name,
+        }),
+      );
+      persist();
+      return { organizations, activity };
+    });
+    return changed;
+  },
+
+  addMember: (input) => {
+    const role = get().role();
+    if (role && !canManageUsers(role)) return null;
+    const orgId = get().currentOrganizationId;
+    if (!orgId) return null;
+    const email = input.email.trim().toLowerCase();
+    const name = input.name.trim();
+    if (!email || !name) return null;
+    const existing = get().users.find((user) => user.email.toLowerCase() === email);
+    if (existing && get().memberships.some((item) => item.userId === existing.id && item.organizationId === orgId)) {
+      return null;
+    }
+    const now = new Date().toISOString();
+    const user: User = existing ?? {
+      id: createId(),
+      name,
+      email,
+      createdAt: now,
+      updatedAt: now,
+    };
+    const membership: OrganizationMembership = {
+      id: createId(),
+      organizationId: orgId,
+      userId: user.id,
+      role: input.role,
+      createdAt: now,
+    };
+    set((state) => {
+      const users = existing ? state.users.map((item) => (item.id === user.id ? { ...item, name, updatedAt: now } : item)) : [...state.users, user];
+      const memberships = [...state.memberships, membership];
+      const activity = prependActivity(
+        state.activity,
+        makeActivityEvent({
+          type: "member_added",
+          templateId: membership.id,
+          templateName: name,
+          organizationId: orgId,
+          userId: actorOf(state),
+          userName: sessionOf(state)?.user.name,
+        }),
+      );
+      persist();
+      return { users, memberships, activity };
+    });
+    return membership.id;
+  },
+
+  updateMemberRole: (membershipId, nextRole) => {
+    const role = get().role();
+    if (role && !canManageUsers(role)) return false;
+    const orgId = get().currentOrganizationId;
+    if (!orgId) return false;
+    const membership = get().memberships.find((item) => item.id === membershipId);
+    if (!membership || membership.organizationId !== orgId) return false;
+    if (membership.role === "admin" && nextRole !== "admin" && adminCount(get().memberships, orgId) <= 1) {
+      return false;
+    }
+    set((state) => {
+      const memberships = state.memberships.map((item) =>
+        item.id === membershipId ? { ...item, role: nextRole } : item,
+      );
+      const user = state.users.find((item) => item.id === membership.userId);
+      const activity = prependActivity(
+        state.activity,
+        makeActivityEvent({
+          type: "member_updated",
+          templateId: membershipId,
+          templateName: user?.name || "Member",
+          organizationId: orgId,
+          userId: actorOf(state),
+          userName: sessionOf(state)?.user.name,
+        }),
+      );
+      persist();
+      return { memberships, activity };
+    });
+    return true;
+  },
+
+  removeMember: (membershipId) => {
+    const role = get().role();
+    if (role && !canManageUsers(role)) return false;
+    const orgId = get().currentOrganizationId;
+    if (!orgId) return false;
+    const membership = get().memberships.find((item) => item.id === membershipId);
+    if (!membership || membership.organizationId !== orgId) return false;
+    if (membership.userId === get().currentUserId) return false;
+    if (membership.role === "admin" && adminCount(get().memberships, orgId) <= 1) return false;
+    set((state) => {
+      const memberships = state.memberships.filter((item) => item.id !== membershipId);
+      const user = state.users.find((item) => item.id === membership.userId);
+      const activity = prependActivity(
+        state.activity,
+        makeActivityEvent({
+          type: "member_removed",
+          templateId: membershipId,
+          templateName: user?.name || "Member",
+          organizationId: orgId,
+          userId: actorOf(state),
+          userName: sessionOf(state)?.user.name,
+        }),
+      );
+      persist();
+      return { memberships, activity };
+    });
+    return true;
   },
 
   saveNow: async () => {

@@ -5,16 +5,21 @@ import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { navPath } from "@/lib/public-path";
-import { FileOutput, Images, LayoutTemplate, PanelLeftClose, PanelLeftOpen, PenTool } from "lucide-react";
+import { canAccessSettings, canEditTemplates, canManageAssets, roleLabel } from "@/lib/roles";
+import { isCloudMode } from "@/lib/session";
+import { useAppStore } from "@/lib/store";
+import { FileOutput, History, Images, LayoutTemplate, PanelLeftClose, PanelLeftOpen, PenTool, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-const NAV = [
+const ALL_NAV = [
   { href: "/templates", label: "Templates", icon: LayoutTemplate },
   { href: "/generate", label: "Generate", icon: FileOutput },
-  { href: "/designer", label: "Designer", icon: PenTool },
-  { href: "/assets", label: "Assets", icon: Images },
+  { href: "/designer", label: "Designer", icon: PenTool, requiresEdit: true },
+  { href: "/assets", label: "Assets", icon: Images, requiresAssets: true },
+  { href: "/history", label: "History", icon: History },
+  { href: "/settings", label: "Settings", icon: Settings, requiresSettings: true },
 ];
 
 const NAV_OPEN_KEY = "labelator.navOpen";
@@ -41,6 +46,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const current = navPath(pathname);
   const [open, setOpenState] = useState(true);
+  const orgName = useAppStore((s) => s.organizations.find((item) => item.id === s.currentOrganizationId)?.name);
+  const userName = useAppStore(
+    (s) => s.users.find((item) => item.id === s.currentUserId)?.name ?? s.users[0]?.name,
+  );
+  const role = useAppStore((s) => s.role() ?? "admin");
 
   useEffect(() => {
     setOpenState(readNavOpen());
@@ -60,6 +70,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     }),
     [open],
   );
+
+  const nav = ALL_NAV.filter((item) => {
+    if (item.requiresEdit && !canEditTemplates(role)) return false;
+    if (item.requiresAssets && !canManageAssets(role) && role === "operator") return false;
+    if (item.requiresSettings && !canAccessSettings(role)) return false;
+    return true;
+  });
 
   return (
     <NavSidebarContext.Provider value={value}>
@@ -114,7 +131,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             )}
           </div>
           <nav className={cn("flex flex-1 flex-col gap-0.5 pt-2", open ? "px-2" : "items-center px-1")}>
-            {NAV.map((item) => {
+            {nav.map((item) => {
               const active = current === item.href || (item.href === "/generate" && current === "/print");
               const Icon = item.icon;
               const link = (
@@ -144,10 +161,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
           {open ? (
-            <p className="px-5 py-4 text-[11px] leading-relaxed text-muted-foreground">
-              Find a template, add data, generate labels.
-            </p>
-          ) : null}
+            <div className="border-t border-sidebar-border px-4 py-3">
+              <p className="truncate text-[12px] font-medium text-sidebar-foreground">
+                {orgName ?? "Workspace"}
+              </p>
+              <p className="truncate text-[11px] text-muted-foreground">
+                {userName ?? "Demo Admin"} · {roleLabel(role)}
+              </p>
+              {isCloudMode() ? (
+                <Link href="/login" className="mt-1 inline-block text-[11px] text-[#1b4f9c] hover:underline">
+                  Switch account
+                </Link>
+              ) : (
+                <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">Local demo session</p>
+              )}
+            </div>
+          ) : (
+            <Hint label={orgName ?? "Workspace"} side="right">
+              <div className="mx-auto mb-3 size-8 rounded-full bg-sidebar-accent text-center text-[10px] font-semibold leading-8 text-sidebar-accent-foreground">
+                {(userName ?? "D").slice(0, 1)}
+              </div>
+            </Hint>
+          )}
         </aside>
         <main className="min-w-0 flex-1">{children}</main>
       </div>

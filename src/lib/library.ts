@@ -1,15 +1,23 @@
-import { CATALOG, CATALOG_REVISION, buildCatalogDocument } from "./catalog";
+import { CATALOG_REVISION, buildCatalogDocument } from "./catalog";
+import { catalogEntriesForEdition } from "./catalog-registry";
 import type { LabelDocument } from "./document";
+import type { ProductEdition } from "./edition";
 import { createId } from "./ids";
+import { recordsForOrganization } from "./workspace-scope";
 
 export type TemplateFolder = {
   id: string;
   name: string;
   collapsed?: boolean;
+  organizationId?: string;
 };
 
 export const MY_TEMPLATES_FOLDER_ID = "folder_my_templates";
 export const STELLANTIS_KRAGUJEVAC_FOLDER = "Stellantis Kragujevac";
+
+export function foldersInOrganization(folders: TemplateFolder[], organizationId?: string | null) {
+  return recordsForOrganization(folders, organizationId);
+}
 
 export function folderIdFromName(name: string) {
   const slug = name
@@ -20,10 +28,10 @@ export function folderIdFromName(name: string) {
   return slug ? `folder_${slug}` : `folder_${createId()}`;
 }
 
-export function defaultFolders(): TemplateFolder[] {
+export function defaultFolders(edition: ProductEdition = "industrial"): TemplateFolder[] {
   const seen = new Set<string>();
   const folders: TemplateFolder[] = [];
-  for (const entry of CATALOG) {
+  for (const entry of catalogEntriesForEdition(edition)) {
     const id = folderIdFromName(entry.group);
     if (seen.has(id)) continue;
     seen.add(id);
@@ -236,13 +244,16 @@ export function seedTemplateLibrary(
   folders: TemplateFolder[] | undefined,
   alreadySeeded: boolean | undefined,
   deletedFolderIds?: string[],
+  edition: ProductEdition = "industrial",
 ): { documents: LabelDocument[]; folders: TemplateFolder[]; didChange: boolean } {
   let foldersNext =
-    alreadySeeded && folders?.length ? [...folders] : mergeFolders(defaultFolders(), folders);
+    alreadySeeded && folders?.length ? [...folders] : mergeFolders(defaultFolders(edition), folders);
   foldersNext = excludeDeletedFolders(foldersNext, deletedFolderIds);
   foldersNext = recoverFoldersFromDocuments(foldersNext, documents, deletedFolderIds);
   foldersNext = excludeDeletedFolders(foldersNext, deletedFolderIds);
-  foldersNext = ensureNamedFolder(foldersNext, STELLANTIS_KRAGUJEVAC_FOLDER);
+  if (edition === "industrial") {
+    foldersNext = ensureNamedFolder(foldersNext, STELLANTIS_KRAGUJEVAC_FOLDER);
+  }
 
   let nextDocs = documents;
   let didChange = !folders?.length || folders.length !== foldersNext.length;
@@ -251,7 +262,7 @@ export function seedTemplateLibrary(
   if (shouldSeedCatalog) {
     const haveCatalog = new Set(documents.map((doc) => doc.catalogId).filter(Boolean));
     const seeded: LabelDocument[] = [];
-    for (const entry of CATALOG) {
+    for (const entry of catalogEntriesForEdition(edition)) {
       if (haveCatalog.has(entry.id)) continue;
       const doc = buildCatalogDocument(entry.id);
       doc.folderId = folderIdFromName(entry.group);

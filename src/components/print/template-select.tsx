@@ -3,7 +3,9 @@
 import { Input } from "@/components/ui/input";
 import { pageSizeCaption, type LabelDocument } from "@/lib/document";
 import { schemaColumns } from "@/lib/excel";
+import { foldersInOrganization } from "@/lib/library";
 import { useAppStore } from "@/lib/store";
+import { visibleTemplates, templateStatusOf } from "@/lib/template-library";
 import { cn } from "@/lib/utils";
 import { Check, ChevronDown, Search } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -27,9 +29,16 @@ function matchesQuery(doc: LabelDocument, folderName: string | undefined, query:
 }
 
 export function PrintTemplateSelect({ current }: { current: LabelDocument }) {
-  const documents = useAppStore((s) => s.documents);
-  const folders = useAppStore((s) => s.folders);
+  const documentsAll = useAppStore((s) => s.documents);
+  const foldersAll = useAppStore((s) => s.folders);
   const openDocument = useAppStore((s) => s.openDocument);
+  const role = useAppStore((s) => s.role());
+  const orgId = useAppStore((s) => s.currentOrganizationId);
+  const folders = useMemo(() => foldersInOrganization(foldersAll, orgId), [foldersAll, orgId]);
+  const documents = useMemo(
+    () => visibleTemplates(documentsAll, role, orgId).filter((doc) => templateStatusOf(doc) !== "archived"),
+    [documentsAll, orgId, role],
+  );
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);

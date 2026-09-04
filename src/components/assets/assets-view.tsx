@@ -7,15 +7,18 @@ import { Input } from "@/components/ui/input";
 import {
   PACKAGING_FOLDER_ID,
   assetSrc,
+  assetsForOrganization,
   childFolders,
   folderDescendantIds,
   folderPath,
+  foldersForOrganization,
   formatBytes,
   type AssetFolder,
   type AssetRecord,
 } from "@/lib/assets";
 import { isStaticHost } from "@/lib/public-path";
 import { useAssetStore } from "@/lib/asset-store";
+import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { ChevronRight, Folder, FolderPlus, Images, Pencil, Trash2, Upload } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
@@ -23,8 +26,11 @@ import { toast } from "sonner";
 
 export function AssetsView() {
   const hydrated = useAssetStore((s) => s.hydrated);
-  const folders = useAssetStore((s) => s.folders);
-  const assets = useAssetStore((s) => s.assets);
+  const foldersAll = useAssetStore((s) => s.folders);
+  const assetsAll = useAssetStore((s) => s.assets);
+  const orgId = useAppStore((s) => s.currentOrganizationId);
+  const folders = useMemo(() => foldersForOrganization(foldersAll, orgId), [foldersAll, orgId]);
+  const assets = useMemo(() => assetsForOrganization(assetsAll, orgId), [assetsAll, orgId]);
   const thumbUrls = useAssetStore((s) => s.thumbUrls);
   const createFolder = useAssetStore((s) => s.createFolder);
   const renameFolder = useAssetStore((s) => s.renameFolder);

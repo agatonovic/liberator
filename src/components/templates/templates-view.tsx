@@ -1,6 +1,7 @@
 "use client";
 
 import { Hint } from "@/components/hint";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -17,22 +18,32 @@ import {
 import { PageSizeFields } from "@/components/page-size-fields";
 import { Input } from "@/components/ui/input";
 import { clampPageMm, type LabelDocument } from "@/lib/document";
-import { MY_TEMPLATES_FOLDER_ID } from "@/lib/library";
+import { MY_TEMPLATES_FOLDER_ID, foldersInOrganization } from "@/lib/library";
 import {
   TEMPLATE_SORTS,
   favoriteTemplates,
+  filterTemplatesByStatus,
   folderNameFor,
   matchesTemplateQuery,
+  publishedVersionCaption,
   recentTemplates,
   relativeUsed,
   sortTemplates,
+  statusLabel,
+  templateStatusOf,
+  versionCaption,
+  visibleTemplates,
   type TemplateSort,
+  type TemplateStatusFilter,
 } from "@/lib/template-library";
+import { canArchiveTemplates, canEditTemplates, canGenerateTemplate } from "@/lib/roles";
 import { useAppStore } from "@/lib/store";
+import { downloadTemplateJson } from "@/lib/template-json";
 import { cn } from "@/lib/utils";
 import {
   ChevronDown,
   Copy,
+  Download,
   FileOutput,
   Folder,
   FolderPlus,
@@ -70,6 +81,9 @@ type TemplateCardProps = {
   compact?: boolean;
   currentId: string | null;
   folders: { id: string; name: string }[];
+  workspaceName?: string;
+  canEdit?: boolean;
+  canArchive?: boolean;
   onGenerate: (id: string) => void;
   onEdit: (id: string) => void;
   onFavorite: (id: string) => void;
@@ -77,6 +91,7 @@ type TemplateCardProps = {
   onRename: (id: string, name: string) => void;
   onMove: (id: string, folderId: string) => void;
   onDelete: (id: string) => void;
+  onArchive?: (id: string) => void;
 };
 
 function TemplateCard({
@@ -85,6 +100,9 @@ function TemplateCard({
   compact = false,
   currentId,
   folders,
+  workspaceName,
+  canEdit = true,
+  canArchive = false,
   onGenerate,
   onEdit,
   onFavorite,
@@ -92,8 +110,12 @@ function TemplateCard({
   onRename,
   onMove,
   onDelete,
+  onArchive,
 }: TemplateCardProps) {
   const used = relativeUsed(doc.lastGeneratedAt || doc.lastUsedAt);
+  const status = templateStatusOf(doc);
+  const publishedCaption = status === "draft" ? publishedVersionCaption(doc) : "";
+  const canGenerate = canGenerateTemplate("admin", status);
   return (
     <Card
       draggable
@@ -121,19 +143,29 @@ function TemplateCard({
         </Hint>
       </div>
       <CardHeader className={compact ? "px-4 py-3" : undefined}>
-        <CardTitle className="text-base">{doc.name}</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <span className="min-w-0 truncate">{doc.name}</span>
+          <Badge variant={status === "published" ? "secondary" : "outline"} className="shrink-0 text-[10px]">
+            {statusLabel(status)} {versionCaption(doc)}
+          </Badge>
+          {publishedCaption ? (
+            <Badge variant="outline" className="shrink-0 text-[10px] font-normal">
+              {publishedCaption}
+            </Badge>
+          ) : null}
+        </CardTitle>
         <CardDescription>
           {compact
             ? used || `${doc.page.widthMm} × ${doc.page.heightMm} mm`
-            : `${doc.page.widthMm} × ${doc.page.heightMm} mm${doc.description ? ` · ${doc.description}` : ""}${used ? ` · ${used}` : ""}`}
+            : `${doc.page.widthMm} × ${doc.page.heightMm} mm${workspaceName ? ` · ${workspaceName}` : ""}${doc.description ? ` · ${doc.description}` : ""}${used ? ` · ${used}` : ""}`}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-wrap items-center gap-2">
-        <Button size="sm" onClick={() => onGenerate(doc.id)}>
+        <Button size="sm" disabled={!canGenerate} onClick={() => onGenerate(doc.id)}>
           <FileOutput className="size-3.5" />
           Generate
         </Button>
-        {compact ? null : (
+        {compact || !canEdit ? null : (
           <Button size="sm" variant="outline" onClick={() => onEdit(doc.id)}>
             <PenTool className="size-3.5" />
             Edit
@@ -150,32 +182,48 @@ function TemplateCard({
               <Star className={cn("size-4", doc.favorite && "fill-amber-400 text-amber-500")} />
               {doc.favorite ? "Unfavorite" : "Favorite"}
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onDuplicate(doc.id)}>
-              <Copy className="size-4" />
-              Duplicate
+            <DropdownMenuItem
+              onClick={() => {
+                downloadTemplateJson(doc, { exportScope: "working" });
+                toast.success("Downloaded current JSON");
+              }}
+            >
+              <Download className="size-4" />
+              Download current JSON
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onRename(doc.id, doc.name)}>
-              <Pencil className="size-4" />
-              Rename
-            </DropdownMenuItem>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Folder className="size-4" />
-                Move
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                {folders.map((item) => (
-                  <DropdownMenuItem key={item.id} disabled={item.id === folderId} onClick={() => onMove(doc.id, item.id)}>
-                    {item.name}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onClick={() => onDelete(doc.id)}>
-              <Trash2 className="size-4" />
-              Delete
-            </DropdownMenuItem>
+            {canEdit ? (
+              <>
+                <DropdownMenuItem onClick={() => onDuplicate(doc.id)}>
+                  <Copy className="size-4" />
+                  Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onRename(doc.id, doc.name)}>
+                  <Pencil className="size-4" />
+                  Rename
+                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Folder className="size-4" />
+                    Move
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    {folders.map((item) => (
+                      <DropdownMenuItem key={item.id} disabled={item.id === folderId} onClick={() => onMove(doc.id, item.id)}>
+                        {item.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                {canArchive && status !== "archived" && onArchive ? (
+                  <DropdownMenuItem onClick={() => onArchive(doc.id)}>Archive</DropdownMenuItem>
+                ) : null}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive" onClick={() => onDelete(doc.id)}>
+                  <Trash2 className="size-4" />
+                  Delete
+                </DropdownMenuItem>
+              </>
+            ) : null}
           </DropdownMenuContent>
         </DropdownMenu>
       </CardContent>
@@ -185,9 +233,16 @@ function TemplateCard({
 
 export function TemplatesView() {
   const hydrated = useAppStore((s) => s.hydrated);
-  const documents = useAppStore((s) => s.documents);
-  const folders = useAppStore((s) => s.folders);
+  const documentsAll = useAppStore((s) => s.documents);
+  const foldersAll = useAppStore((s) => s.folders);
   const currentId = useAppStore((s) => s.currentId);
+  const role = useAppStore((s) => s.role());
+  const orgId = useAppStore((s) => s.currentOrganizationId);
+  const workspaceName = useAppStore(
+    (s) =>
+      s.organizations.find((item) => item.id === s.currentOrganizationId)?.name ?? s.organizations[0]?.name,
+  );
+  const archiveDocument = useAppStore((s) => s.archiveDocument);
   const createBlank = useAppStore((s) => s.createBlank);
   const openDocument = useAppStore((s) => s.openDocument);
   const duplicateDocument = useAppStore((s) => s.duplicateDocument);
@@ -216,6 +271,7 @@ export function TemplatesView() {
   const [dropFolderId, setDropFolderId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [folderFilter, setFolderFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<TemplateStatusFilter>("all");
   const [sort, setSort] = useState<TemplateSort>("used");
   const [recentCollapsed, setRecentCollapsed] = useState(false);
 
@@ -225,6 +281,17 @@ export function TemplatesView() {
   }, []);
 
   const searching = Boolean(query.trim());
+  const canEdit = canEditTemplates(role ?? "admin");
+  const canArchive = canArchiveTemplates(role ?? "admin");
+  const folders = useMemo(() => foldersInOrganization(foldersAll, orgId), [foldersAll, orgId]);
+  const documents = useMemo(
+    () =>
+      filterTemplatesByStatus(
+        visibleTemplates(documentsAll, role, orgId),
+        statusFilter,
+      ),
+    [documentsAll, orgId, role, statusFilter],
+  );
   const recent = useMemo(() => recentTemplates(documents), [documents]);
   const favorites = useMemo(() => favoriteTemplates(documents, sort), [documents, sort]);
 
@@ -275,6 +342,11 @@ export function TemplatesView() {
   }
 
   function goTo(id: string, path: "/designer" | "/generate") {
+    const target = documentsAll.find((item) => item.id === id);
+    if (path === "/generate" && target && !canGenerateTemplate(role ?? "admin", templateStatusOf(target))) {
+      toast.error("Archived templates cannot be generated. Publish or restore a draft first.");
+      return;
+    }
     openDocument(id);
     router.push(path);
   }
@@ -282,6 +354,9 @@ export function TemplatesView() {
   const cardProps = {
     currentId,
     folders,
+    workspaceName,
+    canEdit,
+    canArchive,
     onGenerate: (id: string) => goTo(id, "/generate"),
     onEdit: (id: string) => goTo(id, "/designer"),
     onFavorite: toggleFavorite,
@@ -297,6 +372,9 @@ export function TemplatesView() {
       toast.success(`Moved to ${folders.find((folder) => folder.id === folderId)?.name ?? "folder"}`);
     },
     onDelete: (id: string) => setDeleteId(id),
+    onArchive: (id: string) => {
+      if (archiveDocument(id)) toast.success("Archived");
+    },
   };
 
   function beginRename(id: string, current: string) {
@@ -316,9 +394,11 @@ export function TemplatesView() {
         <div>
           <h1 className="font-heading text-3xl font-semibold tracking-tight">Templates</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Find a reusable label, then generate a batch from Excel or the sheet.
+            {workspaceName ? `${workspaceName} · ` : ""}Choose a template, add data, validate, then generate. Printed
+            batches show up in History.
           </p>
         </div>
+        {canEdit ? (
         <div className="flex flex-wrap justify-end gap-2">
           <Button
             variant="outline"
@@ -340,6 +420,7 @@ export function TemplatesView() {
             New blank template
           </Button>
         </div>
+        ) : null}
       </div>
 
       <div className="mb-6 flex flex-col gap-3">
@@ -368,6 +449,28 @@ export function TemplatesView() {
               </option>
             ))}
           </select>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {(
+            [
+              ["all", "All"],
+              ["published", "Published"],
+              ["draft", "Draft"],
+              ["archived", "Archived"],
+              ["recent", "Recently used"],
+            ] as const
+          )
+            .filter(([id]) => canEdit || id !== "draft")
+            .map(([id, label]) => (
+              <Button
+                key={id}
+                size="sm"
+                variant={statusFilter === id ? "default" : "outline"}
+                onClick={() => setStatusFilter(id)}
+              >
+                {label}
+              </Button>
+            ))}
         </div>
         {folders.length > 1 && !searching ? (
           <div className="flex flex-wrap gap-1.5">

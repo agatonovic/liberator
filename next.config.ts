@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
       canvas: "",
     },
   },
+  serverExternalPackages: ["better-sqlite3"],
 };
 
 export default nextConfig;

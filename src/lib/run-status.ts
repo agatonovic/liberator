@@ -1,11 +1,12 @@
+import { barcodeValueIssue } from "./codes";
 import { findAssetByValue, type AssetFolder, type AssetRecord } from "./assets";
 import { isGaAddressTransform, type DataColumn, type LabelDocument } from "./document";
 import { schemaColumns } from "./excel";
 import { parseGaAddress } from "./format";
 import { filledRowIndexes, headerForColumn } from "./grid";
-import { lookupRowValue, type ColumnMapping, type DataRow } from "./resolve";
+import { lookupRowValue, missingBindings, type ColumnMapping, type DataRow } from "./resolve";
 
-export type GenerateIssueKind = "missing" | "invalid" | "address" | "image";
+export type GenerateIssueKind = "missing" | "invalid" | "address" | "image" | "barcode" | "binding";
 
 export type GenerateIssue = {
   row: number;
@@ -20,6 +21,7 @@ export type GenerateRunStatus = {
   ready: number;
   attention: number;
   issues: GenerateIssue[];
+  bindingIssues: string[];
 };
 
 const ARROW_TOKENS = new Set(["UP", "DOWN", "↑", "▲", "U", "GORE", "↓", "▼", "D", "DOLJE"]);
@@ -59,8 +61,9 @@ export function evaluateGenerateRun(
   folders: AssetFolder[] = [],
 ): GenerateRunStatus {
   const columns = schemaColumns(doc);
+  const bindingIssues = missingBindings(doc, mapping, headers);
   if (!columns.length) {
-    return { filled: 1, ready: 1, attention: 0, issues: [] };
+    return { filled: 1, ready: 1, attention: 0, issues: [], bindingIssues };
   }
   const filledIndexes = filledRowIndexes(rows, headers);
   const addressKeys = new Set(
@@ -69,6 +72,9 @@ export function evaluateGenerateRun(
   const imageBinds = doc.elements
     .filter((el) => el.type === "image" && el.assetFolderId && el.binding?.trim())
     .map((el) => ({ key: el.binding!.trim(), folderId: el.assetFolderId! }));
+  const barcodeBinds = doc.elements
+    .filter((el) => el.type === "barcode" && el.binding?.trim())
+    .map((el) => ({ key: el.binding!.trim(), symbology: el.style.barcodeSymbology ?? "code128" }));
   const issues: GenerateIssue[] = [];
 
   for (const index of filledIndexes) {
@@ -104,6 +110,19 @@ export function evaluateGenerateRun(
         pushCell(cells, reasons, header, "image", "Missing image");
       }
     }
+    for (const bind of barcodeBinds) {
+      const value = cellValue(row, bind.key, mapping, doc);
+      const column = columns.find((item) => item.key === bind.key);
+      const header = column ? headerForColumn(column, mapping, headers) : undefined;
+      if (!value) {
+        pushCell(cells, reasons, header, "barcode", "Barcode value is missing");
+        continue;
+      }
+      const issue = barcodeValueIssue(value, bind.symbology);
+      if (issue) {
+        pushCell(cells, reasons, header, "barcode", issue);
+      }
+    }
     if (reasons.length) {
       const uniqueReasons = [...new Set(reasons)];
       const uniqueHeaders = [...new Set(cells.map((cell) => cell.header))];
@@ -118,18 +137,43 @@ export function evaluateGenerateRun(
   }
 
   const filled = filledIndexes.length;
-  const attention = issues.length;
-  return { filled, ready: Math.max(0, filled - attention), attention, issues };
+  const attention = issues.length + (bindingIssues.length ? 1 : 0);
+  return { filled, ready: Math.max(0, filled - issues.length), attention, issues, bindingIssues };
 }
 
 export function runStatusLabel(status: GenerateRunStatus) {
   if (!status.filled) return "No labels yet";
-  if (!status.attention) return `${status.filled} label${status.filled === 1 ? "" : "s"} ready`;
-  return `${status.ready} ready · ${status.attention} need attention`;
+  if (!status.attention) return `${status.filled} of ${status.filled} rows are ready`;
+  return `${status.ready} of ${status.filled} rows are ready`;
+}
+
+export function runStatusAttentionLabel(status: GenerateRunStatus) {
+  if (!status.attention) return "";
+  const n = status.issues.length || status.attention;
+  return `${n} row${n === 1 ? "" : "s"} need${n === 1 ? "s" : ""} attention`;
 }
 
 export function issueCellKey(rowIndex: number, header: string) {
   return `${rowIndex}:${header}`;
+}
+
+export function summarizeGenerateIssues(status: GenerateRunStatus) {
+  const rows = {
+    missing: 0,
+    invalid: 0,
+    address: 0,
+    image: 0,
+    barcode: 0,
+  };
+  for (const issue of status.issues) {
+    const kinds = new Set(issue.cells.map((cell) => cell.kind));
+    if (kinds.has("missing")) rows.missing += 1;
+    if (kinds.has("invalid")) rows.invalid += 1;
+    if (kinds.has("address")) rows.address += 1;
+    if (kinds.has("image")) rows.image += 1;
+    if (kinds.has("barcode")) rows.barcode += 1;
+  }
+  return { ...rows, bindings: status.bindingIssues.length, invalidRows: status.issues.length };
 }
 
 export function generateIssueCellKeys(status: GenerateRunStatus) {

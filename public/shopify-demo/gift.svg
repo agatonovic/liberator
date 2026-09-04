@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#FCE4EC"/>
+  <rect x="110" y="130" width="180" height="160" fill="#F48FB1"/>
+  <rect x="185" y="130" width="30" height="160" fill="#EC407A"/>
+  <rect x="110" y="190" width="180" height="30" fill="#EC407A"/>
+  <path d="M170 130 q30 -50 60 0" fill="none" stroke="#AD1457" stroke-width="10"/>
+  <text x="200" y="372" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, sans-serif" font-size="22" font-weight="600" fill="#AD1457">Gift</text>
+</svg>

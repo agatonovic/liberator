@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#EFEBE9"/>
+  <ellipse cx="200" cy="210" rx="120" ry="50" fill="#BCAAA4"/>
+  <rect x="80" y="200" width="240" height="16" fill="#8D6E63"/>
+  <text x="200" y="372" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, sans-serif" font-size="22" font-weight="600" fill="#5D4037">Soap dish</text>
+</svg>

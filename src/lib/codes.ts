@@ -79,6 +79,35 @@ export function renderBarcodeCanvas(
   }
 }
 
+function ean13Checksum(digits: string) {
+  let sum = 0;
+  for (let i = 0; i < 12; i += 1) {
+    const n = Number(digits[i]);
+    sum += i % 2 === 0 ? n : n * 3;
+  }
+  return (10 - (sum % 10)) % 10;
+}
+
+/** Returns a short reason when the value cannot encode, otherwise null. */
+export function barcodeValueIssue(value: string, symbology: BarcodeSymbology = "code128"): string | null {
+  const text = value.trim();
+  if (!text) return "Missing barcode value";
+  if (symbology === "ean13") {
+    const digits = text.replace(/\s+/g, "");
+    if (!/^\d{12,13}$/.test(digits)) return "EAN-13 needs 12 or 13 digits";
+    const body = digits.slice(0, 12);
+    if (digits.length === 13 && Number(digits[12]) !== ean13Checksum(body)) return "Invalid EAN-13 checksum";
+    return null;
+  }
+  if (symbology === "code39") {
+    if (!/^[0-9A-Z .$/%+-]+$/i.test(text)) return "Invalid Code 39 characters";
+    if (text.length > 43) return "Barcode value exceeds the supported format";
+    return null;
+  }
+  if (text.length > 80) return "Barcode value exceeds the supported format";
+  return null;
+}
+
 export function barcodeDataUrl(
   value: string,
   symbology: BarcodeSymbology = "code128",

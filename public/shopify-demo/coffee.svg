@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#3E2723"/>
+  <ellipse cx="200" cy="280" rx="80" ry="24" fill="#5D4037"/>
+  <path d="M130 120 q70 -40 140 0 v150 q-70 40 -140 0 z" fill="#6D4C41"/>
+  <circle cx="170" cy="180" r="10" fill="#4E342E"/>
+  <circle cx="210" cy="200" r="8" fill="#4E342E"/>
+  <circle cx="190" cy="230" r="9" fill="#4E342E"/>
+  <text x="200" y="372" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, sans-serif" font-size="22" font-weight="600" fill="#F3E5D0">Coffee</text>
+</svg>

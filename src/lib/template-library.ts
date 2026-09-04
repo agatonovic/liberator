@@ -1,5 +1,8 @@
 import type { LabelDocument } from "./document";
+import type { Role, TemplateStatus } from "./domain";
 import type { TemplateFolder } from "./library";
+import { canSeeTemplate } from "./roles";
+import { belongsToOrganization } from "./workspace-scope";
 
 export type TemplateSort = "used" | "modified" | "name-asc" | "name-desc";
 
@@ -9,6 +12,43 @@ export const TEMPLATE_SORTS: { id: TemplateSort; label: string }[] = [
   { id: "name-asc", label: "Name A–Z" },
   { id: "name-desc", label: "Name Z–A" },
 ];
+
+export type TemplateStatusFilter = "all" | "published" | "draft" | "archived" | "recent";
+
+export function templateStatusOf(doc: LabelDocument): TemplateStatus {
+  return doc.status ?? "published";
+}
+
+export function visibleTemplates(docs: LabelDocument[], role: Role | null | undefined, organizationId?: string | null) {
+  return docs.filter((doc) => {
+    if (!belongsToOrganization(doc, organizationId)) return false;
+    return canSeeTemplate(role ?? "admin", templateStatusOf(doc));
+  });
+}
+
+export function filterTemplatesByStatus(docs: LabelDocument[], filter: TemplateStatusFilter) {
+  if (filter === "all") return docs;
+  if (filter === "recent") return recentTemplates(docs, docs.length);
+  return docs.filter((doc) => templateStatusOf(doc) === filter);
+}
+
+export function versionCaption(doc: LabelDocument) {
+  const n = doc.versionNumber ?? doc.versions?.[0]?.number ?? 1;
+  return `v${n}`;
+}
+
+export function publishedVersionCaption(doc: LabelDocument) {
+  if (!doc.publishedVersionId) return "";
+  const published = doc.versions?.find((item) => item.id === doc.publishedVersionId);
+  const n = published?.number ?? 1;
+  return `Published v${n}`;
+}
+
+export function statusLabel(status: TemplateStatus) {
+  if (status === "published") return "Published";
+  if (status === "archived") return "Archived";
+  return "Draft";
+}
 
 export function recencyStamp(doc: LabelDocument) {
   return doc.lastGeneratedAt || doc.lastUsedAt || "";

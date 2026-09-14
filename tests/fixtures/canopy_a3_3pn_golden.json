@@ -1,0 +1,68 @@
+{
+  "description": "Deterministic Canopy A3 3 PN rows. barcode_pct appends a literal %; it does not scale the barcode.",
+  "templatePackage": "artifacts/packages/Canopy_A3_3_PN_v1.labelator",
+  "page": { "widthMm": 420, "heightMm": 297 },
+  "expectedPages": 6,
+  "rows": [
+    {
+      "position": "WG1D.11.014",
+      "ref1": "9855936580",
+      "qty1": "3",
+      "ref2": "9855936180",
+      "qty2": "1",
+      "ref3": "9860692580",
+      "qty3": "1",
+      "barcode": "WG1D.11.014"
+    },
+    {
+      "position": "WG6.99.123",
+      "ref1": "73 580 423 50",
+      "qty1": "12",
+      "ref2": "9845644594",
+      "qty2": "0",
+      "ref3": "73579863301",
+      "qty3": "99",
+      "barcode": "WG6.99.123%"
+    },
+    {
+      "position": "AB",
+      "ref1": "12",
+      "qty1": "1",
+      "ref2": "1",
+      "qty2": "2",
+      "ref3": "9",
+      "qty3": "3",
+      "barcode": ""
+    },
+    {
+      "position": "",
+      "ref1": "",
+      "qty1": "",
+      "ref2": "9845644594",
+      "qty2": "2",
+      "ref3": "",
+      "qty3": "",
+      "barcode": ""
+    },
+    {
+      "position": "HB9A.011.001",
+      "ref1": "9845605680",
+      "qty1": "2",
+      "ref2": "7357993320",
+      "qty2": "3",
+      "ref3": "9860692580",
+      "qty3": "1",
+      "barcode": "0"
+    },
+    {
+      "position": "WAREHOUSE-LOCATION-CODE-LONG",
+      "ref1": "9855936580",
+      "qty1": "1",
+      "ref2": "9855936180",
+      "qty2": "1",
+      "ref3": "9860692580",
+      "qty3": "1",
+      "barcode": "100%"
+    }
+  ]
+}

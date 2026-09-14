@@ -1,0 +1,38 @@
+{
+  "description": "Deterministic Canopy A3 1 PN rows. barcode_pct appends a literal %; empty barcode falls back to position.",
+  "templatePackage": "artifacts/packages/Canopy_A3_1_PN_v1.labelator",
+  "page": { "widthMm": 420, "heightMm": 297 },
+  "expectedPages": 6,
+  "rows": [
+    {
+      "position": "WG1D.02.001",
+      "ref1": "9845605680",
+      "barcode": "WG1D.02.001"
+    },
+    {
+      "position": "WG1D.11.014",
+      "ref1": "9855936580",
+      "barcode": "WG1D.11.014%"
+    },
+    {
+      "position": "AB",
+      "ref1": "12",
+      "barcode": ""
+    },
+    {
+      "position": "",
+      "ref1": "9845644594",
+      "barcode": ""
+    },
+    {
+      "position": "HB9A.011.001",
+      "ref1": "7357986330",
+      "barcode": "0"
+    },
+    {
+      "position": "WAREHOUSE-LOCATION-CODE-LONG",
+      "ref1": "9845605680",
+      "barcode": "100%"
+    }
+  ]
+}

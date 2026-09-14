@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "collections": [
+    {
+      "id": "packaging",
+      "labelatorAssetFolderId": "asset-folder-packaging",
+      "entries": {
+        "x4202": "packaging/X4202.jpg"
+      }
+    }
+  ]
+}

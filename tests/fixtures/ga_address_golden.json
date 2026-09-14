@@ -1,0 +1,43 @@
+{
+  "description": "Deterministic GA Address golden rows. Fields are the live dataColumns only (address, arrow, barcode).",
+  "templatePackage": "artifacts/packages/GA_Address_v1.labelator",
+  "page": { "widthMm": 408.98, "heightMm": 80.72 },
+  "expectedPages": 6,
+  "notes": [
+    "Stored library JSON leaves the arrow unbound. The package is the print-time repaired document, so arrow UP/DOWN changes pose.",
+    "Empty barcode falls back to address.",
+    "Trailing % is stripped by ga_* transforms."
+  ],
+  "rows": [
+    {
+      "address": "HB9A.011.001",
+      "arrow": "DOWN",
+      "barcode": "HB9A.011.001"
+    },
+    {
+      "address": "RHB9A.012.003",
+      "arrow": "UP",
+      "barcode": ""
+    },
+    {
+      "address": "X.1.2",
+      "arrow": "",
+      "barcode": ""
+    },
+    {
+      "address": "123456789.011.001",
+      "arrow": "DOWN",
+      "barcode": "123456789.011.001"
+    },
+    {
+      "address": "NOT-AN-ADDRESS",
+      "arrow": "UP",
+      "barcode": "PLAIN-39"
+    },
+    {
+      "address": "HB1A.011.001%",
+      "arrow": "DOWN",
+      "barcode": ""
+    }
+  ]
+}

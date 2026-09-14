@@ -1,0 +1,46 @@
+{
+  "description": "Deterministic FIXED GA A4 golden rows. Fields are the live dataColumns only.",
+  "templatePackage": "artifacts/packages/FIXED_GA_A4_v1.labelator",
+  "printMode": "sheet",
+  "page": { "widthMm": 254, "heightMm": 68 },
+  "sheet": { "pageSize": "A4-landscape", "columns": 1, "rows": 2, "gapMm": 0, "marginMm": 4 },
+  "expectedPages": 3,
+  "slotsPerPage": 2,
+  "notes": [
+    "Five rows on a 2-up sheet produce three pages: 2, 2, and 1.",
+    "Both arrows share the arrow binding. UP keeps designed pose; DOWN rotates each 180 degrees around its center.",
+    "Empty title and empty arrow stay blank / designed."
+  ],
+  "rows": [
+    {
+      "reference": "7357986330",
+      "position": "RHB1A.001.003",
+      "title": "FIXED",
+      "arrow": "UP"
+    },
+    {
+      "reference": "98456445941",
+      "position": "WAREHOUSE-LOCATION-VERY-LONG",
+      "title": "FIXED LOCATION HEADER",
+      "arrow": "DOWN"
+    },
+    {
+      "reference": "12",
+      "position": "X",
+      "title": "A",
+      "arrow": "UP"
+    },
+    {
+      "reference": "73 579 863 30",
+      "position": "",
+      "title": "",
+      "arrow": ""
+    },
+    {
+      "reference": "73579863301",
+      "position": "HB9A.011.001",
+      "title": "ŠPED",
+      "arrow": "↓"
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "format": "labelator.package",
+  "formatVersion": 1,
+  "exportedAt": "2026-09-05T00:00:00.000Z",
+  "packageName": "Warehouse_A3_Final_v1",
+  "template": {
+    "name": "Warehouse A3 Final",
+    "templateVersion": "1",
+    "page": {
+      "widthMm": 420,
+      "heightMm": 297
+    },
+    "sheet": {
+      "pageSize": "A3-landscape",
+      "columns": 1,
+      "rows": 1,
+      "gapMm": 4,
+      "marginMm": 8
+    },
+    "elementCount": 24
+  },
+  "fonts": [
+    {
+      "family": "Artifakt Element Black",
+      "weight": 400,
+      "path": "fonts/ArtifaktElement-Black.otf",
+      "format": "otf",
+      "sha256": "7dfc3190a75f7d45baee0ee4d12b584260c10fc680c60a0c72cb1b7f5e1ab12d",
+      "source": "public/fonts/ArtifaktElement-Black.otf"
+    },
+    {
+      "family": "Artifakt Element Black",
+      "weight": 700,
+      "path": "fonts/ArtifaktElement-Black.otf",
+      "format": "otf",
+      "sha256": "7dfc3190a75f7d45baee0ee4d12b584260c10fc680c60a0c72cb1b7f5e1ab12d",
+      "source": "public/fonts/ArtifaktElement-Black.otf"
+    },
+    {
+      "family": "Open Sans",
+      "weight": 400,
+      "path": "fonts/OpenSans-Regular.woff",
+      "format": "woff",
+      "sha256": "bb0f7ed88b00741288cfa77ef7e38f5750e9bbe43fda8e37871ad4f281b8d28c",
+      "source": "Pinned bytes from fonts.googleapis.com/css2 Open Sans wght@400 (Firefox UA), same endpoint as src/lib/fonts.ts fetchFontBytes — gstatic currently serves WOFF"
+    },
+    {
+      "family": "Open Sans",
+      "weight": 700,
+      "path": "fonts/OpenSans-Bold.woff",
+      "format": "woff",
+      "sha256": "a5e0231dc766d482a977e9cdd931bf26eb1cc1d19617bfe33600fdda94602437",
+      "source": "Pinned bytes from fonts.googleapis.com/css2 Open Sans wght@700 (Firefox UA), same endpoint as src/lib/fonts.ts fetchFontBytes — gstatic currently serves WOFF"
+    }
+  ],
+  "requiredTransforms": [
+    "part_number"
+  ],
+  "dataContract": {
+    "fields": [
+      {
+        "key": "reference",
+        "label": "Reference",
+        "aliases": [
+          "reference",
+          "Reference",
+          "REFERENCA",
+          "REFERENCE",
+          "Produit",
+          "PRODUCT"
+        ],
+        "required": true,
+        "example": "73 580 423 50",
+        "elementBindings": [
+          "REFERENCA"
+        ]
+      },
+      {
+        "key": "warehouse_code",
+        "label": "Magacin",
+        "aliases": [
+          "warehouse_code",
+          "Magacin",
+          "MAGACIN",
+          "WAREHOUSE_CODE"
+        ],
+        "required": true,
+        "example": "WG6.99.123",
+        "elementBindings": [
+          "MAGACIN"
+        ]
+      },
+      {
+        "key": "ref4",
+        "label": "REF4",
+        "aliases": [
+          "ref4",
+          "REF4"
+        ],
+        "required": true,
+        "example": "QULY",
+        "elementBindings": [
+          "REF4"
+        ]
+      },
+      {
+        "key": "depth",
+        "label": "Dubina",
+        "aliases": [
+          "depth",
+          "Dubina",
+          "DUBINA"
+        ],
+        "required": true,
+        "example": "1",
+        "elementBindings": [
+          "DUBINA"
+        ]
+      },
+      {
+        "key": "stackability",
+        "label": "Složivost",
+        "aliases": [
+          "stackability",
+          "Složivost",
+          "SLOŽIVOST",
+          "SLOZIVOST"
+        ],
+        "required": true,
+        "example": "4",
+        "elementBindings": [
+          "SLOZIVOST"
+        ]
+      },
+      {
+        "key": "packaging",
+        "label": "Pakovanje",
+        "aliases": [
+          "packaging",
+          "Pakovanje",
+          "PAKOVANJE",
+          "PAKOVANJE (MDR)"
+        ],
+        "required": true,
+        "example": "X4202",
+        "elementBindings": [
+          "PAKOVANJE (MDR)",
+          "packaging"
+        ]
+      },
+      {
+        "key": "barcode",
+        "label": "Barcode",
+        "aliases": [
+          "barcode",
+          "Barcode",
+          "BARCODE",
+          "BARCODE: ADRESA SKLADIŠTA"
+        ],
+        "required": false,
+        "example": "WG6.99.123%",
+        "elementBindings": [
+          "BARCODE"
+        ]
+      }
+    ]
+  },
+  "assets": {
+    "indexPath": "assets/index.json",
+    "collections": [
+      {
+        "id": "packaging",
+        "entryCount": 1,
+        "labelatorAssetFolderId": "asset-folder-packaging"
+      }
+    ]
+  },
+  "labelator": {
+    "templateId": "ee4837ef-c0f7-4ac9-8612-a689518ad7b0",
+    "catalogId": "warehouse_a3",
+    "catalogRevision": null,
+    "folderId": "655d6e1b-31bb-4d5e-ae3d-0ca99fbdead6",
+    "documentVersion": 1,
+    "exportScope": "working"
+  }
+}

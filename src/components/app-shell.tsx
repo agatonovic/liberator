@@ -8,7 +8,7 @@ import { navPath } from "@/lib/public-path";
 import { canAccessSettings, canEditTemplates, canManageAssets, roleLabel } from "@/lib/roles";
 import { isCloudMode } from "@/lib/session";
 import { useAppStore } from "@/lib/store";
-import { FileOutput, History, Images, LayoutTemplate, PanelLeftClose, PanelLeftOpen, PenTool, Settings } from "lucide-react";
+import { FileOutput, History, Images, LayoutTemplate, PanelLeftClose, PanelLeftOpen, PenTool, Settings, Code2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
@@ -20,6 +20,7 @@ const ALL_NAV = [
   { href: "/assets", label: "Assets", icon: Images, requiresAssets: true },
   { href: "/history", label: "History", icon: History },
   { href: "/settings", label: "Settings", icon: Settings, requiresSettings: true },
+  { href: "/developers", label: "Developers", icon: Code2, requiresEdit: true },
 ];
 
 const NAV_OPEN_KEY = "labelator.navOpen";

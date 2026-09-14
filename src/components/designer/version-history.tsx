@@ -9,6 +9,7 @@ import { relativeUsed } from "@/lib/template-library";
 import { useAppStore } from "@/lib/store";
 import { formatVersionDate, versionLabel } from "@/lib/versions";
 import { downloadTemplateJson } from "@/lib/template-json";
+import { LabelatorExportButton } from "@/components/designer/labelator-export";
 import { Download, Eye, History, Pencil, RotateCcw, Save, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -120,6 +121,7 @@ export function DesignerSaveControls({
           Download JSON
         </Button>
       </Hint>
+      <LabelatorExportButton doc={doc} />
       <Hint label="Save a named checkpoint" shortcut="⇧⌘S">
         <Button size="sm" variant="outline" className="px-2 text-xs" onClick={save}>
           <Save className="size-3.5" />

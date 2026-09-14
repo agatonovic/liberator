@@ -1,0 +1,35 @@
+{
+  "description": "Deterministic A3 Warehouse golden rows for LABELATOR vs Python renderer PoC",
+  "templatePackage": "artifacts/packages/Warehouse_A3_Final_v1.labelator",
+  "page": { "widthMm": 420, "heightMm": 297 },
+  "expectedPages": 3,
+  "rows": [
+    {
+      "reference": "7358042350",
+      "ref4": "QULY",
+      "depth": "1",
+      "stackability": "4",
+      "packaging": "X4202",
+      "warehouse_code": "WG6.99.123",
+      "barcode": "WG6.99.123"
+    },
+    {
+      "reference": "73 580 423 50",
+      "ref4": "REVI",
+      "depth": "6",
+      "stackability": "6",
+      "packaging": "X4202",
+      "warehouse_code": "WG1D.01.001",
+      "barcode": "WG1D.01.001"
+    },
+    {
+      "reference": "9845644594",
+      "ref4": "ABCD",
+      "depth": "2",
+      "stackability": "3",
+      "packaging": "X4202",
+      "warehouse_code": "HB9A.011.001",
+      "barcode": "HB9A.011.001"
+    }
+  ]
+}

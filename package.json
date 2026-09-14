@@ -4,12 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3000",
-    "build": "next build",
-    "build:pages": "cp data/library.json public/library.json && GITHUB_PAGES=true next build && touch out/.nojekyll",
+    "publish:labelator": "LABELATOR_PUBLISH=1 vite-node --config vitest.config.mts scripts/publish-labelator-packages.mts",
+    "build": "npm run publish:labelator && next build",
+    "build:pages": "npm run publish:labelator && cp data/library.json public/library.json && GITHUB_PAGES=true next build && touch out/.nojekyll",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "export:a3-warehouse": "vitest run tests/labelator-package.test.ts -t \"writes deterministic A3 Warehouse\"",
+    "audit:renderer-compatibility": "vitest run tests/renderer-compatibility-audit.test.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -47,6 +50,7 @@
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "canvas": "^3.2.3",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",

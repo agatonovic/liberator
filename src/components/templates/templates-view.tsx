@@ -39,6 +39,7 @@ import {
 import { canArchiveTemplates, canEditTemplates, canGenerateTemplate } from "@/lib/roles";
 import { useAppStore } from "@/lib/store";
 import { downloadTemplateJson } from "@/lib/template-json";
+import { CatalogLabelatorDownload } from "@/components/designer/labelator-export";
 import { cn } from "@/lib/utils";
 import {
   ChevronDown,
@@ -117,6 +118,7 @@ function TemplateCard({
   const publishedCaption = status === "draft" ? publishedVersionCaption(doc) : "";
   const canGenerate = canGenerateTemplate("admin", status);
   return (
+    <>
     <Card
       draggable
       onDragStart={(event) => {
@@ -191,6 +193,7 @@ function TemplateCard({
               <Download className="size-4" />
               Download current JSON
             </DropdownMenuItem>
+            <CatalogLabelatorDownload doc={doc} />
             {canEdit ? (
               <>
                 <DropdownMenuItem onClick={() => onDuplicate(doc.id)}>
@@ -228,6 +231,7 @@ function TemplateCard({
         </DropdownMenu>
       </CardContent>
     </Card>
+    </>
   );
 }
 

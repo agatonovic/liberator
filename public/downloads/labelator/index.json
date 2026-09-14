@@ -1,0 +1,116 @@
+{
+  "generatedBy": "scripts/publish-labelator-packages.mts",
+  "hrefPrefix": "/downloads/labelator",
+  "packages": [
+    {
+      "name": "Canopy A3 — 1 PN",
+      "fileName": "Canopy_A3_1_PN_v1.labelator",
+      "href": "/downloads/labelator/Canopy_A3_1_PN_v1.labelator",
+      "sha256": "c1b3a3d4e9d59da4b7e457bae050f95bfcbf33ce61530ec3b7ff6570b17b120b",
+      "pageMm": "420 × 297 mm",
+      "printMode": "1-up",
+      "templateId": "14057388-ae40-4251-a03d-d9cb77a5d0e4",
+      "catalogId": null
+    },
+    {
+      "name": "Canopy A3 — 2 PN",
+      "fileName": "Canopy_A3_2_PN_v1.labelator",
+      "href": "/downloads/labelator/Canopy_A3_2_PN_v1.labelator",
+      "sha256": "51183492913127f2f16feae62c64fce9d7bbe8d67f98298f8fbf6c3f6847ba20",
+      "pageMm": "420 × 297 mm",
+      "printMode": "1-up",
+      "templateId": "374ebcd7-87ef-4c98-b006-3cb9d38d659b",
+      "catalogId": null
+    },
+    {
+      "name": "Canopy A3 — 3 PN",
+      "fileName": "Canopy_A3_3_PN_v1.labelator",
+      "href": "/downloads/labelator/Canopy_A3_3_PN_v1.labelator",
+      "sha256": "4203114bfa58fb8f1beaebc866339cc91b71500cfbba4f3f8de99d9afdeaa32c",
+      "pageMm": "420 × 297 mm",
+      "printMode": "1-up",
+      "templateId": "6060f5ce-7572-44a4-b085-9845557f62df",
+      "catalogId": "canopy_a3_3pn"
+    },
+    {
+      "name": "CDC A3",
+      "fileName": "CDC_A3_v1.labelator",
+      "href": "/downloads/labelator/CDC_A3_v1.labelator",
+      "sha256": "e23b5b19adc6446bfe070f06fea52f232b37e96f679ab608ddb56b9ce3729fb2",
+      "pageMm": "420 × 297 mm",
+      "printMode": "1-up",
+      "templateId": "3085002f-b6ce-4feb-bfb5-62f111cd9645",
+      "catalogId": "cdc_a3"
+    },
+    {
+      "name": "FIXED GA A4",
+      "fileName": "FIXED_GA_A4_v1.labelator",
+      "href": "/downloads/labelator/FIXED_GA_A4_v1.labelator",
+      "sha256": "bb8c57aa2cf1e569c316a7f4db4d3ea32f2e46d232af6f4b63b5d861d969fd54",
+      "pageMm": "254 × 68 mm",
+      "printMode": "sheet",
+      "templateId": "ff9a7d76-b9a8-4b29-a861-612b6142c9a9",
+      "catalogId": "fixed_ga_a4"
+    },
+    {
+      "name": "GA Address",
+      "fileName": "GA_Address_v1.labelator",
+      "href": "/downloads/labelator/GA_Address_v1.labelator",
+      "sha256": "a5bf9bf1d3216d1ec69fdc49b99767e8ebaa446cda04ab1083f7df567119befd",
+      "pageMm": "408.98 × 80.72 mm",
+      "printMode": "1-up",
+      "templateId": "0a9b4a95-985c-487d-a58e-057a5e45ba57",
+      "catalogId": "ga_warehouse_a3"
+    },
+    {
+      "name": "GA Warehouse Dual",
+      "fileName": "GA_Warehouse_Dual_v1.labelator",
+      "href": "/downloads/labelator/GA_Warehouse_Dual_v1.labelator",
+      "sha256": "d52d25546c917c9d64ecb61267747297590a2935d2be3efdf557a57463bb156b",
+      "pageMm": "408.98 × 133.63 mm",
+      "printMode": "sheet",
+      "templateId": "5289784a-bd04-47ed-99da-e936c3618691",
+      "catalogId": "ga_warehouse_a3_dual"
+    },
+    {
+      "name": "HBC A4 Shelf",
+      "fileName": "HBC_A4_Shelf_v1.labelator",
+      "href": "/downloads/labelator/HBC_A4_Shelf_v1.labelator",
+      "sha256": "1a1d68fadeb70e819a46c0fe10ca08c73ca470edd00c352d7b4933473dc60e32",
+      "pageMm": "210 × 188 mm",
+      "printMode": "1-up",
+      "templateId": "0bc3bdcb-e913-4015-bb02-d95a0d17c39e",
+      "catalogId": "hbc_a4"
+    },
+    {
+      "name": "OVS A3 dual",
+      "fileName": "OVS_A3_Dual_v1.labelator",
+      "href": "/downloads/labelator/OVS_A3_Dual_v1.labelator",
+      "sha256": "2602d1942c47df6809d5d00583a6ce173911cfe576aa780e36faae9dea1c418a",
+      "pageMm": "380 × 100 mm",
+      "printMode": "sheet",
+      "templateId": "ac4c76e0-42b0-4233-94d9-946516d43d80",
+      "catalogId": "simple_ovs_a3_dual"
+    },
+    {
+      "name": "Složivost A4",
+      "fileName": "Slozivost_A4_v1.labelator",
+      "href": "/downloads/labelator/Slozivost_A4_v1.labelator",
+      "sha256": "f4ce7e8a759b1253b43a8e142121e9c027b1d2b6dbd5ffeea908650b64df0c4b",
+      "pageMm": "210 × 148.5 mm",
+      "printMode": "sheet",
+      "templateId": "d74d79b4-d004-47d5-b9f2-373d06a3abcc",
+      "catalogId": "slozivost_a4"
+    },
+    {
+      "name": "Warehouse A3 Final",
+      "fileName": "Warehouse_A3_Final_v1.labelator",
+      "href": "/downloads/labelator/Warehouse_A3_Final_v1.labelator",
+      "sha256": "36b0a8ad3d8b43962c3549239b5a0406a2042da87421406bb2fd938333013aa5",
+      "pageMm": "420 × 297 mm",
+      "printMode": "1-up",
+      "templateId": "ee4837ef-c0f7-4ac9-8612-a689518ad7b0",
+      "catalogId": "warehouse_a3"
+    }
+  ]
+}

@@ -43,6 +43,17 @@ next-env.d.ts
 # copied into public/ during the GitHub Pages build
 /public/library.json
 
+# portable .labelator export artifacts (generated; not source of truth)
+/artifacts/
+
+# Local Python virtualenv (not source). Canonical renderer is tools/labelator_renderer.
+/tools/labelator_renderer_poc/.venv/
+/tools/**/__pycache__/
+**/*.pyc
+/tools/labelator_renderer/*.egg-info/
+/tools/labelator_renderer/**/*.egg-info/
+/tools/labelator_renderer/.venv/
+
 # local Pilot SQLite (Node / cloud mode)
 /data/labelator.db
 /data/labelator.db-journal

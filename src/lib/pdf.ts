@@ -774,7 +774,8 @@ async function generateCanvasPdf(
   return pdf.save();
 }
 
-async function generateVectorPdf(
+/** Vector pdf-lib path (also used by Node / golden harnesses when `document` is absent). */
+export async function generateVectorPdf(
   doc: LabelDocument,
   dataRows: Array<DataRow | null>,
   mapping: ColumnMapping,

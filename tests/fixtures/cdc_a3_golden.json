@@ -1,0 +1,38 @@
+{
+  "description": "Deterministic CDC A3 rows. barcode_pct appends a literal %; empty barcode falls back to warehouse_code.",
+  "templatePackage": "artifacts/packages/CDC_A3_v1.labelator",
+  "page": { "widthMm": 420, "heightMm": 297 },
+  "expectedPages": 6,
+  "rows": [
+    {
+      "building_name": "CDC",
+      "warehouse_code": "CDCNN.10.001",
+      "barcode": "CDCNN.10.001"
+    },
+    {
+      "building_name": "CDC",
+      "warehouse_code": "CDCNN.01.003",
+      "barcode": "CDCNN.01.003%"
+    },
+    {
+      "building_name": "CDC",
+      "warehouse_code": "CDCNN.99.007",
+      "barcode": ""
+    },
+    {
+      "building_name": "CDC",
+      "warehouse_code": "",
+      "barcode": ""
+    },
+    {
+      "building_name": "CDC",
+      "warehouse_code": "CDCNN.10.001",
+      "barcode": "0"
+    },
+    {
+      "building_name": "CDC WEST",
+      "warehouse_code": "WAREHOUSE-CODE-LONG",
+      "barcode": "WAREHOUSE-CODE-LONG"
+    }
+  ]
+}

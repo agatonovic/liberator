@@ -85,7 +85,7 @@ describe("labelator package format", () => {
     expect(build.manifest.exportedAt).toBe(A3_WAREHOUSE_PACKAGE_EXPORTED_AT);
     expect(build.manifest.template.name).toBe("Warehouse A3 Final");
     expect(build.manifest.template.page).toEqual({ widthMm: 420, heightMm: 297 });
-    expect(build.manifest.template.elementCount).toBe(24);
+    expect(build.manifest.template.elementCount).toBe(23);
     expect(build.manifest.requiredTransforms).toEqual(["part_number"]);
     expect(collectRequiredTransforms(doc)).toEqual(["part_number"]);
     expect(build.manifest.labelator?.templateId).toBe(A3_WAREHOUSE_TEMPLATE_ID);
@@ -127,15 +127,13 @@ describe("labelator package format", () => {
     const doc = liveA3();
     const build = buildA3WarehousePackage(doc, repoRoot);
     expect(build.template.kind).toBe("labelator.template");
-    expect(build.template.document.elements).toHaveLength(24);
+    expect(build.template.document.elements).toHaveLength(23);
     const part = build.template.document.elements.find((el) => el.transform === "part_number");
     expect(part?.binding).toBe("REFERENCA");
     expect(part?.spans?.some((span) => span.fill === "#FF2600")).toBe(true);
     const barcode = build.template.document.elements.find((el) => el.type === "barcode");
     expect(barcode?.style.barcodeSymbology).toBe("code39");
-    const image = build.template.document.elements.find((el) => el.type === "image");
-    expect(image?.assetFolderId).toBe(PACKAGING_FOLDER_ID);
-    expect(image?.binding).toBe("packaging");
+    expect(build.template.document.elements.some((el) => el.type === "image")).toBe(false);
   });
 
   it("validates a built package and rejects missing fonts", () => {
@@ -162,7 +160,7 @@ describe("labelator package format", () => {
     const contents = readLabelatorPackageFromZip(zip);
     const restored = documentFromPackage(contents);
     expect(renderingRelevant(restored)).toEqual(renderingRelevant(doc));
-    expect(restored.elements).toHaveLength(24);
+    expect(restored.elements).toHaveLength(23);
     expect(JSON.stringify(library)).toBe(beforeLibrary);
   });
 

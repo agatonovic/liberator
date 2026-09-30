@@ -60,7 +60,7 @@ describe("template JSON export", () => {
     expect(templateJsonFileName(payload.document)).toMatch(/^labelator-ga-address-v3\.json$/);
   });
 
-  it("exports Canopy, OVS dual, barcode, and image-bearing templates with their bindings", () => {
+  it("exports Canopy, OVS dual, barcode, and Warehouse A3 templates with their bindings", () => {
     const names = ["Canopy A3 — 3 PN", "OVS A3 dual", "GA Warehouse Dual", "Warehouse A3 Final "];
     for (const name of names) {
       const doc = library.documents.find((item) => item.name === name);

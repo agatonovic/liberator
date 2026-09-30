@@ -17,7 +17,7 @@
       "gapMm": 4,
       "marginMm": 8
     },
-    "elementCount": 24
+    "elementCount": 23
   },
   "fonts": [
     {
@@ -144,8 +144,7 @@
         "required": true,
         "example": "X4202",
         "elementBindings": [
-          "PAKOVANJE (MDR)",
-          "packaging"
+          "PAKOVANJE (MDR)"
         ]
       },
       {

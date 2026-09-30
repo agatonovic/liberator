@@ -7,7 +7,7 @@
     "version": 1,
     "id": "ee4837ef-c0f7-4ac9-8612-a689518ad7b0",
     "name": "Warehouse A3 Final ",
-    "updatedAt": "2026-08-25T18:46:00.000Z",
+    "updatedAt": "2026-09-30T09:40:00.000Z",
     "page": {
       "widthMm": 420,
       "heightMm": 297
@@ -73,21 +73,6 @@
           "strokeWidth": 2,
           "opacity": 1
         }
-      },
-      {
-        "id": "4bfb13ab-9464-44b1-a613-bd486e6dff46",
-        "type": "image",
-        "x": 298.80000000000024,
-        "y": 128.35555515374728,
-        "width": 111.70031926103383,
-        "height": 77.97938369619168,
-        "rotation": 0,
-        "style": {
-          "fill": "#000000",
-          "opacity": 1
-        },
-        "assetFolderId": "asset-folder-packaging",
-        "binding": "packaging"
       },
       {
         "id": "cda8b4de-2cd2-4a24-8ee2-c54a5561b531",

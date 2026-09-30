@@ -74,6 +74,7 @@ export function LabelPreview({
                 zoom={zoom}
                 value={resolveValue(element, row, mapping, doc.dataColumns)}
                 interactive={false}
+                missingImagePlaceholder={false}
                 onSelect={() => {}}
                 onDragEnd={() => {}}
               />

@@ -369,14 +369,17 @@ function LabelPhoto({
   width,
   height,
   fit,
+  placeholder,
 }: {
   src?: string;
   width: number;
   height: number;
   fit: ImageFit;
+  placeholder: boolean;
 }) {
   const image = useHtmlImage(src);
   if (!image) {
+    if (!placeholder) return null;
     if (src) return <Rect width={width} height={height} fill="#f6f3ec" stroke="#d9d4c8" dash={[4, 3]} />;
     return <ImagePlaceholder width={width} height={height} label="Image" />;
   }
@@ -400,6 +403,7 @@ export function CanvasElement({
   value,
   interactive,
   sampling = false,
+  missingImagePlaceholder = true,
   onSelect,
   onContextMenu,
   onDragMove,
@@ -415,6 +419,7 @@ export function CanvasElement({
   value: string;
   interactive: boolean;
   sampling?: boolean;
+  missingImagePlaceholder?: boolean;
   onSelect: (event: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => void;
   onContextMenu?: (event: Konva.KonvaEventObject<PointerEvent>) => void;
   onDragMove?: (event: Konva.KonvaEventObject<DragEvent>) => void;
@@ -635,6 +640,7 @@ export function CanvasElement({
           width={width}
           height={height}
           fit={imageFitOf(element)}
+          placeholder={missingImagePlaceholder}
         />
       ) : null}
     </Group>

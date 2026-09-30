@@ -650,33 +650,7 @@ async function drawElement(
         return;
       }
     }
-    if (!useDesignedMedia(element, value)) return;
-    paintNative((box) => {
-      page.drawRectangle({
-        x: box.x,
-        y: box.y,
-        width,
-        height,
-        color: rgb(0.96, 0.95, 0.93),
-        borderColor: rgb(0.85, 0.83, 0.78),
-        borderWidth: 0.75,
-        borderDashArray: [4, 3],
-        opacity,
-      });
-      const label = "IMAGE";
-      const fallback = fonts.get("IBM Plex Sans") ?? [...fonts.values()][0];
-      if (!fallback) return;
-      const fontSize = Math.min(11, Math.max(6, height * 0.18));
-      const textWidth = fallback.regular.widthOfTextAtSize(label, fontSize);
-      page.drawText(label, {
-        x: box.x + Math.max(0, (width - textWidth) / 2),
-        y: box.y + (height - fontSize) / 2,
-        size: fontSize,
-        font: fallback.regular,
-        color: rgb(0.54, 0.51, 0.46),
-        opacity,
-      });
-    });
+    return;
   }
 }
 

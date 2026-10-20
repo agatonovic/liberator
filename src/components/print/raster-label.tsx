@@ -2,6 +2,7 @@
 
 import { CanvasElement } from "@/components/designer/canvas-element";
 import { resolveBoundImageSrc } from "@/lib/assets";
+import { showMissingImagePlaceholder } from "@/lib/missing-image";
 import { useAssetStore } from "@/lib/asset-store";
 import { dataUrlToBytes } from "@/lib/codes";
 import type { LabelDocument } from "@/lib/document";
@@ -119,7 +120,7 @@ function OffscreenLabel({
               zoom={zoom}
               value={resolveValue(element, row, mapping, doc.dataColumns)}
               interactive={false}
-              missingImagePlaceholder={false}
+              missingImagePlaceholder={showMissingImagePlaceholder("generated")}
               onSelect={() => {}}
               onDragEnd={() => {}}
             />

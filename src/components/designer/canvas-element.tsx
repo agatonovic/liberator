@@ -16,6 +16,7 @@ import { imageDestination } from "@/lib/image";
 import { resolveBoundImageSrc, type AssetFolder, type AssetRecord } from "@/lib/assets";
 import { useAssetStore } from "@/lib/asset-store";
 import { gaMagacinPrefixSpans, normalizeArrow } from "@/lib/format";
+import { showMissingImagePlaceholder } from "@/lib/missing-image";
 import { useDesignedMedia } from "@/lib/resolve";
 import { isStrokeArrow, polygonPoints } from "@/lib/shapes";
 import { layoutRuns, runsFromContent, transferSpans } from "@/lib/text-color";
@@ -403,7 +404,7 @@ export function CanvasElement({
   value,
   interactive,
   sampling = false,
-  missingImagePlaceholder = true,
+  missingImagePlaceholder = showMissingImagePlaceholder("generated"),
   onSelect,
   onContextMenu,
   onDragMove,

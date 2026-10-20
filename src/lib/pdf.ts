@@ -650,6 +650,7 @@ async function drawElement(
         return;
       }
     }
+    // Generated output never paints an Image placeholder — empty cell unless `src` resolved.
     return;
   }
 }

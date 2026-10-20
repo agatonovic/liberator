@@ -3,6 +3,7 @@
 import { CanvasElement } from "@/components/designer/canvas-element";
 import { useLabelFonts } from "@/components/designer/use-label-fonts";
 import type { LabelDocument } from "@/lib/document";
+import { showMissingImagePlaceholder } from "@/lib/missing-image";
 import { resolveValue } from "@/lib/resolve";
 import { mmToPx } from "@/lib/units";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -73,6 +74,7 @@ export function TemplateThumbnail({
                   zoom={zoom}
                   value={resolveValue(element, null, {})}
                   interactive={false}
+                  missingImagePlaceholder={showMissingImagePlaceholder("design")}
                   onSelect={() => {}}
                   onDragEnd={() => {}}
                 />

@@ -21,6 +21,7 @@ import {
 import { computeDragGuides, computeResizeGuides, elementAabb, elementGuideBox, boxesIntersect, measureSelection, spacingMarks, type GuideMark } from "@/lib/guides";
 import { releasePartSplit } from "@/lib/format";
 import { designerResolveValue, type ColumnMapping, type DataRow } from "@/lib/resolve";
+import { showMissingImagePlaceholder } from "@/lib/missing-image";
 import { useAppStore } from "@/lib/store";
 import { toolFromShortcut } from "@/lib/tool-shortcuts";
 import { mmToPx, panAfterZoom, pxToMm, roundMm } from "@/lib/units";
@@ -880,6 +881,7 @@ export function DesignerCanvas({
               value={designerResolveValue(element, previewRow, mapping, doc.dataColumns)}
               interactive={!readOnly && !placing && !element.locked}
               sampling={sampling}
+              missingImagePlaceholder={showMissingImagePlaceholder("design")}
               onSelect={(event) => {
                 event.cancelBubble = true;
                 focusCanvas();

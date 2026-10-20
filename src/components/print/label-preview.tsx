@@ -3,6 +3,7 @@
 import { CanvasElement } from "@/components/designer/canvas-element";
 import { useLabelFonts } from "@/components/designer/use-label-fonts";
 import type { LabelDocument } from "@/lib/document";
+import { showMissingImagePlaceholder } from "@/lib/missing-image";
 import { resolveValue, type ColumnMapping, type DataRow } from "@/lib/resolve";
 import { mmToPx } from "@/lib/units";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -74,7 +75,7 @@ export function LabelPreview({
                 zoom={zoom}
                 value={resolveValue(element, row, mapping, doc.dataColumns)}
                 interactive={false}
-                missingImagePlaceholder={false}
+                missingImagePlaceholder={showMissingImagePlaceholder("generated")}
                 onSelect={() => {}}
                 onDragEnd={() => {}}
               />

@@ -311,6 +311,12 @@ export function PrintView() {
     setPaperOpen(true);
   }
 
+  function continueGenerate(onlyValid: boolean) {
+    setValidOnly(onlyValid);
+    setValidationOpen(false);
+    setPaperOpen(true);
+  }
+
   function downloadBlankExcel() {
     if (!doc) return;
     try {
@@ -668,13 +674,13 @@ export function PrintView() {
       </div>
 
       <Dialog open={validationOpen} onOpenChange={setValidationOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Validate data before generating</DialogTitle>
             <DialogDescription>
               {runStatus
-                ? `${runStatus.ready} of ${runStatus.filled} rows are ready. ${runStatusAttentionLabel(runStatus)} Invalid rows are not printed until they are fixed.`
-                : "Invalid rows are not printed until they are fixed."}
+                ? `${runStatus.ready} of ${runStatus.filled} rows are ready. ${runStatusAttentionLabel(runStatus)} You can generate the ready rows, or generate all rows anyway.`
+                : "You can generate the ready rows, or generate all rows anyway."}
             </DialogDescription>
           </DialogHeader>
           {runStatus ? (
@@ -705,7 +711,7 @@ export function PrintView() {
               })()}
             </div>
           ) : null}
-          <DialogFooter>
+          <DialogFooter className="sm:flex-col sm:items-stretch">
             <Button
               variant="outline"
               onClick={() => {
@@ -716,14 +722,18 @@ export function PrintView() {
               Review rejected rows
             </Button>
             <Button
+              variant={validPrintRows.length ? "default" : "outline"}
               disabled={!validPrintRows.length}
-              onClick={() => {
-                setValidOnly(true);
-                setValidationOpen(false);
-                setPaperOpen(true);
-              }}
+              onClick={() => continueGenerate(true)}
             >
               Generate valid rows
+            </Button>
+            <Button
+              variant={validPrintRows.length ? "outline" : "default"}
+              disabled={!allPrintRows.length}
+              onClick={() => continueGenerate(false)}
+            >
+              Generate anyway
             </Button>
           </DialogFooter>
         </DialogContent>

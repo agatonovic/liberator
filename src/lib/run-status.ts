@@ -1,5 +1,5 @@
 import { barcodeValueIssue } from "./codes";
-import { findAssetByValue, type AssetFolder, type AssetRecord } from "./assets";
+import type { AssetFolder, AssetRecord } from "./assets";
 import { isGaAddressTransform, type DataColumn, type LabelDocument } from "./document";
 import { schemaColumns } from "./excel";
 import { parseGaAddress } from "./format";
@@ -60,6 +60,8 @@ export function evaluateGenerateRun(
   assets: AssetRecord[] = [],
   folders: AssetFolder[] = [],
 ): GenerateRunStatus {
+  void assets;
+  void folders;
   const columns = schemaColumns(doc);
   const bindingIssues = missingBindings(doc, mapping, headers);
   if (!columns.length) {
@@ -69,9 +71,6 @@ export function evaluateGenerateRun(
   const addressKeys = new Set(
     doc.elements.filter((el) => isGaAddressTransform(el.transform) && el.binding).map((el) => el.binding as string),
   );
-  const imageBinds = doc.elements
-    .filter((el) => el.type === "image" && el.assetFolderId && el.binding?.trim())
-    .map((el) => ({ key: el.binding!.trim(), folderId: el.assetFolderId! }));
   const barcodeBinds = doc.elements
     .filter((el) => el.type === "barcode" && el.binding?.trim())
     .map((el) => ({ key: el.binding!.trim(), symbology: el.style.barcodeSymbology ?? "code128" }));
@@ -101,23 +100,11 @@ export function evaluateGenerateRun(
         pushCell(cells, reasons, header, "address", "Invalid address");
       }
     }
-    for (const bind of imageBinds) {
-      const value = cellValue(row, bind.key, mapping, doc);
-      if (!value) continue;
-      if (!findAssetByValue(assets, bind.folderId, value, folders)) {
-        const column = columns.find((item) => item.key === bind.key);
-        const header = column ? headerForColumn(column, mapping, headers) : undefined;
-        pushCell(cells, reasons, header, "image", "Missing image");
-      }
-    }
     for (const bind of barcodeBinds) {
       const value = cellValue(row, bind.key, mapping, doc);
       const column = columns.find((item) => item.key === bind.key);
       const header = column ? headerForColumn(column, mapping, headers) : undefined;
-      if (!value) {
-        pushCell(cells, reasons, header, "barcode", "Barcode value is missing");
-        continue;
-      }
+      if (!value) continue;
       const issue = barcodeValueIssue(value, bind.symbology);
       if (issue) {
         pushCell(cells, reasons, header, "barcode", issue);

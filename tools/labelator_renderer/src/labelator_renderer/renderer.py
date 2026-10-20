@@ -288,6 +288,7 @@ class Renderer:
         page.insert_image(box, stream=png, keep_proportion=False, overlay=True)
 
     def _draw_image(self, page, box, el, value: str) -> None:
+        # Generated PDF: skip missing photos. Do not paint an Image placeholder.
         if not value.strip():
             return
         folder = el.get("assetFolderId")
